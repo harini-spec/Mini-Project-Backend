@@ -1,0 +1,64 @@
+Models: [] - Key
+Bus: [Bus ID] (Number Plate), Route ID, Total no.of seats 
+Schedule: [Scehdule ID], Bus ID, Date of Departure, Date of Arrival, Driver ID
+Route Details: [Route ID], From, To 
+
+Driver: [Driver ID], Name, Age, Experience years
+User: [User ID], Name, Age, Phone, Email, Role(Customer, Admin), Reward points
+User Details: [User ID], Password Hash, Password encrypted, Status (for soft delete)
+Feedback: [Ticket ID], Feedback Date, Feedback Message, Rating
+
+Seats: [Seat ID], Bus ID, Seat Number, Seat Type, Price of seat  
+
+Tickets: 
+    [Ticket ID], User ID, Schedule ID, 
+    Status(Booked / Ride Over / Ticket cancelled), 
+    Total cost, Discount% (Based on reward points)
+
+Ticket Details: [Ticket ID], Seat ID  
+
+-----------------------------------------------------------------------------------------------------------------------------------/
+
+Working:
+    User Input : 
+        Bus ID, Route ID, Date of Departure, List of seats 
+
+    Add seats to Ticket Details table : 
+        Take each seat from the customer's input, first check completely if all the seats are available 
+        If yes, add them to the database one by one 
+        
+    CheckTicketAvailability: Params - Schedule ID, Seat ID 
+        Get all Tickets of given --  Schedule ID (Bus ID, Date of Depature), and of Status = active (double checking)
+        Get their Ticket IDs
+        Now get all the Ticket Details for given Ticket ID 
+        Check if given seat ID is available or already booked 
+        If available - true, else false 
+
+    Update Ride Status:
+        Once the ride is over, mark the ticket Status as - Completed 
+        This can be used to get customer's ticket booking history (Status = Completed --> History)
+
+    Calculate Total cost: 
+        In Seats table, get the Unit price of given seat type.
+        Multiple with no. of seats booked 
+        Calculate Discount:
+            Get Customer's reward points and convert to %
+        Minus the discount from total 
+
+    Calculate Reward points:
+        With each ticket booking, add 10 Reward points to customer. 
+
+    Ticket cancellation:
+        Refund the amount and reduce 20 reward points (10 more as penalty).
+        Change ticket status to cancelled (To get old record details - info abt reward pts penalty)
+
+    Reward points system:
+        1 ticket booking  = 10 Reward points 
+        100 reward points = 10% off 
+
+    Adding feedback: - can only provide for finished rides
+        Check if the status of the ticket is completed before inserting the feedback 
+
+-----------------------------------------------------------------------------------------------------------------------------------/
+
+Endpoints: 

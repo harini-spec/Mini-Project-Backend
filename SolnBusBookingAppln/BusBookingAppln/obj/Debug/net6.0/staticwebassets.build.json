@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "aChCXLffpZ54BWfHURIDDDVvObAJRWPh7LiYgUbrV/g=",
+  "Source": "BusBookingAppln",
+  "BasePath": "_content/BusBookingAppln",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

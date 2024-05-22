@@ -1,0 +1,207 @@
+Models: 
+
+    [] - Key
+
+    Bus: [Bus ID] (Number Plate), Total no.of seats 
+    Schedule: [Scehdule ID], Bus ID, Route ID, Date of Departure, Date of Arrival, Driver ID
+    Route: [Route ID], From, To 
+    Route Details: [Route ID, Stop number], From, To
+
+    Driver: [Driver ID], Name, Age, Phone, Experience years
+    User: [User ID], Name, Age, Phone, Email, Role(Customer, Admin)
+    Rewards: [User ID], Reward points
+    User Details: [User ID], Password Hash, Password encrypted, Status (for soft delete)
+    Feedback: [Ticket ID], Feedback Date, Feedback Message, Rating
+
+    Seats: [Seat ID], Bus ID, Seat Number, Seat Type, Price of seat  
+
+    Tickets: 
+        [Ticket ID], User ID, Schedule ID, 
+        Status(Not Booked / Booked / Ride Completed / Cancelled (all the tickets are cancelled)), 
+        Total cost, Date and Time of adding 
+
+    Ticket Details: [Ticket ID, Seat ID], Seat price, Passenger Name, Age, Gender, Status (Not Booked / Booked / Cancelled)
+
+    Payment: [Payment Transaction ID], Ticket ID, GST, Total Amount, Discount% (Based on reward points), Payment method, Payment date, Payment status (Success / Fail)
+
+    Refund: [Refund Transaction ID], Ticket ID, Refund Amount(Total cost in Ticket if full ticket cancelled, else calculate total seat cost from Ticket Details), Refund Date, Refund Status (Success / Fail)
+
+-----------------------------------------------------------------------------------------------------------------------------------/
+
+Endpoints: 
+
+Admin/Customer:
+    Post/Login
+        - Enter mail and password, Generates JWT Token
+
+
+Admin:
+    Post/Register Admin 
+        - Fill User Object and encrypt password - populate UserDetail Object, Role = Admin 
+    Post/Add Bus 
+        - Fill Bus Object and it's Nav prop SeatsInBus
+    Post/Add Route 
+        - Fill Route Object and it's Nav prop RouteDetails
+    Post/Add Driver
+        - Fill Driver Object
+    Post/Add Schedule 
+        - Fill Schedule Object with Bus Id, Route Id, Driver Id 
+    Put/UpdateRideStatus 
+        - Ticket status = Ride completed
+    
+
+Customer:
+    Post/Add Feedback 
+        - Fill Feedback Object only if Ticket Status = Ride Completed 
+
+    Post/Register Customer 
+        - Fill User Object and encrypt password - populate UserDetail Object, Role = Customer 
+
+    Get/BusesScheduledOnGivenDate 
+        - Buses Scheduled on a particular day are returned 
+        Input: 
+            - Date of Departure, Source, Destination
+                - Convert Source and Destination to Route ID 
+        Output:
+            - List of schedule objects 
+
+    Get/Check Ticket availability 
+        Input:
+            - Bus Id, List of Seat Numbers, Source, Destination, Date of departure
+                - Using these two, find the Seat ID (Check if seat number is in the bus)
+                - Convert source and dest to Route ID 
+                - Use Bus ID, Route ID, Date of departure - Scehdule ID 
+        CheckTicketAvailability:
+            - Check if Schedule Id in Ticket and Seat ID in Ticket Details 
+            - If Ticket Status = Booked 
+                - Check if Ticket Details Status of that particular seat = Booked 
+                - If booked, not available, if not available
+            - If Ticket Status = Cancelled 
+                - Go ahead to booking, available
+            - If Ticket Status = Not Booked 
+                - Check if its been 1 hr since them adding the ticket 
+                - If so, release ticket 
+                    - Release Ticket : Delete Ticket Details first, then ticket 
+                    - send available
+                - If not, not available 
+
+    Post/Book Ticket
+        Input:
+            - Bus Id, List of Seat Numbers, Source, Destination, Date of departure
+            - CheckTicketAvailability
+        Book Ticket:
+            Get Passenger details
+            Ticket Detail status = Not Booked 
+            Ticket status = Not Booked
+            Fill Ticket Detail object 
+            Calculate Total cost of seats from seats table 
+            Date and Time of adding 
+
+    Post/Make Payment 
+        Input:
+            - Ticket ID, Payment method
+        Logic:
+            - Calculate discount %:
+                - Reward system 
+                - Reduce user points if any present and if discount provided 
+            - Caculate total = total + gst - discount 
+            - Update status = Succes 
+            - Add 10 reward points to user
+
+    Delete/Cancel Ticket 
+        Input: 
+            - Ticket Id
+        Logic:
+            - Check if its on the day of the ride - No refund 
+            - Refund (total amount - gst amount) in payment (get Payemnt Id by ticket Id and status = success)
+            - Deduct 10 reward points provided to user while booking 
+            - Ticket status = Cancelled 
+            - Fill refund object 
+        Output:
+            - Refund object
+
+    Delete/Cancel Seats
+        Input:
+            - Cancellation DTO object: TicketID, seat ID
+        Logic:
+            - Check if its on the day of the ride - No refund 
+            - Refund amt of seat in ticket details 
+            - Change ticket details status = cancelled 
+            - Check if all ticket details status = "Cancelled" - Deduct 10 reward points from user, Ticket status = cancelled 
+            - Fill refund object 
+        Output:
+            - Refund object
+
+    Delete/User Account 
+        - Soft delete 
+
+-----------------------------------------------------------------------------------------------------------------------------------/
+
+Business logic:
+
+    User Input : 
+        Bus ID, Route ID, Date of Departure, List of seats 
+
+    Add seats to Ticket Details table : 
+        Take each seat from the customer's input, first check completely if all the seats are available 
+        If yes, add them to the database one by one 
+        
+    CheckTicketAvailability: Params - Schedule ID, Seat ID 
+        Get all Tickets of given -- Schedule ID (Bus ID, Date of Depature), and of Status = Booked (double checking)
+        Get their Ticket IDs
+        Now get all the Ticket Details for given Ticket ID 
+        Check if given seat ID is available or already booked (status)
+        If available - true, else false 
+
+    Update Ride Status:
+        Once the ride is over, mark the ticket Status as - Completed 
+        This can be used to get customer's ticket booking history (Status = Completed --> History)
+
+    Calculate Total cost for Ticket: 
+        In Seats table, get the Unit price of given seat.
+        Add them 
+
+    During Payment:
+        Calculate Reward points:
+            With each ticket booking, add 10 Reward points to customer. 
+                Reward points system:
+                    1 ticket booking  = 10 Reward points 
+                    100 reward points = 10% off 
+        Calculate Discount:
+            Get Customer's reward points and convert to %
+            Minus the rewards points of customer 
+            Minus the discount from total amount in ticket (exclude GST)
+
+    Ticket cancellation:
+        Cancellation DTO object: TicketID, seat ID
+        Total / Partial 
+        Total:
+            List of cancellation DTO objects
+        Partial:
+            Few cancellation DTO objects 
+
+        Cannot refund on the day of the ride 
+        Will get only the base amount
+        Refund the amount and fill refund table 
+        Don't refund the reward points 
+
+        Total:
+            -- Change ticket status - cancelled 
+        Partial:
+            -- Change ticket details status - cancelled 
+
+    Adding feedback: - can only provide for finished rides
+        Check if the status of the ticket is completed before inserting the feedback 
+
+    Payment : 
+        Once the payment is done, change the ticket status to booked. For payment, put some % of gst 
+
+    Release tickets :
+        While doing the payment - check
+        Delete ticket if status = Not booked, delete ticket details too 
+        If it's been 1 hr from the time of adding the ticket, release it - ticket status = Not booked 
+
+    1 Ticket - n Payments (For fail case)
+    1 Payment - n Refund (For fail case)
+
+-----------------------------------------------------------------------------------------------------------------------------------/

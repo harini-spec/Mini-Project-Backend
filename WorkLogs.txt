@@ -1,0 +1,5 @@
+Installed Packages:
+    Entity Framework core 
+    EF Core - SQL Server
+    EF Core - Tools
+    EF Core - JWT Bearer 

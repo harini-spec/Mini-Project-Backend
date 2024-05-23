@@ -14,7 +14,7 @@ namespace BusBookingAppln.Models.DBModels
 
 
         [Key]
-        public int TransactionId { get; set; }
+        public string TransactionId { get; set; }
 
 
         [Range(0, 100, ErrorMessage = "GST percentage must be between 0 and 100")]

@@ -5,11 +5,6 @@ namespace BusBookingAppln.Models.DBModels
 {
     public class UserDetail
     {
-        public UserDetail()
-        {
-            Status = "Active";
-        }
-
 
         [Key]
         [Required(ErrorMessage = "User ID can't be empty")]

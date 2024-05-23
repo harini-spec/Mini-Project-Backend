@@ -4,6 +4,7 @@ using BusBookingAppln.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusBookingAppln.Migrations
 {
     [DbContext(typeof(BusBookingContext))]
-    partial class BusBookingContextModelSnapshot : ModelSnapshot
+    [Migration("20240523080523_initial")]
+    partial class initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,6 +63,9 @@ namespace BusBookingAppln.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<int>("UserDetailsUserId")
+                        .HasColumnType("int");
+
                     b.Property<int>("YearsOfExperience")
                         .HasColumnType("int");
 
@@ -69,29 +74,9 @@ namespace BusBookingAppln.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("UserDetailsUserId");
+
                     b.ToTable("Drivers");
-                });
-
-            modelBuilder.Entity("BusBookingAppln.Models.DBModels.DriverDetail", b =>
-                {
-                    b.Property<int>("DriverId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("PasswordEncrypted")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<byte[]>("PasswordHashKey")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("DriverId");
-
-                    b.ToTable("DriversDetails");
                 });
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Feedback", b =>
@@ -429,15 +414,15 @@ namespace BusBookingAppln.Migrations
                     b.ToTable("UserDetails");
                 });
 
-            modelBuilder.Entity("BusBookingAppln.Models.DBModels.DriverDetail", b =>
+            modelBuilder.Entity("BusBookingAppln.Models.DBModels.Driver", b =>
                 {
-                    b.HasOne("BusBookingAppln.Models.DBModels.Driver", "DriverDetailsForDriver")
-                        .WithOne("DriverDetails")
-                        .HasForeignKey("BusBookingAppln.Models.DBModels.DriverDetail", "DriverId")
+                    b.HasOne("BusBookingAppln.Models.DBModels.UserDetail", "UserDetails")
+                        .WithMany()
+                        .HasForeignKey("UserDetailsUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("DriverDetailsForDriver");
+                    b.Navigation("UserDetails");
                 });
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Feedback", b =>
@@ -591,9 +576,6 @@ namespace BusBookingAppln.Migrations
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Driver", b =>
                 {
-                    b.Navigation("DriverDetails")
-                        .IsRequired();
-
                     b.Navigation("SchedulesForDriver");
                 });
 

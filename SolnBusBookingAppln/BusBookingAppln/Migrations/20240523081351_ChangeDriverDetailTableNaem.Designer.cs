@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusBookingAppln.Migrations
 {
     [DbContext(typeof(BusBookingContext))]
-    [Migration("20240522125734_initial")]
-    partial class initial
+    [Migration("20240523081351_ChangeDriverDetailTableNaem")]
+    partial class ChangeDriverDetailTableNaem
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,16 +26,13 @@ namespace BusBookingAppln.Migrations
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Bus", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("BusNumber")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("TotalSeats")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("BusNumber");
 
                     b.ToTable("Buses");
                 });
@@ -51,20 +48,52 @@ namespace BusBookingAppln.Migrations
                     b.Property<int>("Age")
                         .HasColumnType("int");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<int>("YearsOfExperience")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.ToTable("Drivers");
+                });
+
+            modelBuilder.Entity("BusBookingAppln.Models.DBModels.DriverDetail", b =>
+                {
+                    b.Property<int>("DriverId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("PasswordEncrypted")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordHashKey")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DriverId");
+
+                    b.ToTable("DriversDetails");
                 });
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Feedback", b =>
@@ -77,7 +106,8 @@ namespace BusBookingAppln.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("Rating")
                         .HasColumnType("int");
@@ -89,11 +119,8 @@ namespace BusBookingAppln.Migrations
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Payment", b =>
                 {
-                    b.Property<int>("TransactionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionId"), 1L, 1);
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<float>("DiscountPercentage")
                         .HasColumnType("real");
@@ -127,11 +154,8 @@ namespace BusBookingAppln.Migrations
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Refund", b =>
                 {
-                    b.Property<int>("TransactionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionId"), 1L, 1);
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<float>("RefundAmount")
                         .HasColumnType("real");
@@ -139,7 +163,7 @@ namespace BusBookingAppln.Migrations
                     b.Property<DateTime>("RefundDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("RefundStatus")
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -176,11 +200,13 @@ namespace BusBookingAppln.Migrations
 
                     b.Property<string>("Destination")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Source")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -197,11 +223,13 @@ namespace BusBookingAppln.Migrations
 
                     b.Property<string>("From_Location")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("To_Location")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("RouteId", "StopNumber");
 
@@ -216,8 +244,9 @@ namespace BusBookingAppln.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
+                    b.Property<string>("BusNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DateTimeOfArrival")
                         .HasColumnType("datetime2");
@@ -233,7 +262,7 @@ namespace BusBookingAppln.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BusId");
+                    b.HasIndex("BusNumber");
 
                     b.HasIndex("DriverId");
 
@@ -250,22 +279,23 @@ namespace BusBookingAppln.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
+                    b.Property<string>("BusNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("SeatNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("SeatNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("SeatPrice")
                         .HasColumnType("real");
 
                     b.Property<string>("SeatType")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BusId");
+                    b.HasIndex("BusNumber");
 
                     b.ToTable("Seats");
                 });
@@ -320,11 +350,12 @@ namespace BusBookingAppln.Migrations
 
                     b.Property<string>("PassengerName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PassengerPhone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<float>("SeatPrice")
                         .HasColumnType("real");
@@ -353,21 +384,27 @@ namespace BusBookingAppln.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -392,6 +429,17 @@ namespace BusBookingAppln.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("UserDetails");
+                });
+
+            modelBuilder.Entity("BusBookingAppln.Models.DBModels.DriverDetail", b =>
+                {
+                    b.HasOne("BusBookingAppln.Models.DBModels.Driver", "DriverDetailsForDriver")
+                        .WithOne("DriverDetails")
+                        .HasForeignKey("BusBookingAppln.Models.DBModels.DriverDetail", "DriverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DriverDetailsForDriver");
                 });
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Feedback", b =>
@@ -453,7 +501,7 @@ namespace BusBookingAppln.Migrations
                 {
                     b.HasOne("BusBookingAppln.Models.DBModels.Bus", "ScheduledBus")
                         .WithMany("SchedulesForBus")
-                        .HasForeignKey("BusId")
+                        .HasForeignKey("BusNumber")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -480,7 +528,7 @@ namespace BusBookingAppln.Migrations
                 {
                     b.HasOne("BusBookingAppln.Models.DBModels.Bus", "SeatInBus")
                         .WithMany("SeatsInBus")
-                        .HasForeignKey("BusId")
+                        .HasForeignKey("BusNumber")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -545,6 +593,9 @@ namespace BusBookingAppln.Migrations
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Driver", b =>
                 {
+                    b.Navigation("DriverDetails")
+                        .IsRequired();
+
                     b.Navigation("SchedulesForDriver");
                 });
 
@@ -562,8 +613,7 @@ namespace BusBookingAppln.Migrations
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Ticket", b =>
                 {
-                    b.Navigation("FeedbackForRide")
-                        .IsRequired();
+                    b.Navigation("FeedbackForRide");
 
                     b.Navigation("PaymentsForTicket");
 
@@ -574,8 +624,7 @@ namespace BusBookingAppln.Migrations
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.User", b =>
                 {
-                    b.Navigation("RewardsOfUser")
-                        .IsRequired();
+                    b.Navigation("RewardsOfUser");
 
                     b.Navigation("TicketsAdded");
 

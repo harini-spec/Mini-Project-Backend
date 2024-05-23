@@ -17,18 +17,11 @@ Async
 Unit Test 
 Model state - check in controller (When you check this, it checks if the required fields are empty, else only when inserting to db)
 Validations for DTOs too 
-
-
-By Thursday: 
-    ERD and the whole models planned
-    Including validations
-    Documentation - Like the assessment qn
-    Sequence Diagram
-    Plan endpoints 
-
+Catch general exception and throw it in service / seperate exceptions in controller 
 
 Work Plan:
     Add Async
     Repo layer 
     Register and Login - for User and admin 
     Admin side - Services, Controllers, Exceptions, Unit tests 
+    dbexception in update and delete, InvalidOperationException - validation exception 

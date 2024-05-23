@@ -11,6 +11,7 @@ namespace BusBookingAppln.Contexts
 
         public DbSet<Bus> Buses { get; set; }
         public DbSet<Driver> Drivers { get; set; }
+        public DbSet<DriverDetail> DriversDetails { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Refund> Refunds { get; set; }
@@ -28,6 +29,14 @@ namespace BusBookingAppln.Contexts
         {
             modelBuilder.Entity<RouteDetail>().HasKey(rd => new { rd.RouteId, rd.StopNumber });
             modelBuilder.Entity<TicketDetail>().HasKey(td => new { td.TicketId, td.SeatId });
+
+            modelBuilder.Entity<Driver>()
+            .HasIndex(d => d.Email)
+            .IsUnique();
+
+            modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
 
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.TicketPaidFor)
@@ -56,7 +65,7 @@ namespace BusBookingAppln.Contexts
             modelBuilder.Entity<Schedule>()
                 .HasOne(s => s.ScheduledBus)
                 .WithMany(b => b.SchedulesForBus)
-                .HasForeignKey(s => s.BusId)
+                .HasForeignKey(s => s.BusNumber)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Schedule>()
@@ -68,7 +77,7 @@ namespace BusBookingAppln.Contexts
             modelBuilder.Entity<Seat>()
                 .HasOne(s => s.SeatInBus)
                 .WithMany(b => b.SeatsInBus)
-                .HasForeignKey(s => s.BusId)
+                .HasForeignKey(s => s.BusNumber)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Ticket>()

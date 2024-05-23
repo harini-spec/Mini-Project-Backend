@@ -12,12 +12,12 @@ namespace BusBookingAppln.Models.DBModels
 
 
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
 
-        [Required(ErrorMessage = "Bus ID can't be empty")]
-        [Range(1, int.MaxValue, ErrorMessage = "Bus ID must be greater than 0")]
-        public int BusId { get; set; }
+        [Required(ErrorMessage = "Bus Number can't be empty")]
+        public string BusNumber { get; set; }
         public Bus SeatInBus { get; set; }
 
 

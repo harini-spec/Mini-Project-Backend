@@ -1,4 +1,6 @@
 using BusBookingAppln.Contexts;
+using BusBookingAppln.Models.DBModels;
+using BusBookingAppln.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -62,6 +64,25 @@ namespace BusBookingAppln
             builder.Services.AddDbContext<BusBookingContext>(
                options => options.UseSqlServer(builder.Configuration.GetConnectionString("defaultConnection"))
                );
+            #endregion
+
+            #region repositories
+            builder.Services.AddScoped<IRepository<string, Bus>, BusRepository>();
+            builder.Services.AddScoped<IRepository<int, Driver>, MainRepository<int, Driver>>();
+            builder.Services.AddScoped<IRepository<int, DriverDetail>, MainRepository<int, DriverDetail>>();
+            builder.Services.AddScoped<IRepository<int, Feedback>, MainRepository<int, Feedback>>();
+            builder.Services.AddScoped<IRepository<string, Payment>, PaymentRepository>();
+            builder.Services.AddScoped<IRepository<string, Refund>, RefundRepository>();
+            builder.Services.AddScoped<IRepository<int, Reward>, MainRepository<int, Reward>>();
+            builder.Services.AddScoped<IRepository<int, Models.DBModels.Route>, MainRepository<int, Models.DBModels.Route>>();
+            builder.Services.AddScoped<IRepository<int, Schedule>, MainRepository<int, Schedule>>();
+            builder.Services.AddScoped<IRepository<int, Seat>, MainRepository<int, Seat>>();
+            builder.Services.AddScoped<IRepository<int, Ticket>, MainRepository<int, Ticket>>();
+            builder.Services.AddScoped<IRepository<int, User>, MainRepository<int, User>>();
+            builder.Services.AddScoped<IRepository<int, UserDetail>, MainRepository<int, UserDetail>>();
+            builder.Services.AddScoped<IRepositoryCompositeKey<int, RouteDetail>, RouteDetailRepository>();
+            builder.Services.AddScoped<IRepositoryCompositeKey<int, TicketDetail>, TicketDetailRepository>();
+
             #endregion
 
             var app = builder.Build();

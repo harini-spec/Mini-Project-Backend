@@ -1,0 +1,52 @@
+﻿
+using BusBookingAppln.Contexts;
+using BusBookingAppln.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Data.Common;
+
+namespace BusBookingAppln.Repositories
+{
+    public abstract class BaseRepository<K, T> : IRepository<K, T> where T : class
+    {
+        public readonly BusBookingContext _context;
+
+        public BaseRepository(BusBookingContext context)
+        {
+            _context = context;
+        }
+
+        public virtual async Task<T> Add(T entity)
+        {
+            try
+            {
+                _context.Add(entity);
+                await _context.SaveChangesAsync();
+                return entity;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new DbUpdateConcurrencyCustomException();
+            }
+            catch (DbUpdateException)
+            {
+                throw new DbUpdateCustomException();
+            }
+        }
+
+        public virtual async Task<IList<T>> GetAll()
+        {
+            var items = await _context.Set<T>().ToListAsync();
+            if(items.Count == 0)
+            {
+                throw new NoItemsFoundException($"No entities of type {typeof(T).Name} are found.");
+            }
+            return items;
+        }
+
+        public abstract Task<T> GetById(K key);
+        public abstract Task<T> Update(T entity);
+        public abstract Task<T> Delete(K key);
+
+    }
+}

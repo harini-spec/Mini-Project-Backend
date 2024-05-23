@@ -8,6 +8,7 @@ Models:
     Route Details: [Route ID, Stop number], From, To
 
     Driver: [Driver ID], Name, Age, Phone, Experience years
+    Driver Details: [Driver ID], Password Hash, Password encrypted, Status (for soft delete)
     User: [User ID], Name, Age, Phone, Email, Role(Customer, Admin)
     Rewards: [User ID], Reward points
     User Details: [User ID], Password Hash, Password encrypted, Status (for soft delete)
@@ -34,21 +35,30 @@ Admin/Customer:
     Post/Login
         - Enter mail and password, Generates JWT Token
 
-
 Admin:
     Post/Register Admin 
         - Fill User Object and encrypt password - populate UserDetail Object, Role = Admin 
+        - Status = Active for one admin 
+    Put/Active admin account 
+        - One admin is active - can activate others 
     Post/Add Bus 
         - Fill Bus Object and it's Nav prop SeatsInBus
     Post/Add Route 
         - Fill Route Object and it's Nav prop RouteDetails
     Post/Add Driver
-        - Fill Driver Object
+        - Fill Driver Object, UserDetail status = "Inactive", Default password = "Root"
     Post/Add Schedule 
         - Fill Schedule Object with Bus Id, Route Id, Driver Id 
     Put/UpdateRideStatus 
         - Ticket status = Ride completed
-    
+    Put/Activate driver account 
+        - UserDetail Status = Active
+
+Driver:
+    Put/Change password 
+        - If UserDetail status = "Active", get password and update 
+    Get/AllSchedules
+        - All schedule info
 
 Customer:
     Post/Add Feedback 
@@ -56,6 +66,7 @@ Customer:
 
     Post/Register Customer 
         - Fill User Object and encrypt password - populate UserDetail Object, Role = Customer 
+        - Status = Active 
 
     Get/BusesScheduledOnGivenDate 
         - Buses Scheduled on a particular day are returned 
@@ -134,6 +145,7 @@ Customer:
 
     Delete/User Account 
         - Soft delete 
+
 
 -----------------------------------------------------------------------------------------------------------------------------------/
 

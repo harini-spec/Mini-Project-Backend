@@ -12,6 +12,7 @@ namespace BusBookingAppln.Models.DBModels
 
 
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
 

@@ -12,7 +12,7 @@ namespace BusBookingAppln.Models.DBModels
         }
 
         [Key]
-        public int TransactionId { get; set; }
+        public string TransactionId { get; set; }
 
 
         [Required(ErrorMessage = "Refund amount can't be empty")]

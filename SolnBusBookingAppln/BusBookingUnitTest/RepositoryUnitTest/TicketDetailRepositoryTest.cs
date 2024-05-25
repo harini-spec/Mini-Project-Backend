@@ -2,6 +2,7 @@
 using BusBookingAppln.Exceptions;
 using BusBookingAppln.Models.DBModels;
 using BusBookingAppln.Repositories;
+using BusBookingAppln.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -22,7 +23,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task AddTicketDetailSuccessTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
+            IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
 
             // Action
             var result = await ticketDetailRepository.Add(new TicketDetail
@@ -47,7 +48,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task AddTicketDetailInvalidOperationExceptionTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
+            IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             var result = await ticketDetailRepository.Add(new TicketDetail
             {
                 TicketId = 2,
@@ -82,7 +83,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetTicketDetailSuccessTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
+            IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             await ticketDetailRepository.Add(new TicketDetail
             {
                 TicketId = 3,
@@ -108,7 +109,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetTicketDetailFailureTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
+            IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
 
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await ticketDetailRepository.GetById(100, 3));
@@ -121,7 +122,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task DeleteTicketDetailExceptionTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
+            IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
 
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await ticketDetailRepository.Delete(100, 3));
@@ -134,7 +135,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetAllTicketDetailsFailTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
+            IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             await ticketDetailRepository.Delete(2, 1);
 
             // Action
@@ -148,7 +149,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetAllTicketDetailsSuccessTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
+            IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             await ticketDetailRepository.Add(new TicketDetail
             {
                 TicketId = 4,
@@ -174,7 +175,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task UpdateTicketDetailExceptionTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
+            IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             var ticketDetail = new TicketDetail
             {
                 TicketId = 100,
@@ -198,7 +199,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task DeleteTicketDetailSuccessTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
+            IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             await ticketDetailRepository.Add(new TicketDetail
             {
                 TicketId = 5,
@@ -222,7 +223,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task UpdateTicketDetailSuccessTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
+            IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             await ticketDetailRepository.Add(new TicketDetail
             {
                 TicketId = 6,

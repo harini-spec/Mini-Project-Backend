@@ -1,8 +1,12 @@
 using BusBookingAppln.Contexts;
 using BusBookingAppln.Models.DBModels;
-using BusBookingAppln.Repositories;
+using BusBookingAppln.Repositories.Classes;
+using BusBookingAppln.Repositories.Interfaces;
+using BusBookingAppln.Services.Classes;
+using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -67,23 +71,38 @@ namespace BusBookingAppln
             #endregion
 
             #region repositories
-            builder.Services.AddScoped<IRepository<string, Bus>, BusRepository>();
-            builder.Services.AddScoped<IRepository<int, Driver>, MainRepository<int, Driver>>();
+            builder.Services.AddScoped<IRepository<string, Bus>, MainRepository<string, Bus>>();
+            // builder.Services.AddScoped<IRepository<int, Driver>, MainRepository<int, Driver>>();
+            builder.Services.AddScoped<IRepository<int, Driver>, DriverWithScheduleRepository>();
             builder.Services.AddScoped<IRepository<int, DriverDetail>, MainRepository<int, DriverDetail>>();
             builder.Services.AddScoped<IRepository<int, Feedback>, MainRepository<int, Feedback>>();
-            builder.Services.AddScoped<IRepository<string, Payment>, PaymentRepository>();
-            builder.Services.AddScoped<IRepository<string, Refund>, RefundRepository>();
+            builder.Services.AddScoped<IRepository<string, Payment>, MainRepository<string, Payment>>();
+            builder.Services.AddScoped<IRepository<string, Refund>, MainRepository<string, Refund>>();
             builder.Services.AddScoped<IRepository<int, Reward>, MainRepository<int, Reward>>();
-            builder.Services.AddScoped<IRepository<int, Models.DBModels.Route>, MainRepository<int, Models.DBModels.Route>>();
+            builder.Services.AddScoped<IRepository<int, BusRoute>, MainRepository<int, BusRoute>>();
             builder.Services.AddScoped<IRepository<int, Schedule>, MainRepository<int, Schedule>>();
             builder.Services.AddScoped<IRepository<int, Seat>, MainRepository<int, Seat>>();
             builder.Services.AddScoped<IRepository<int, Ticket>, MainRepository<int, Ticket>>();
             builder.Services.AddScoped<IRepository<int, User>, MainRepository<int, User>>();
             builder.Services.AddScoped<IRepository<int, UserDetail>, MainRepository<int, UserDetail>>();
-            builder.Services.AddScoped<IRepositoryCompositeKey<int, RouteDetail>, RouteDetailRepository>();
-            builder.Services.AddScoped<IRepositoryCompositeKey<int, TicketDetail>, TicketDetailRepository>();
+            builder.Services.AddScoped<IRepositoryCompositeKey<int, int, RouteDetail>, RouteDetailRepository>();
+            builder.Services.AddScoped<IRepositoryCompositeKey<int, int, TicketDetail>, TicketDetailRepository>();
+
 
             #endregion
+
+            #region services 
+
+            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddScoped<IDriverService, DriverService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IBusService, BusService>();
+            builder.Services.AddScoped<IRouteService, RouteService>();
+            builder.Services.AddScoped<IScheduleService, ScheduleService>();
+            #endregion
+
+
 
             var app = builder.Build();
 
@@ -94,6 +113,7 @@ namespace BusBookingAppln
                 app.UseSwaggerUI();
             }
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

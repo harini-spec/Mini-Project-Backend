@@ -1,11 +1,11 @@
-﻿
-using BusBookingAppln.Contexts;
+﻿using BusBookingAppln.Contexts;
 using BusBookingAppln.Exceptions;
+using BusBookingAppln.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Data.Common;
 
-namespace BusBookingAppln.Repositories
+namespace BusBookingAppln.Repositories.Classes
 {
     public abstract class BaseRepository<K, T> : IRepository<K, T> where T : class
     {
@@ -33,7 +33,7 @@ namespace BusBookingAppln.Repositories
         public virtual async Task<IList<T>> GetAll()
         {
             var items = await _context.Set<T>().ToListAsync();
-            if(items.Count == 0)
+            if (items.Count == 0)
             {
                 throw new NoItemsFoundException($"No entities of type {typeof(T).Name} are found.");
             }

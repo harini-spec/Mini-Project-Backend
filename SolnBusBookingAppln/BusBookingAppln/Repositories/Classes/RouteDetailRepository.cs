@@ -1,11 +1,12 @@
 ﻿using BusBookingAppln.Contexts;
 using BusBookingAppln.Exceptions;
 using BusBookingAppln.Models.DBModels;
+using BusBookingAppln.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace BusBookingAppln.Repositories
+namespace BusBookingAppln.Repositories.Classes
 {
-    public class RouteDetailRepository : IRepositoryCompositeKey<int, RouteDetail>
+    public class RouteDetailRepository : IRepositoryCompositeKey<int, int, RouteDetail>
     {
         public readonly BusBookingContext _context;
 
@@ -26,7 +27,7 @@ namespace BusBookingAppln.Repositories
             {
                 throw new InvalidOperationCustomException();
             }
-            
+
         }
 
         public virtual async Task<IList<RouteDetail>> GetAll()

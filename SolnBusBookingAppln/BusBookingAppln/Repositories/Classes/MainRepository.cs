@@ -3,7 +3,7 @@ using BusBookingAppln.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace BusBookingAppln.Repositories
+namespace BusBookingAppln.Repositories.Classes
 {
     public class MainRepository<K, T> : BaseRepository<K, T> where T : class
     {

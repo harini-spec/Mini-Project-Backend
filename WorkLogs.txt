@@ -6,8 +6,6 @@ Installed Packages:
     EF Core - InMemory
 
 Repository Layer:
-    For Primary Key - IRepository - Base Repository 
-                                  - Int ID        - Main Repository
-                                  - String ID     - Seperate Repository   (Concrete Class)
-
-    For Composite Key - IRepositoryCompositeKey - Seperate Repository       (Concrete Class)
+    For Primary Key     - IRepository - Base Repository - Main Repository
+    For Include         - IRepository - Concrete Class
+    For Composite Key   - IRepositoryCompositeKey - Concrete Class

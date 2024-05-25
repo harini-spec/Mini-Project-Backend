@@ -1,11 +1,12 @@
 ﻿using BusBookingAppln.Contexts;
 using BusBookingAppln.Exceptions;
 using BusBookingAppln.Models.DBModels;
+using BusBookingAppln.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace BusBookingAppln.Repositories
+namespace BusBookingAppln.Repositories.Classes
 {
-    public class TicketDetailRepository : IRepositoryCompositeKey<int, TicketDetail>
+    public class TicketDetailRepository : IRepositoryCompositeKey<int, int, TicketDetail>
     {
         public readonly BusBookingContext _context;
 

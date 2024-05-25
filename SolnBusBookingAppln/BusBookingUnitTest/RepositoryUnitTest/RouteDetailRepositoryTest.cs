@@ -2,6 +2,7 @@
 using BusBookingAppln.Exceptions;
 using BusBookingAppln.Models.DBModels;
 using BusBookingAppln.Repositories;
+using BusBookingAppln.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -22,7 +23,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task AddRouteDetailSuccessTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
+            IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
 
             // Action
             var result = await routeDetailRepository.Add(new RouteDetail
@@ -43,7 +44,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task AddRouteDetailInvalidOperationExceptionTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
+            IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             var result = await routeDetailRepository.Add(new RouteDetail
             {
                 RouteId = 2,
@@ -70,7 +71,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetRouteDetailSuccessTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
+            IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             await routeDetailRepository.Add(new RouteDetail
             {
                 RouteId = 3,
@@ -92,7 +93,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetRouteDetailFailureTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
+            IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
 
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await routeDetailRepository.GetById(100, 3));
@@ -105,7 +106,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task DeleteRouteDetailExceptionTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
+            IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
 
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await routeDetailRepository.Delete(100, 3));
@@ -118,7 +119,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetAllRouteDetailsFailTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
+            IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             await routeDetailRepository.Delete(2, 1);
 
             // Action
@@ -132,7 +133,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetAllRouteDetailsSuccessTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
+            IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             await routeDetailRepository.Add(new RouteDetail
             {
                 RouteId = 4,
@@ -154,7 +155,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task UpdateRouteDetailExceptionTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
+            IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             var routeDetail = new RouteDetail
             {
                 RouteId = 100,
@@ -174,7 +175,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task DeleteRouteDetailSuccessTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
+            IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             await routeDetailRepository.Add(new RouteDetail
             {
                 RouteId = 5,
@@ -194,7 +195,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task UpdateRouteDetailSuccessTest()
         {
             // Arrange
-            IRepositoryCompositeKey<int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
+            IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             await routeDetailRepository.Add(new RouteDetail
             {
                 RouteId = 6,

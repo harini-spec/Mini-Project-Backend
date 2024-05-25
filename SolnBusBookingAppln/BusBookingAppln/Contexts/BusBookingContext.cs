@@ -15,7 +15,7 @@ namespace BusBookingAppln.Contexts
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Refund> Refunds { get; set; }
-        public DbSet<Models.DBModels.Route> Routes { get; set; }    
+        public DbSet<BusRoute> Routes { get; set; }    
         public DbSet<User> Users { get; set; }
         public DbSet<UserDetail> UserDetails { get; set; }
         public DbSet<Reward> Rewards { get; set; }

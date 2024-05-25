@@ -14,7 +14,6 @@ namespace BusBookingAppln.Models.DBModels
         public string BusNumber { get; set; }
 
 
-        [Range(10, 50, ErrorMessage = "Invalid entry for Total Seats")]
         public int TotalSeats { get; set; }
 
 

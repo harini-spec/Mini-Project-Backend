@@ -1,4 +1,4 @@
-﻿namespace BusBookingAppln.Repositories
+﻿namespace BusBookingAppln.Repositories.Interfaces
 {
     public interface IRepository<K, T> where T : class
     {

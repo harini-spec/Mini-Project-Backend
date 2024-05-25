@@ -38,7 +38,6 @@ Admin/Customer:
 Admin:
     Post/Register Admin 
         - Fill User Object and encrypt password - populate UserDetail Object, Role = Admin 
-        - Status = Active for one admin 
     Put/Active admin account 
         - One admin is active - can activate others 
     Post/Add Bus 

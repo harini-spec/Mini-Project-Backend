@@ -24,13 +24,9 @@ namespace BusBookingAppln.Repositories
                 await _context.SaveChangesAsync();
                 return entity;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (InvalidOperationException)
             {
-                throw new DbUpdateConcurrencyCustomException();
-            }
-            catch (DbUpdateException)
-            {
-                throw new DbUpdateCustomException();
+                throw new InvalidOperationCustomException();
             }
         }
 
@@ -45,7 +41,7 @@ namespace BusBookingAppln.Repositories
         }
 
         public abstract Task<T> GetById(K key);
-        public abstract Task<T> Update(T entity);
+        public abstract Task<T> Update(T entity, K key);
         public abstract Task<T> Delete(K key);
 
     }

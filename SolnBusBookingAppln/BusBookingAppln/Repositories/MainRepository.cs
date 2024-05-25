@@ -9,17 +9,24 @@ namespace BusBookingAppln.Repositories
     {
         private readonly DbSet<T> _dbSet;
 
-        protected MainRepository(BusBookingContext context) : base(context)
+        public MainRepository(BusBookingContext context) : base(context)
         {
             _dbSet = _context.Set<T>();
         }
 
         public override async Task<T> Delete(K key)
         {
-            var item = await GetById(key);
-            _context.Remove(item);
-            await _context.SaveChangesAsync();
-            return item;
+            try
+            {
+                var item = await GetById(key);
+                _context.Remove(item);
+                await _context.SaveChangesAsync();
+                return item;
+            }
+            catch (EntityNotFoundException)
+            {
+                throw;
+            }
         }
 
         public override async Task<T> GetById(K key)
@@ -30,13 +37,16 @@ namespace BusBookingAppln.Repositories
             return item;
         }
 
-        public override async Task<T> Update(T entity)
+        public override async Task<T> Update(T entity, K key)
         {
-            _context.Update(entity);
-            int result = await _context.SaveChangesAsync();
-            if (result == 0)
-                throw new EntityNotFoundException($"Entity of type {typeof(T).Name} with specified ID not found.");
-            return entity;
+            try
+            {
+                await GetById(key);
+                _context.Update(entity);
+                int result = await _context.SaveChangesAsync();
+                return entity;
+            }
+            catch (EntityNotFoundException) { throw; }
         }
     }
 }

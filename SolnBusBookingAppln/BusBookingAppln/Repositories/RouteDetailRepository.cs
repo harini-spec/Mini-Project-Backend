@@ -22,14 +22,11 @@ namespace BusBookingAppln.Repositories
                 await _context.SaveChangesAsync();
                 return entity;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (InvalidOperationException)
             {
-                throw new DbUpdateConcurrencyCustomException();
+                throw new InvalidOperationCustomException();
             }
-            catch (DbUpdateException)
-            {
-                throw new DbUpdateCustomException();
-            }
+            
         }
 
         public virtual async Task<IList<RouteDetail>> GetAll()
@@ -61,9 +58,9 @@ namespace BusBookingAppln.Repositories
         public async Task<RouteDetail> Update(RouteDetail entity)
         {
             var item = await GetById(entity.RouteId, entity.StopNumber);
-            _context.Update(item);
+            _context.Update(entity);
             await _context.SaveChangesAsync();
-            return item;
+            return entity;
         }
     }
 }

@@ -24,4 +24,4 @@ Work Plan:
     Repo layer 
     Register and Login - for User and admin 
     Admin side - Services, Controllers, Exceptions, Unit tests 
-    dbexception in update and delete, InvalidOperationException - validation exception 
+    Exceptions: OperationCanceledException, DbUpdateException, DbUpdateConcurrencyException, same key? - InvalidOperationException

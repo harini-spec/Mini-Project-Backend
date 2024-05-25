@@ -2,12 +2,12 @@
 
 namespace BusBookingAppln.Exceptions
 {
-    public class DbUpdateCustomException : Exception
+    public class InvalidOperationCustomException : Exception
     {
         string msg;
-        public DbUpdateCustomException()
+        public InvalidOperationCustomException()
         {
-            msg = "Database exception: DbUpdateException";
+            msg = "Invalid operation : Key already present in DB";
         }
         public override string Message => msg;
     }

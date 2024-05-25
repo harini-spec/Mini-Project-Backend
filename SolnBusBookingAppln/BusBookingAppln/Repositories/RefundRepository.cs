@@ -27,12 +27,12 @@ namespace BusBookingAppln.Repositories
             return item;
         }
 
-        public async override Task<Refund> Update(Refund entity)
+        public async override Task<Refund> Update(Refund entity, string key)
         {
-            var item = await GetById(entity.TransactionId);
-            _context.Update(item);
+            await GetById(key);
+            _context.Update(entity);
             await _context.SaveChangesAsync();
-            return item;
+            return entity;
         }
     }
 }

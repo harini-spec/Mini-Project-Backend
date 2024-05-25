@@ -13,10 +13,17 @@ namespace BusBookingAppln.Repositories
 
         public async override Task<Bus> Delete(string key)
         {
-            var item = await GetById(key);
-            _context.Remove(item);
-            await _context.SaveChangesAsync();
-            return item;
+            try
+            {
+                var item = await GetById(key);
+                _context.Remove(item);
+                await _context.SaveChangesAsync();
+                return item;
+            }
+            catch (EntityNotFoundException)
+            {
+                throw;
+            }
         }
 
         public async override Task<Bus> GetById(string key)
@@ -27,12 +34,16 @@ namespace BusBookingAppln.Repositories
             return item;
         }
 
-        public async override Task<Bus> Update(Bus entity)
+        public async override Task<Bus> Update(Bus entity, string key)
         {
-            var item = await GetById(entity.BusNumber);
-            _context.Update(entity);
-            await _context.SaveChangesAsync();
-            return item;
+            try
+            {
+                var item = await GetById(key);
+                _context.Update(entity);
+                await _context.SaveChangesAsync();
+                return entity;
+            }
+            catch (EntityNotFoundException) { throw; }
         }
     }
 }

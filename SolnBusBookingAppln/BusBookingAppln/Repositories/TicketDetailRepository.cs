@@ -22,13 +22,9 @@ namespace BusBookingAppln.Repositories
                 await _context.SaveChangesAsync();
                 return entity;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (InvalidOperationException)
             {
-                throw new DbUpdateConcurrencyCustomException();
-            }
-            catch (DbUpdateException)
-            {
-                throw new DbUpdateCustomException();
+                throw new InvalidOperationCustomException();
             }
         }
 
@@ -60,10 +56,10 @@ namespace BusBookingAppln.Repositories
 
         public async Task<TicketDetail> Update(TicketDetail entity)
         {
-            var item = await GetById(entity.TicketId, entity.SeatId);
-            _context.Update(item);
+            await GetById(entity.TicketId, entity.SeatId);
+            _context.Update(entity);
             await _context.SaveChangesAsync();
-            return item;
+            return entity;
         }
     }
 }

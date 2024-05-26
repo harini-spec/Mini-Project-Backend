@@ -103,7 +103,7 @@ namespace BusBookingAppln.Services.Classes
             List<GetScheduleDTO> SchedulesOfDriver = MapScheduleToGetScheduleDTO(schedules);    
             if(schedules.Count == 0)
             {
-                throw new NoItemsFoundException("No entities of type Driver are found.");
+                throw new NoItemsFoundException($"No Schedules are found for Driver with Id {DriverId}.");
             }
             return SchedulesOfDriver;
         }

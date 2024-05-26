@@ -1,4 +1,5 @@
-﻿using BusBookingAppln.Models.DTOs;
+﻿using BusBookingAppln.Exceptions;
+using BusBookingAppln.Models.DTOs;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -35,6 +36,37 @@ namespace BusBookingAppln.Controllers
                 catch (InvalidOperationException ioe)
                 {
                     return Conflict(new ErrorModel(409, ioe.Message));
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(new ErrorModel(500, ex.Message));
+                }
+            }
+            return BadRequest("All details are not provided. Please check the object");
+        }
+
+        [Authorize(Roles = "Admin, Customer")]
+        [HttpPost("BusesScheduledOnGivenDateAndRoute")]
+        [ProducesResponseType(typeof(List<ScheduleReturnDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<ScheduleReturnDTO>>> GetBusesScheduledOnGivenDateAndRoute(UserInputDTOForSchedule userInput)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    List<ScheduleReturnDTO> result = await _scheduleService.GetAllSchedulesForAGivenDateAndRoute(userInput);
+                    return Ok(result);
+                }
+                catch (NoRoutesFoundForGivenSourceAndDest nrf)
+                {
+                    return NotFound(new ErrorModel(404, nrf.Message));
+                }
+                catch (NoSchedulesFoundForGivenRouteAndDate nsf)
+                {
+                    return NotFound(new ErrorModel(404, nsf.Message));
                 }
                 catch (Exception ex)
                 {

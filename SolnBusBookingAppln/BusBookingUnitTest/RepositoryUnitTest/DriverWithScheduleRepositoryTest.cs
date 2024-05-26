@@ -2,13 +2,14 @@
 using BusBookingAppln.Exceptions;
 using BusBookingAppln.Models.DBModels;
 using BusBookingAppln.Repositories;
+using BusBookingAppln.Repositories.Classes;
 using BusBookingAppln.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace BusBookingUnitTest.RepositoryUnitTest
 {
-    public class DriverRepositoryTest
+    public class DriverWithScheduleRepositoryTest
     {
         BusBookingContext context;
         [SetUp]
@@ -23,7 +24,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task AddDriverSuccessTest()
         {
             // Arrange
-            IRepository<int, Driver> driverRepository = new MainRepository<int, Driver>(context);
+            IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
 
             // Action
             var result = await driverRepository.Add(new Driver
@@ -47,7 +48,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task AddDriverInvalidOperationExceptionTest()
         {
             // Arrange
-            IRepository<int, Driver> driverRepository = new MainRepository<int, Driver>(context);
+            IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             var result = await driverRepository.Add(new Driver
             {
                 Id = 2,
@@ -80,7 +81,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetByDriverIdSuccessTest()
         {
             // Arrange
-            IRepository<int, Driver> driverRepository = new MainRepository<int, Driver>(context);
+            IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             await driverRepository.Add(new Driver
             {
                 Id = 3,
@@ -105,7 +106,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetByDriverIdFailureTest()
         {
             // Arrange
-            IRepository<int, Driver> driverRepository = new MainRepository<int, Driver>(context);
+            IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
 
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await driverRepository.GetById(100));
@@ -118,7 +119,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task DeleteByDriverIdExceptionTest()
         {
             // Arrange
-            IRepository<int, Driver> driverRepository = new MainRepository<int, Driver>(context);
+            IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
 
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await driverRepository.Delete(100));
@@ -131,7 +132,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetAllDriverFailTest()
         {
             // Arrange
-            IRepository<int, Driver> driverRepository = new MainRepository<int, Driver>(context);
+            IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             // Used here becuz if used in exception, add in exception is not async so order is changing 
             await driverRepository.Delete(2);
 
@@ -146,7 +147,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetAllDriverSuccessTest()
         {
             // Arrange
-            IRepository<int, Driver> driverRepository = new MainRepository<int, Driver>(context);
+            IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             await driverRepository.Add(new Driver
             {
                 Id = 4,
@@ -171,7 +172,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task UpdateDriverExceptionTest()
         {
             // Arrange
-            IRepository<int, Driver> driverRepository = new MainRepository<int, Driver>(context);
+            IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             var driver = new Driver
             {
                 Id = 100,
@@ -194,7 +195,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task DeleteDriverSuccessTest()
         {
             // Arrange
-            IRepository<int, Driver> driverRepository = new MainRepository<int, Driver>(context);
+            IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             await driverRepository.Add(new Driver
             {
                 Id = 3,
@@ -216,7 +217,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task UpdateDriverSuccessTest()
         {
             // Arrange
-            IRepository<int, Driver> driverRepository = new MainRepository<int, Driver>(context);
+            IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             await driverRepository.Add(new Driver
             {
                 Id = 3,

@@ -11,7 +11,9 @@ Model state - check in controller (When you check this, it checks if the require
 Postman requests 
 Try all endpoints once 
 Left over APIs
-
+Clean git unwanted folders
+Valid new password of driver 
+For repos with Include - check for exception for the included part
 -----------------------------------------------------------------------------------------------------------------------------------/
 
 Endpoints: 
@@ -23,16 +25,8 @@ Admin:
         - Ticket status = Ride completed
 
 Customer:
-    Post/Add Feedback 
-        - Fill Feedback Object only if Ticket Status = Ride Completed 
 
-    Get/BusesScheduledOnGivenDate 
-        - Buses Scheduled on a particular day are returned 
-        Input: 
-            - Date of Departure, Source, Destination
-                - Convert Source and Destination to Route ID 
-        Output:
-            - List of schedule objects 
+    Get/Available seat on a schedule 
 
     Get/Check Ticket availability 
         Input:
@@ -66,6 +60,8 @@ Customer:
             Calculate Total cost of seats from seats table 
             Date and Time of adding 
 
+    Delete/Remove seat 
+
     Post/Make Payment 
         Input:
             - Ticket ID, Payment method
@@ -76,6 +72,9 @@ Customer:
             - Caculate total = total + gst - discount 
             - Update status = Succes 
             - Add 10 reward points to user
+
+    Post/Add Feedback 
+        - Fill Feedback Object only if Ticket Status = Ride Completed 
 
     Delete/Cancel Ticket 
         Input: 
@@ -100,6 +99,7 @@ Customer:
             - Fill refund object 
         Output:
             - Refund object
+
 
     Delete/User Account 
         - Soft delete 

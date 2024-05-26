@@ -2,6 +2,7 @@
 using BusBookingAppln.Exceptions;
 using BusBookingAppln.Models.DBModels;
 using BusBookingAppln.Repositories;
+using BusBookingAppln.Repositories.Classes;
 using BusBookingAppln.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;

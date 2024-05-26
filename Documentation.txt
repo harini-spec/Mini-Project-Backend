@@ -48,6 +48,7 @@ Admin:
         - Fill Driver Object, UserDetail status = "Inactive", Default password = "Root"
     Post/Add Schedule 
         - Fill Schedule Object with Bus Id, Route Id, Driver Id 
+        - Check if bus already scheduled for a diff ride 
     Put/UpdateRideStatus 
         - Ticket status = Ride completed
     Put/Activate driver account 

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BusBookingAppln")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+02439dd4c2eb575a4c9fb64e13a5cef843ff7470")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+07267e5d0c0ff6e809154fc401867eaee8b54d6f")]
 [assembly: System.Reflection.AssemblyProductAttribute("BusBookingAppln")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BusBookingAppln")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

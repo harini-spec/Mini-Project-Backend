@@ -1,12 +1,105 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2944025D-CB7F-4058-B531-9A7D16352A77}|BusBookingAppln\\BusBookingAppln.csproj|c:\\users\\vc\\desktop\\presidio\\mini-project-backend\\solnbusbookingappln\\busbookingappln\\services\\classes\\scheduleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2944025D-CB7F-4058-B531-9A7D16352A77}|BusBookingAppln\\BusBookingAppln.csproj|solutionrelative:busbookingappln\\services\\classes\\scheduleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2944025D-CB7F-4058-B531-9A7D16352A77}|BusBookingAppln\\BusBookingAppln.csproj|c:\\users\\vc\\desktop\\presidio\\mini-project-backend\\solnbusbookingappln\\busbookingappln\\models\\dbmodels\\schedule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2944025D-CB7F-4058-B531-9A7D16352A77}|BusBookingAppln\\BusBookingAppln.csproj|solutionrelative:busbookingappln\\models\\dbmodels\\schedule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2944025D-CB7F-4058-B531-9A7D16352A77}|BusBookingAppln\\BusBookingAppln.csproj|c:\\users\\vc\\desktop\\presidio\\mini-project-backend\\solnbusbookingappln\\busbookingappln\\models\\dbmodels\\ticket.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2944025D-CB7F-4058-B531-9A7D16352A77}|BusBookingAppln\\BusBookingAppln.csproj|solutionrelative:busbookingappln\\models\\dbmodels\\ticket.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2944025D-CB7F-4058-B531-9A7D16352A77}|BusBookingAppln\\BusBookingAppln.csproj|c:\\users\\vc\\desktop\\presidio\\mini-project-backend\\solnbusbookingappln\\busbookingappln\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2944025D-CB7F-4058-B531-9A7D16352A77}|BusBookingAppln\\BusBookingAppln.csproj|solutionrelative:busbookingappln\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2944025D-CB7F-4058-B531-9A7D16352A77}|BusBookingAppln\\BusBookingAppln.csproj|c:\\users\\vc\\desktop\\presidio\\mini-project-backend\\solnbusbookingappln\\busbookingappln\\services\\interfaces\\ischeduleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2944025D-CB7F-4058-B531-9A7D16352A77}|BusBookingAppln\\BusBookingAppln.csproj|solutionrelative:busbookingappln\\services\\interfaces\\ischeduleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\BusBookingAppln\\Program.cs",
+              "RelativeDocumentMoniker": "BusBookingAppln\\Program.cs",
+              "ToolTip": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\BusBookingAppln\\Program.cs",
+              "RelativeToolTip": "BusBookingAppln\\Program.cs",
+              "ViewState": "AQIAADcAAAAAAAAAAAAAAFMAAABcAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-26T06:34:12.436Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Ticket.cs",
+              "DocumentMoniker": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\BusBookingAppln\\Models\\DBModels\\Ticket.cs",
+              "RelativeDocumentMoniker": "BusBookingAppln\\Models\\DBModels\\Ticket.cs",
+              "ToolTip": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\BusBookingAppln\\Models\\DBModels\\Ticket.cs",
+              "RelativeToolTip": "BusBookingAppln\\Models\\DBModels\\Ticket.cs",
+              "ViewState": "AQIAABcAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-26T18:20:26.155Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Schedule.cs",
+              "DocumentMoniker": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\BusBookingAppln\\Models\\DBModels\\Schedule.cs",
+              "RelativeDocumentMoniker": "BusBookingAppln\\Models\\DBModels\\Schedule.cs",
+              "ToolTip": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\BusBookingAppln\\Models\\DBModels\\Schedule.cs",
+              "RelativeToolTip": "BusBookingAppln\\Models\\DBModels\\Schedule.cs",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAAABsAAAAaAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-26T08:51:14.695Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "IScheduleService.cs",
+              "DocumentMoniker": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\BusBookingAppln\\Services\\Interfaces\\IScheduleService.cs",
+              "RelativeDocumentMoniker": "BusBookingAppln\\Services\\Interfaces\\IScheduleService.cs",
+              "ToolTip": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\BusBookingAppln\\Services\\Interfaces\\IScheduleService.cs",
+              "RelativeToolTip": "BusBookingAppln\\Services\\Interfaces\\IScheduleService.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAOAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-26T17:44:09.99Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ScheduleService.cs",
+              "DocumentMoniker": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\BusBookingAppln\\Services\\Classes\\ScheduleService.cs",
+              "RelativeDocumentMoniker": "BusBookingAppln\\Services\\Classes\\ScheduleService.cs",
+              "ToolTip": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\BusBookingAppln\\Services\\Classes\\ScheduleService.cs",
+              "RelativeToolTip": "BusBookingAppln\\Services\\Classes\\ScheduleService.cs",
+              "ViewState": "AQIAAFMAAAAAAAAAAAAAAGoAAAAOAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-26T09:13:44.89Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

@@ -82,7 +82,8 @@ namespace BusBookingAppln
             builder.Services.AddScoped<IRepository<int, BusRoute>, MainRepository<int, BusRoute>>();
             builder.Services.AddScoped<IRepository<int, Schedule>, MainRepository<int, Schedule>>();
             builder.Services.AddScoped<IRepository<int, Seat>, MainRepository<int, Seat>>();
-            builder.Services.AddScoped<IRepository<int, Ticket>, MainRepository<int, Ticket>>();
+            // builder.Services.AddScoped<IRepository<int, Ticket>, MainRepository<int, Ticket>>();
+            builder.Services.AddScoped<IRepository<int, Ticket>, TicketRepository>();
             builder.Services.AddScoped<IRepository<int, User>, MainRepository<int, User>>();
             builder.Services.AddScoped<IRepository<int, UserDetail>, MainRepository<int, UserDetail>>();
             builder.Services.AddScoped<IRepositoryCompositeKey<int, int, RouteDetail>, RouteDetailRepository>();

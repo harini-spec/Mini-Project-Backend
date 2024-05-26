@@ -2,6 +2,7 @@
 using BusBookingAppln.Models.DTOs;
 using BusBookingAppln.Models.DTOs.RegisterAndLogin;
 using BusBookingAppln.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -80,5 +81,7 @@ namespace BusBookingAppln.Controllers
             }
             return BadRequest("All details are not provided. Please check the object");
         }
+
+        
     }
 }

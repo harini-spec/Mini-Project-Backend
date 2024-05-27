@@ -145,7 +145,12 @@ Customer:
 
     Delete/User Account 
         - Soft delete 
+        - Don't delete if active tickets present 
 
+    Get/All Tickets of Customer 
+
+    Delete/Remove Ticket Item
+    Delete/Remove Ticket
 
 -----------------------------------------------------------------------------------------------------------------------------------/
 

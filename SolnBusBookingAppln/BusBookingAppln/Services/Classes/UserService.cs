@@ -47,8 +47,12 @@ namespace BusBookingAppln.Services.Classes
                 bool isPasswordSame = ComparePassword(encryptedPass, userDetail.PasswordEncrypted);
                 if (isPasswordSame)
                 {
-                    LoginOutputDTO loginOutputDTO = MapUserToLoginReturnDTO(user);
-                    return loginOutputDTO;
+                    if (userDetail.Status == "Active")
+                    {
+                        LoginOutputDTO loginOutputDTO = MapUserToLoginReturnDTO(user);
+                        return loginOutputDTO;
+                    }
+                    throw new UserNotActiveException("Your account is not activated");
                 }
                 throw new UnauthorizedUserException("Invalid username or password");
             }

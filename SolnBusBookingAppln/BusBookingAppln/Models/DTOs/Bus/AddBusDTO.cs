@@ -1,7 +1,7 @@
 ﻿using BusBookingAppln.Models.DBModels;
 using System.ComponentModel.DataAnnotations;
 
-namespace BusBookingAppln.Models.DTOs
+namespace BusBookingAppln.Models.DTOs.Bus
 {
     public class AddBusDTO
     {

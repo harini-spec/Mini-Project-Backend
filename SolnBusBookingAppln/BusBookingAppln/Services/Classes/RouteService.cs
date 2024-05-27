@@ -1,5 +1,6 @@
-﻿using BusBookingAppln.Models.DBModels;
-using BusBookingAppln.Models.DTOs;
+﻿using BusBookingAppln.Exceptions;
+using BusBookingAppln.Models.DBModels;
+using BusBookingAppln.Models.DTOs.Route;
 using BusBookingAppln.Repositories.Interfaces;
 using BusBookingAppln.Services.Interfaces;
 
@@ -12,6 +13,24 @@ namespace BusBookingAppln.Services.Classes
         public RouteService(IRepository<int, BusRoute> RouteRepository)
         {
             _RouteRepository = RouteRepository;
+        }
+
+        public async Task<int> GetRoute(string source, string destination)
+        {
+            var Routes = await _RouteRepository.GetAll();
+            foreach (var route in Routes)
+            {
+                if (route.Source.ToLower() == source.ToLower() && route.Destination.ToLower() == destination.ToLower())
+                {
+                    return route.Id;
+                }
+            }
+            throw new NoRoutesFoundForGivenSourceAndDest(source, destination);
+        }
+
+        public async Task<BusRoute> GetRoute(int RouteId)
+        {
+            return await _RouteRepository.GetById(RouteId);
         }
 
         public async Task<AddRouteDTO> AddRoute(AddRouteDTO addRouteDTO)

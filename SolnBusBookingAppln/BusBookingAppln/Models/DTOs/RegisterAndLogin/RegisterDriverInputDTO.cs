@@ -20,7 +20,7 @@ namespace BusBookingAppln.Models.DTOs.RegisterAndLogin
 
 
         [Required(ErrorMessage = "Phone cannot be empty")]
-        [StringLength(10, ErrorMessage = "Enter valid phone number")]
+        [StringLength(10, MinimumLength = 10, ErrorMessage = "Enter a valid phone number")]
         public string Phone { get; set; }
 
 

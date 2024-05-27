@@ -24,7 +24,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task AddTicketSuccessTest()
         {
             // Arrange
-            IRepository<int, Ticket> ticketRepository = new TicketRepository(context);
+            IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
 
             // Action
             var result = await ticketRepository.Add(new Ticket
@@ -47,7 +47,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task AddTicketInvalidOperationExceptionTest()
         {
             // Arrange
-            IRepository<int, Ticket> ticketRepository = new TicketRepository(context);
+            IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             var result = await ticketRepository.Add(new Ticket
             {
                 Id = 2,
@@ -78,7 +78,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetByTicketIdSuccessTest()
         {
             // Arrange
-            IRepository<int, Ticket> ticketRepository = new TicketRepository(context);
+            IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             await ticketRepository.Add(new Ticket
             {
                 Id = 3,
@@ -102,7 +102,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetByTicketIdFailureTest()
         {
             // Arrange
-            IRepository<int, Ticket> ticketRepository = new TicketRepository(context);
+            IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
 
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await ticketRepository.GetById(100));
@@ -115,7 +115,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task DeleteByTicketIdExceptionTest()
         {
             // Arrange
-            IRepository<int, Ticket> ticketRepository = new TicketRepository(context);
+            IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
 
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await ticketRepository.Delete(100));
@@ -128,7 +128,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetAllTicketFailTest()
         {
             // Arrange
-            IRepository<int, Ticket> ticketRepository = new TicketRepository(context);
+            IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             await ticketRepository.Delete(2);
 
             // Action
@@ -142,7 +142,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetAllTicketSuccessTest()
         {
             // Arrange
-            IRepository<int, Ticket> ticketRepository = new TicketRepository(context);
+            IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             await ticketRepository.Add(new Ticket
             {
                 Id = 4,
@@ -166,7 +166,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task UpdateTicketExceptionTest()
         {
             // Arrange
-            IRepository<int, Ticket> ticketRepository = new TicketRepository(context);
+            IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             var ticket = new Ticket
             {
                 Id = 100,
@@ -188,7 +188,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task DeleteTicketSuccessTest()
         {
             // Arrange
-            IRepository<int, Ticket> ticketRepository = new TicketRepository(context);
+            IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             await ticketRepository.Add(new Ticket
             {
                 Id = 5,
@@ -210,7 +210,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task UpdateTicketSuccessTest()
         {
             // Arrange
-            IRepository<int, Ticket> ticketRepository = new TicketRepository(context);
+            IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             await ticketRepository.Add(new Ticket
             {
                 Id = 6,

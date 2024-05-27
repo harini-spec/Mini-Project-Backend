@@ -6,11 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BusBookingAppln.Repositories.Classes
 {
-    public class DriverWithScheduleRepository : BaseRepository<int, Driver>
+    public class BusRepositoryWithSeats : BaseRepository<string, Bus>
     {
-        public DriverWithScheduleRepository(BusBookingContext context) : base(context) { }
+        public BusRepositoryWithSeats(BusBookingContext context) : base(context) 
+        {}
 
-        public virtual async Task<Driver> Add(Driver entity)
+        public virtual async Task<Bus> Add(Bus entity)
         {
             try
             {
@@ -24,17 +25,17 @@ namespace BusBookingAppln.Repositories.Classes
             }
         }
 
-        public virtual async Task<IList<Driver>> GetAll()
+        public virtual async Task<IList<Bus>> GetAll()
         {
-            var items = _context.Drivers.Include(x => x.SchedulesForDriver).ToList();
+            var items = _context.Buses.Include(x => x.SeatsInBus).ToList();
             if (items.Count == 0)
             {
-                throw new NoItemsFoundException("No entities of type Driver are found.");
+                throw new NoItemsFoundException("No entities of type Bus are found.");
             }
             return items;
         }
 
-        public override async Task<Driver> Delete(int key)
+        public override async Task<Bus> Delete(string key)
         {
             try
             {
@@ -49,15 +50,15 @@ namespace BusBookingAppln.Repositories.Classes
             }
         }
 
-        public override async Task<Driver> GetById(int key)
+        public override async Task<Bus> GetById(string key)
         {
-            var item = _context.Drivers.Include(x => x.SchedulesForDriver).ToList().FirstOrDefault(x => x.Id == key);
+            var item = _context.Buses.Include(x => x.SeatsInBus).ToList().FirstOrDefault(x => x.BusNumber == key);
             if (item == null)
-                throw new EntityNotFoundException($"Entity of type Driver with ID {key} not found.");
+                throw new EntityNotFoundException($"Entity of type Bus with BusNumber = {key} not found.");
             return item;
         }
 
-        public override async Task<Driver> Update(Driver entity, int key)
+        public override async Task<Bus> Update(Bus entity, string key)
         {
             try
             {

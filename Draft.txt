@@ -14,53 +14,35 @@ Left over APIs
 Clean git unwanted folders
 Valid new password of driver 
 For repos with Include - check for exception for the included part
+
+Try to combine driver with user 
+Do not use composite key 
+Unit test buswithseatsrepo 
+check authorize part 
+Add summary for every method 
+Logging 
+check all files - crct ones are present 
+
+Ticket status = Not booked, Booked, Cancelled, Ride Over 
+Ticket detail status = '' 
+
+clean documentation 
+Add migration once 
+
 -----------------------------------------------------------------------------------------------------------------------------------/
 
 Endpoints: 
 
-add migration once 
-
-Admin:
-    Put/UpdateRideStatus 
-        - Ticket status = Ride completed
-
 Customer:
+    Post/Add Feedback 
+        - Fill Feedback Object only if Ticket Status = Ride Completed  
 
-    Get/Available seat on a schedule 
+    Get/All Tickets of Customer 
 
-    Get/Check Ticket availability 
-        Input:
-            - Bus Id, List of Seat Numbers, Source, Destination, Date of departure
-                - Using these two, find the Seat ID (Check if seat number is in the bus)
-                - Convert source and dest to Route ID 
-                - Use Bus ID, Route ID, Date of departure - Scehdule ID 
-        CheckTicketAvailability:
-            - Check if Schedule Id in Ticket and Seat ID in Ticket Details 
-            - If Ticket Status = Booked 
-                - Check if Ticket Details Status of that particular seat = Booked 
-                - If booked, not available, if not available
-            - If Ticket Status = Cancelled 
-                - Go ahead to booking, available
-            - If Ticket Status = Not Booked 
-                - Check if its been 1 hr since them adding the ticket 
-                - If so, release ticket 
-                    - Release Ticket : Delete Ticket Details first, then ticket 
-                    - send available
-                - If not, not available 
+    Delete/User Account 
+        - Soft delete 
 
-    Post/Book Ticket
-        Input:
-            - Bus Id, List of Seat Numbers, Source, Destination, Date of departure
-            - CheckTicketAvailability
-        Book Ticket:
-            Get Passenger details
-            Ticket Detail status = Not Booked 
-            Ticket status = Not Booked
-            Fill Ticket Detail object 
-            Calculate Total cost of seats from seats table 
-            Date and Time of adding 
 
-    Delete/Remove seat 
 
     Post/Make Payment 
         Input:
@@ -72,9 +54,6 @@ Customer:
             - Caculate total = total + gst - discount 
             - Update status = Succes 
             - Add 10 reward points to user
-
-    Post/Add Feedback 
-        - Fill Feedback Object only if Ticket Status = Ride Completed 
 
     Delete/Cancel Ticket 
         Input: 
@@ -99,11 +78,6 @@ Customer:
             - Fill refund object 
         Output:
             - Refund object
-
-
-    Delete/User Account 
-        - Soft delete 
-
 
 -----------------------------------------------------------------------------------------------------------------------------------/
 

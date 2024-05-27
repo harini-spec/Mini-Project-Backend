@@ -71,7 +71,8 @@ namespace BusBookingAppln
             #endregion
 
             #region repositories
-            builder.Services.AddScoped<IRepository<string, Bus>, MainRepository<string, Bus>>();
+            // builder.Services.AddScoped<IRepository<string, Bus>, MainRepository<string, Bus>>();
+            builder.Services.AddScoped<IRepository<string, Bus>, BusRepositoryWithSeats>();
             // builder.Services.AddScoped<IRepository<int, Driver>, MainRepository<int, Driver>>();
             builder.Services.AddScoped<IRepository<int, Driver>, DriverWithScheduleRepository>();
             builder.Services.AddScoped<IRepository<int, DriverDetail>, MainRepository<int, DriverDetail>>();
@@ -83,7 +84,7 @@ namespace BusBookingAppln
             builder.Services.AddScoped<IRepository<int, Schedule>, MainRepository<int, Schedule>>();
             builder.Services.AddScoped<IRepository<int, Seat>, MainRepository<int, Seat>>();
             // builder.Services.AddScoped<IRepository<int, Ticket>, MainRepository<int, Ticket>>();
-            builder.Services.AddScoped<IRepository<int, Ticket>, TicketRepository>();
+            builder.Services.AddScoped<IRepository<int, Ticket>, TicketWithTicketDetailsRepository>();
             builder.Services.AddScoped<IRepository<int, User>, MainRepository<int, User>>();
             builder.Services.AddScoped<IRepository<int, UserDetail>, MainRepository<int, UserDetail>>();
             builder.Services.AddScoped<IRepositoryCompositeKey<int, int, RouteDetail>, RouteDetailRepository>();
@@ -101,6 +102,9 @@ namespace BusBookingAppln
             builder.Services.AddScoped<IBusService, BusService>();
             builder.Services.AddScoped<IRouteService, RouteService>();
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
+            builder.Services.AddScoped<ISeatService, SeatService>(); 
+            builder.Services.AddScoped<ITicketService, TicketService>();
+            builder.Services.AddScoped<ISeatAvailability, SeatAvailabilityService>();
             #endregion
 
 

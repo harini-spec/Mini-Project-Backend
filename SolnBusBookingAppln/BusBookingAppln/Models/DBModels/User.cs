@@ -36,7 +36,7 @@ namespace BusBookingAppln.Models.DBModels
 
 
         [Required(ErrorMessage = "Name can't be empty")]
-        [StringLength(10, ErrorMessage = "Enter valid phone number")]
+        [StringLength(10, MinimumLength = 10, ErrorMessage = "Enter a valid phone number")]
         public string Phone { get; set; }
 
 

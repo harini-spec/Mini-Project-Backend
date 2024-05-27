@@ -1,6 +1,6 @@
 ﻿using BusBookingAppln.Exceptions;
 using BusBookingAppln.Models.DBModels;
-using BusBookingAppln.Models.DTOs;
+using BusBookingAppln.Models.DTOs.Driver;
 using BusBookingAppln.Models.DTOs.RegisterAndLogin;
 using BusBookingAppln.Repositories.Interfaces;
 using BusBookingAppln.Services.Interfaces;

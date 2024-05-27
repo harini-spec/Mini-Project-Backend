@@ -1,6 +1,7 @@
 ﻿using BusBookingAppln.Exceptions;
 using BusBookingAppln.Models.DBModels;
-using BusBookingAppln.Models.DTOs;
+using BusBookingAppln.Models.DTOs.Bus;
+using BusBookingAppln.Models.DTOs.Schedule;
 using BusBookingAppln.Repositories.Interfaces;
 using BusBookingAppln.Services.Interfaces;
 
@@ -13,6 +14,28 @@ namespace BusBookingAppln.Services.Classes
         public BusService(IRepository<string, Bus> BusRepository)
         {
             _busRepo = BusRepository;
+        }
+
+        public bool CheckIfBusAlreadyBooked(List<Schedule> schedules, AddScheduleDTO addScheduleDTO)
+        {
+            foreach (var schedule in schedules)
+            {
+                if (schedule.BusNumber == addScheduleDTO.BusNumber)
+                {
+                    if ((addScheduleDTO.DateTimeOfDeparture >= schedule.DateTimeOfDeparture && addScheduleDTO.DateTimeOfDeparture <= schedule.DateTimeOfArrival) ||
+                        (addScheduleDTO.DateTimeOfArrival >= schedule.DateTimeOfDeparture && addScheduleDTO.DateTimeOfDeparture <= schedule.DateTimeOfArrival) ||
+                        (addScheduleDTO.DateTimeOfDeparture <= schedule.DateTimeOfDeparture && addScheduleDTO.DateTimeOfArrival >= schedule.DateTimeOfArrival))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public async Task<Bus> GetBusByBusNumber(string BusNumber)
+        {
+            return await _busRepo.GetById(BusNumber);
         }
 
         public async Task<AddBusDTO> AddBus(AddBusDTO InputBus)

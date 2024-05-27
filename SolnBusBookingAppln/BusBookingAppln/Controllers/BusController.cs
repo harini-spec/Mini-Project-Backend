@@ -1,6 +1,7 @@
 ﻿using BusBookingAppln.Exceptions;
 using BusBookingAppln.Models.DBModels;
 using BusBookingAppln.Models.DTOs;
+using BusBookingAppln.Models.DTOs.Bus;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

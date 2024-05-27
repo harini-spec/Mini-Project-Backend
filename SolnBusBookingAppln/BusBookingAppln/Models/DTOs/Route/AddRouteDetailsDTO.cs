@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BusBookingAppln.Models.DTOs
+namespace BusBookingAppln.Models.DTOs.Route
 {
     public class AddRouteDetailsDTO
     {

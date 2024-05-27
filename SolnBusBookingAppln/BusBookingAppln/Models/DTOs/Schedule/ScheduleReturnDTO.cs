@@ -1,18 +1,15 @@
 ﻿using BusBookingAppln.Models.DBModels;
 using System.ComponentModel.DataAnnotations;
 
-namespace BusBookingAppln.Models.DTOs
+namespace BusBookingAppln.Models.DTOs.Schedule
 {
-    public class GetScheduleDTO
+    public class ScheduleReturnDTO
     {
-        public int Id { get; set; }
-
+        public int ScheduleId { get; set; }
         public DateTime DateTimeOfDeparture { get; set; }
-
         public DateTime DateTimeOfArrival { get; set; }
-
         public string BusNumber { get; set; }
-
-        public int RouteId { get; set; }
+        public string Source { get; set; }
+        public string Destination { get; set; }
     }
 }

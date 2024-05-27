@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace BusBookingAppln.Models.DTOs
+namespace BusBookingAppln.Models.DTOs.Bus
 {
     public class AddSeatsInputDTO
     {

@@ -1,7 +1,7 @@
 ﻿using BusBookingAppln.Exceptions;
 using BusBookingAppln.Models.DBModels;
-using BusBookingAppln.Models.DTOs;
 using BusBookingAppln.Models.DTOs.RegisterAndLogin;
+using BusBookingAppln.Models.DTOs.Schedule;
 using BusBookingAppln.Repositories.Interfaces;
 using BusBookingAppln.Services.Interfaces;
 using System.Security.Cryptography;
@@ -122,6 +122,29 @@ namespace BusBookingAppln.Services.Classes
                 getScheduleDTOs.Add(getScheduleDTO);
             }
             return getScheduleDTOs;
+        }
+
+        public async Task<bool> CheckIfDriverAvailable(AddScheduleDTO addScheduleDTO, int driverId)
+        {
+            Driver driver = await GetDriverById(driverId);
+            List<Schedule> schedules = driver.SchedulesForDriver.ToList();
+            if (schedules.Count == 0)
+                return true;
+            foreach (var schedule in schedules)
+                {
+                    if ((addScheduleDTO.DateTimeOfDeparture >= schedule.DateTimeOfDeparture && addScheduleDTO.DateTimeOfDeparture <= schedule.DateTimeOfArrival) ||
+                            (addScheduleDTO.DateTimeOfArrival >= schedule.DateTimeOfDeparture && addScheduleDTO.DateTimeOfDeparture <= schedule.DateTimeOfArrival) ||
+                            (addScheduleDTO.DateTimeOfDeparture <= schedule.DateTimeOfDeparture && addScheduleDTO.DateTimeOfArrival >= schedule.DateTimeOfArrival))
+                    {
+                        return false;
+                    }
+                }
+            return true;
+        }
+
+        public async Task<Driver> GetDriverById(int DriverId)
+        {
+            return await _driverWithSchedulesRepo.GetById(DriverId);
         }
     }
 }

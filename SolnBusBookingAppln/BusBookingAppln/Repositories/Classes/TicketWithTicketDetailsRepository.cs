@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BusBookingAppln.Repositories.Classes
 {
-    public class TicketRepository : IRepository<int, Ticket>
+    public class TicketWithTicketDetailsRepository : IRepository<int, Ticket>
     {
         public readonly BusBookingContext _context;
 
-        public TicketRepository(BusBookingContext context)
+        public TicketWithTicketDetailsRepository(BusBookingContext context)
         {
             _context = context;
         }

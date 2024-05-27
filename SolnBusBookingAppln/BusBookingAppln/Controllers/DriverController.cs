@@ -2,6 +2,7 @@
 using BusBookingAppln.Models.DBModels;
 using BusBookingAppln.Models.DTOs;
 using BusBookingAppln.Models.DTOs.RegisterAndLogin;
+using BusBookingAppln.Models.DTOs.Schedule;
 using BusBookingAppln.Repositories;
 using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
@@ -66,6 +67,7 @@ namespace BusBookingAppln.Controllers
 
         [Authorize(Roles = "Driver")]
         [HttpPut("ChangePassword")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
@@ -98,6 +100,7 @@ namespace BusBookingAppln.Controllers
 
         [Authorize(Roles = "Driver")]
         [HttpGet("GetSchedules")]
+        [ProducesResponseType(typeof(List<GetScheduleDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
@@ -131,6 +134,5 @@ namespace BusBookingAppln.Controllers
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }
-
     }
 }

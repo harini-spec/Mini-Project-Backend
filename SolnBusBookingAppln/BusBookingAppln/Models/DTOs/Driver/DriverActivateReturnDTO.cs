@@ -1,4 +1,4 @@
-﻿namespace BusBookingAppln.Models.DTOs
+﻿namespace BusBookingAppln.Models.DTOs.Driver
 {
     public class DriverActivateReturnDTO
     {

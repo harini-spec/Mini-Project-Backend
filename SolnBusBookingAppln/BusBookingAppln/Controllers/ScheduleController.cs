@@ -1,5 +1,6 @@
 ﻿using BusBookingAppln.Exceptions;
 using BusBookingAppln.Models.DTOs;
+using BusBookingAppln.Models.DTOs.Schedule;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -51,7 +52,7 @@ namespace BusBookingAppln.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<ScheduleReturnDTO>>> GetBusesScheduledOnGivenDateAndRoute(UserInputDTOForSchedule userInput)
+        public async Task<ActionResult<List<ScheduleReturnDTO>>> GetAllSchedulesForAGivenDateAndRoute(UserInputDTOForSchedule userInput)
         {
             if (ModelState.IsValid)
             {
@@ -74,6 +75,32 @@ namespace BusBookingAppln.Controllers
                 }
             }
             return BadRequest("All details are not provided. Please check the object");
+        }
+
+        [Authorize(Roles = "Admin, Customer")]
+        [HttpGet("GetAllSchedules")]
+        [ProducesResponseType(typeof(List<ScheduleReturnDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<ScheduleReturnDTO>>> GetAllSchedules()
+        {
+                try
+                {
+                    List<ScheduleReturnDTO> result = await _scheduleService.GetAllSchedules();
+                    return Ok(result);
+                }
+                catch (EntityNotFoundException enf)
+                {
+                    return NotFound(new ErrorModel(404, enf.Message));
+                }
+                catch (NoItemsFoundException nif)
+                {
+                    return NotFound(new ErrorModel(404, nif.Message));
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(new ErrorModel(500, ex.Message));
+                }
         }
     }
 }

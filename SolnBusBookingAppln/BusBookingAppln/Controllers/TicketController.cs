@@ -179,5 +179,28 @@ namespace BusBookingAppln.Controllers
             }
         }
 
+        [HttpGet("GetAllTicketsOfCustomer")]
+        [Authorize(Roles = "Customer")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<AddedTicketDTO>>> GetAllTicketsOfCustomer()
+        {
+            try
+            {
+                int CustomerId = Convert.ToInt32(User.FindFirstValue("ID"));
+                var result = await _TicketService.GetAllTicketsOfCustomer(CustomerId);
+                return Ok(result);
+            }
+            catch (NoItemsFoundException nif)
+            {
+                return NotFound(new ErrorModel(404, nif.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ErrorModel(500, ex.Message));
+            }
+        }
+
     }
 }

@@ -33,9 +33,6 @@ Add migration once
 
 Endpoints: 
 Customer:
-
-    Get/All Tickets of Customer 
-
     Post/Make Payment 
         Input:
             - Ticket ID, Payment method

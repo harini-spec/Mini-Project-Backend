@@ -5,10 +5,6 @@ namespace BusBookingAppln.Models.DTOs.Bus
 {
     public class AddBusDTO
     {
-        public AddBusDTO()
-        {
-            SeatsInBus = new List<AddSeatsInputDTO>();
-        }
 
         [Required]
         public string BusNumber { get; set; }

@@ -71,26 +71,21 @@ namespace BusBookingAppln
             #endregion
 
             #region repositories
-            // builder.Services.AddScoped<IRepository<string, Bus>, MainRepository<string, Bus>>();
-            builder.Services.AddScoped<IRepository<string, Bus>, BusRepositoryWithSeats>();
-            // builder.Services.AddScoped<IRepository<int, Driver>, MainRepository<int, Driver>>();
+            builder.Services.AddScoped<IRepository<string, Bus>, BusWithSeatsRepository>();
             builder.Services.AddScoped<IRepository<int, Driver>, DriverWithScheduleRepository>();
             builder.Services.AddScoped<IRepository<int, DriverDetail>, MainRepository<int, DriverDetail>>();
-            builder.Services.AddScoped<IRepository<int, Feedback>, MainRepository<int, Feedback>>();
+            builder.Services.AddScoped<IRepository<int, Feedback>, FeedbackWithTicketRepository>();
             builder.Services.AddScoped<IRepository<string, Payment>, MainRepository<string, Payment>>();
             builder.Services.AddScoped<IRepository<string, Refund>, MainRepository<string, Refund>>();
             builder.Services.AddScoped<IRepository<int, Reward>, MainRepository<int, Reward>>();
             builder.Services.AddScoped<IRepository<int, BusRoute>, MainRepository<int, BusRoute>>();
             builder.Services.AddScoped<IRepository<int, Schedule>, MainRepository<int, Schedule>>();
             builder.Services.AddScoped<IRepository<int, Seat>, MainRepository<int, Seat>>();
-            // builder.Services.AddScoped<IRepository<int, Ticket>, MainRepository<int, Ticket>>();
             builder.Services.AddScoped<IRepository<int, Ticket>, TicketWithTicketDetailsRepository>();
             builder.Services.AddScoped<IRepository<int, User>, MainRepository<int, User>>();
             builder.Services.AddScoped<IRepository<int, UserDetail>, MainRepository<int, UserDetail>>();
             builder.Services.AddScoped<IRepositoryCompositeKey<int, int, RouteDetail>, RouteDetailRepository>();
             builder.Services.AddScoped<IRepositoryCompositeKey<int, int, TicketDetail>, TicketDetailRepository>();
-
-
             #endregion
 
             #region services 
@@ -105,6 +100,9 @@ namespace BusBookingAppln
             builder.Services.AddScoped<ISeatService, SeatService>(); 
             builder.Services.AddScoped<ITicketService, TicketService>();
             builder.Services.AddScoped<ISeatAvailability, SeatAvailabilityService>();
+            builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+            builder.Services.AddScoped<ICustomerService, CustomerService>();
+
             #endregion
 
 

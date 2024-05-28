@@ -12,6 +12,6 @@ namespace BusBookingAppln.Services.Interfaces
         public Task<string> RemoveTicket(int UserId, int TicketId);
         public Task<AddedTicketDetailDTO> RemoveTicketItem(int UserId, int TicketId, int SeatId);
         public Task<string> UpdateTicketStatusToRideOver(int ScheduleId);
-
+        public Task<bool> CheckIfUserHasActiveTickets(int userId);
     }
 }

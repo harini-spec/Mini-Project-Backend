@@ -18,13 +18,9 @@ namespace BusBookingAppln.Services.Classes
         public async Task<int> GetRoute(string source, string destination)
         {
             var Routes = await _RouteRepository.GetAll();
-            foreach (var route in Routes)
-            {
-                if (route.Source.ToLower() == source.ToLower() && route.Destination.ToLower() == destination.ToLower())
-                {
-                    return route.Id;
-                }
-            }
+            var Route = Routes.ToList().FirstOrDefault(x => x.Source.ToLower() == source.ToLower() && x.Destination.ToLower() == destination.ToLower());
+            if(Route != null)
+                return Route.Id;
             throw new NoRoutesFoundForGivenSourceAndDest(source, destination);
         }
 

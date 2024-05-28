@@ -55,7 +55,7 @@ namespace BusBookingAppln.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BusRoutes");
+                    b.ToTable("Routes");
                 });
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Driver", b =>

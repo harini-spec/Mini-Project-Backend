@@ -232,5 +232,22 @@ namespace BusBookingAppln.Services.Classes
             }
             return "Status successfully updated";
         }
+
+        public async Task<bool> CheckIfUserHasActiveTickets(int userId)
+        {
+            var tickets = new List<Ticket>();
+            try 
+            { 
+                tickets = await GetAllTickets(); 
+            }
+            catch (NoItemsFoundException)
+            {
+                return false;
+            }
+            tickets = tickets.ToList().Where(x => x.UserId == userId && x.Status == "Booked").ToList();
+            if (tickets.Count == 0)
+                return false;
+            return true;
+        }
     }
 }

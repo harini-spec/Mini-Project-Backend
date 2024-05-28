@@ -9,6 +9,6 @@ namespace BusBookingAppln.Services.Interfaces
         public Task<Schedule> GetScheduleById(int ScheduleId);
         public Task<List<ScheduleReturnDTO>> GetAllSchedulesForAGivenDateAndRoute(UserInputDTOForSchedule userInputDTOForSchedule);
         public Task<List<ScheduleReturnDTO>> GetAllSchedules();
-
+        public Task<List<ScheduleReturnDTO>> GetAllSchedulesOfDriver(int DriverId);
     }
 }

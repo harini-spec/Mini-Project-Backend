@@ -5,6 +5,7 @@ using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BusBookingAppln.Controllers
 {
@@ -13,10 +14,12 @@ namespace BusBookingAppln.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ICustomerService _customerService;
 
-        public CustomerController(IUserService userService)
+        public CustomerController(IUserService userService, ICustomerService customerService)
         {
             _userService = userService;
+            _customerService = customerService;
         }
 
         [HttpPost("LoginCustomer")]
@@ -82,6 +85,80 @@ namespace BusBookingAppln.Controllers
             return BadRequest("All details are not provided. Please check the object");
         }
 
-        
+        [HttpDelete("DeleteCustomerAccount")]
+        [Authorize(Roles = "Customer")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<string>> SoftDeleteCustomerAccount()
+        {
+            try
+            {
+                int CustomerId = Convert.ToInt32(User.FindFirstValue("ID"));
+                string result = await _customerService.SoftDeleteCustomerAccount(CustomerId);
+                return Ok(result);
+            }
+            catch (UserNotActiveException uue)
+            {
+                return Unauthorized(new ErrorModel(401, uue.Message));
+            }
+            catch (EntityNotFoundException enf)
+            {
+                return NotFound(new ErrorModel(404, enf.Message));
+            }
+            catch (NoItemsFoundException nif)
+            {
+                return NotFound(new ErrorModel(404, nif.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ErrorModel(500, ex.Message));
+            }
+        }
+
+        [HttpPut("ActivateDeletedCustomerAccount")]
+        [ProducesResponseType(typeof(LoginOutputDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<string>> ActivateDeletedCustomerAccount(LoginInputDTO loginInputDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    LoginOutputDTO result = await _customerService.ActivateDeletedCustomerAccount(loginInputDTO);
+                    return Ok(result);
+                }
+                catch (UnauthorizedUserException uue)
+                {
+                    return Unauthorized(new ErrorModel(401, uue.Message));
+                }
+                catch (UserNotActiveException uue)
+                {
+                    return Unauthorized(new ErrorModel(401, uue.Message));
+                }
+                catch (EntityNotFoundException enf)
+                {
+                    return NotFound(new ErrorModel(404, enf.Message));
+                }
+                catch (ArgumentNullException ane)
+                {
+                    return BadRequest(new ErrorModel(400, ane.Message));
+                }
+                catch (IncorrectOperationException ioe)
+                {
+                    return BadRequest(new ErrorModel(400, ioe.Message));
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(new ErrorModel(500, ex.Message));
+                }
+            }
+            return BadRequest("All details are not provided. Please check the object");
+        }
     }
 }

@@ -53,6 +53,7 @@ Admin:
         - Ticket status = Ride completed
     Put/Activate driver account 
         - UserDetail Status = Active
+    Get/GetAllFeedbacksOfARide      
 
 Driver:
     Put/Change password 
@@ -143,9 +144,10 @@ Customer:
         Output:
             - Refund object
 
-    Delete/User Account 
+    Delete/Deactivate Customer Account 
         - Soft delete 
         - Don't delete if active tickets present 
+    Put/Reactivate account 
 
     Get/All Tickets of Customer 
 

@@ -96,34 +96,6 @@ namespace BusBookingAppln.Services.Classes
             return "Password successfully changed";
         }
 
-        public async Task<List<GetScheduleDTO>> GetAllSchedulesOfDriver(int DriverId)
-        {
-            Driver driver = await _driverWithSchedulesRepo.GetById(DriverId);
-            List<Schedule> schedules = driver.SchedulesForDriver.ToList();
-            List<GetScheduleDTO> SchedulesOfDriver = MapScheduleToGetScheduleDTO(schedules);    
-            if(schedules.Count == 0)
-            {
-                throw new NoItemsFoundException($"No Schedules are found for Driver with Id {DriverId}.");
-            }
-            return SchedulesOfDriver;
-        }
-
-        private List<GetScheduleDTO> MapScheduleToGetScheduleDTO(List<Schedule> schedules)
-        {
-            List<GetScheduleDTO> getScheduleDTOs = new List<GetScheduleDTO>();
-            foreach(var schedule in schedules)
-            {
-                GetScheduleDTO getScheduleDTO = new GetScheduleDTO();
-                getScheduleDTO.Id = schedule.Id;
-                getScheduleDTO.BusNumber = schedule.BusNumber;
-                getScheduleDTO.RouteId = schedule.RouteId;
-                getScheduleDTO.DateTimeOfDeparture = schedule.DateTimeOfDeparture;
-                getScheduleDTO.DateTimeOfArrival = schedule.DateTimeOfArrival;
-                getScheduleDTOs.Add(getScheduleDTO);
-            }
-            return getScheduleDTOs;
-        }
-
         public async Task<bool> CheckIfDriverAvailable(AddScheduleDTO addScheduleDTO, int driverId)
         {
             Driver driver = await GetDriverById(driverId);

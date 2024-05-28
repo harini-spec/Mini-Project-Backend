@@ -10,7 +10,6 @@ namespace BusBookingAppln.Services.Interfaces
         public Task<string> ChangePassword(string email, string newPassword);
         public Task<Driver> GetDriverByEmail(string email);
         public Task<Driver> GetDriverById(int DriverId);
-        public Task<List<GetScheduleDTO>> GetAllSchedulesOfDriver(int DriverId);
         public Task<bool> CheckIfDriverAvailable(AddScheduleDTO addSchedulesDTO, int driverId);
     }
 }

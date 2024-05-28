@@ -2,10 +2,10 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace BusBookingAppln.Models.DTOs.Bus
+namespace BusBookingAppln.Models.DTOs.Feedback
 {
-    public class GetSeatsDTO : AddSeatsInputDTO
+    public class GetFeedbackDTO : AddFeedbackDTO
     {
-        public int Id { get; set; }
+        public DateTime FeedbackDate { get; set; }
     }
 }

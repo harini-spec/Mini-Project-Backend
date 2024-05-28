@@ -18,10 +18,12 @@ namespace BusBookingAppln.Controllers
     public class DriverController : ControllerBase
     {
         private readonly IDriverService _driverService;
+        private readonly IScheduleService _scheduleService;
 
-        public DriverController(IDriverService driverService)
+        public DriverController(IDriverService driverService, IScheduleService scheduleService)
         {
             _driverService = driverService;
+            _scheduleService = scheduleService;
         }
 
         [HttpPost("LoginDriver")]
@@ -100,17 +102,17 @@ namespace BusBookingAppln.Controllers
 
         [Authorize(Roles = "Driver")]
         [HttpGet("GetSchedules")]
-        [ProducesResponseType(typeof(List<GetScheduleDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ScheduleReturnDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<GetScheduleDTO>>> GetSchedules()
+        public async Task<ActionResult<List<ScheduleReturnDTO>>> GetSchedules()
         {
             try
             {
                 int DriverId = Convert.ToInt32(User.FindFirstValue("ID"));
-                var result = await _driverService.GetAllSchedulesOfDriver(DriverId);
+                var result = await _scheduleService.GetAllSchedulesOfDriver(DriverId);
                 return Ok(result);
             }
             catch (UnauthorizedUserException uue)

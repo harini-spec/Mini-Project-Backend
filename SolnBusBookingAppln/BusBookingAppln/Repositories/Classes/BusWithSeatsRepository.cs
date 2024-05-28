@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BusBookingAppln.Repositories.Classes
 {
-    public class BusRepositoryWithSeats : BaseRepository<string, Bus>
+    public class BusWithSeatsRepository : BaseRepository<string, Bus>
     {
-        public BusRepositoryWithSeats(BusBookingContext context) : base(context) 
+        public BusWithSeatsRepository(BusBookingContext context) : base(context) 
         {}
 
         public virtual async Task<Bus> Add(Bus entity)

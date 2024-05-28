@@ -16,7 +16,7 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRepository<int, UserDetail> _userDetailRepo;
         private readonly ITokenService _tokenService;
 
-        public UserService(IRepository<int, User> userRepo, IRepository<int, UserDetail> userDetailRepo, ITokenService tokenService) 
+        public UserService(IRepository<int, User> userRepo, IRepository<int, UserDetail> userDetailRepo, ITokenService tokenService)
         {
             _userRepo = userRepo;
             _userDetailRepo = userDetailRepo;
@@ -27,6 +27,10 @@ namespace BusBookingAppln.Services.Classes
         {
             var users = await _userRepo.GetAll();
             var user = users.ToList().FirstOrDefault(x => x.Email == email);
+            if(user == null)
+            {
+                throw new UnauthorizedUserException("Invalid username or password");
+            }
             return user;
         }
 
@@ -35,11 +39,6 @@ namespace BusBookingAppln.Services.Classes
             try
             {
                 User user = await GetUserByEmail(loginInputDTO.Email);
-                if(user == null)
-                {
-                    throw new UnauthorizedUserException("Invalid username or password");
-                }
-
                 UserDetail userDetail = await _userDetailRepo.GetById(user.Id);
 
                 HMACSHA512 hMACSHA = new HMACSHA512(userDetail.PasswordHashKey);
@@ -106,7 +105,7 @@ namespace BusBookingAppln.Services.Classes
             }
             catch (UnableToRegisterException) { throw; }
             catch (Exception) { }
-            if(user == null)
+            if (user == null)
             {
                 throw new UnableToRegisterException("Not able to register at this moment");
             }

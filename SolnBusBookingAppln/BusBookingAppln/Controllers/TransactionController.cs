@@ -91,5 +91,43 @@ namespace BusBookingAppln.Controllers
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }
+
+        [HttpPost("CancelSeat")]
+        [Authorize(Roles = "Customer")]
+        [ProducesResponseType(typeof(RefundOutputDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<RefundOutputDTO>> CancelTicketSeat(CancelSeatsInputDTO cancelSeatsInputDTO)
+        {
+            try
+            {
+                int CustomerId = Convert.ToInt32(User.FindFirstValue("ID"));
+                RefundOutputDTO result = await _TransactionService.CancelSeats(CustomerId, cancelSeatsInputDTO);
+                return Ok(result);
+            }
+            catch (UnauthorizedUserException uau)
+            {
+                return Unauthorized(new ErrorModel(401, uau.Message));
+            }
+            catch (IncorrectOperationException ioe)
+            {
+                return BadRequest(new ErrorModel(400, ioe.Message));
+            }
+            catch (InvalidOperationException ioe)
+            {
+                return Conflict(new ErrorModel(409, ioe.Message));
+            }
+            catch (EntityNotFoundException enf)
+            {
+                return NotFound(new ErrorModel(404, enf.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ErrorModel(500, ex.Message));
+            }
+        }
     }
 }

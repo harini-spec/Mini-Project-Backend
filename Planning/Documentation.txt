@@ -155,6 +155,7 @@ Customer:
     Delete/Remove Ticket Item
     Delete/Remove Ticket
 
+    Refund: Only half of what they paid (final amt) - for both full ticket and seats (half of og price - w/o gst and discount)
 -----------------------------------------------------------------------------------------------------------------------------------/
 
 Business logic:

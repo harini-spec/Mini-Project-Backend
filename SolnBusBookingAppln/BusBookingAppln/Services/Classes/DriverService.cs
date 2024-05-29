@@ -85,15 +85,19 @@ namespace BusBookingAppln.Services.Classes
 
         public async Task<string> ChangePassword(string email, string NewPassword)
         {
-            Driver driver = await GetDriverByEmail(email);
-            DriverDetail driverDetail = await _driverDetailRepo.GetById(driver.Id);
+            if(NewPassword.Length >= 8)
+            {
+                Driver driver = await GetDriverByEmail(email);
+                DriverDetail driverDetail = await _driverDetailRepo.GetById(driver.Id);
 
-            HMACSHA512 hMACSHA = new HMACSHA512();
-            driverDetail.PasswordHashKey = hMACSHA.Key;
-            driverDetail.PasswordEncrypted = hMACSHA.ComputeHash(Encoding.UTF8.GetBytes(NewPassword));
-            await _driverDetailRepo.Update(driverDetail, driverDetail.DriverId);
+                HMACSHA512 hMACSHA = new HMACSHA512();
+                driverDetail.PasswordHashKey = hMACSHA.Key;
+                driverDetail.PasswordEncrypted = hMACSHA.ComputeHash(Encoding.UTF8.GetBytes(NewPassword));
+                await _driverDetailRepo.Update(driverDetail, driverDetail.DriverId);
 
-            return "Password successfully changed";
+                return "Password successfully changed";
+            }
+            throw new ValidationErrorExcpetion("Password must be atleast 8 characters");
         }
 
         public async Task<bool> CheckIfDriverAvailable(AddScheduleDTO addScheduleDTO, int driverId)

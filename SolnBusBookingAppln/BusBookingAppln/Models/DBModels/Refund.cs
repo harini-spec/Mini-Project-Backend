@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BusBookingAppln.Models.DBModels
 {
-    //Ticket ID
     public class Refund
     {
         public Refund()

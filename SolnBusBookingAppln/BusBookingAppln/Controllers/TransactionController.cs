@@ -24,6 +24,7 @@ namespace BusBookingAppln.Controllers
         [HttpPost("BookTicket")]
         [Authorize(Roles = "Customer")]
         [ProducesResponseType(typeof(PaymentOutputDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status409Conflict)]
@@ -35,6 +36,10 @@ namespace BusBookingAppln.Controllers
                 int CustomerId = Convert.ToInt32(User.FindFirstValue("ID"));
                 PaymentOutputDTO result = await _TransactionService.BookTicket(CustomerId, TicketId, PaymentMethod);
                 return Ok(result);
+            }
+            catch (IncorrectOperationException ioe)
+            {
+                return BadRequest(new ErrorModel(400, ioe.Message));
             }
             catch (UnauthorizedUserException uau)
             {

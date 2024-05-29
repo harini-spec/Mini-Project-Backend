@@ -11,11 +11,14 @@ namespace BusBookingAppln.Services.Classes
     {
         private readonly IRepository<string, Bus> _busRepo;
 
+
         public BusService(IRepository<string, Bus> BusRepository)
         {
             _busRepo = BusRepository;
         }
 
+
+        // Checks if bus already booked during a specific time period. True if booked, false if not
         public bool CheckIfBusAlreadyBooked(List<Schedule> schedules, AddScheduleDTO addScheduleDTO)
         {
             foreach (var schedule in schedules)
@@ -33,11 +36,8 @@ namespace BusBookingAppln.Services.Classes
             return false;
         }
 
-        public async Task<Bus> GetBusByBusNumber(string BusNumber)
-        {
-            return await _busRepo.GetById(BusNumber);
-        }
 
+        // Add bus with seats
         public async Task<AddBusDTO> AddBus(AddBusDTO InputBus)
         {
             if(InputBus.SeatsInBus.Count() == InputBus.TotalSeats)
@@ -51,6 +51,24 @@ namespace BusBookingAppln.Services.Classes
             throw new DataDoesNotMatchException();
         }
 
+
+        public async Task<Bus> GetBusByBusNumber(string BusNumber)
+        {
+            return await _busRepo.GetById(BusNumber);
+        }
+
+
+        // Map AddBusDTO to Bus
+        private Bus MapAddBusDTOToBus(AddBusDTO inputBus)
+        {
+            Bus bus = new Bus();
+            bus.BusNumber = inputBus.BusNumber;
+            bus.TotalSeats = inputBus.TotalSeats;
+            return bus;
+        }
+
+
+        // Map AddSeatsInputDTO List DTO to Seat List 
         private List<Seat> MapAddSeatsInputDTOToSeatList(string BusNumber, IList<AddSeatsInputDTO> seatsInBus)
         {
             List<Seat> seats = new List<Seat>();
@@ -65,14 +83,6 @@ namespace BusBookingAppln.Services.Classes
                 seats.Add(seat);
             }
             return seats;
-        }
-
-        private Bus MapAddBusDTOToBus(AddBusDTO inputBus)
-        {
-            Bus bus = new Bus();
-            bus.BusNumber = inputBus.BusNumber;
-            bus.TotalSeats = inputBus.TotalSeats;
-            return bus;
         }
     }
 }

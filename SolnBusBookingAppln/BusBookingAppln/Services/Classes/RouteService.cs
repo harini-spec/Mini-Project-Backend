@@ -10,11 +10,14 @@ namespace BusBookingAppln.Services.Classes
     {
         private readonly IRepository<int, Models.DBModels.Route> _RouteRepository;
 
+
         public RouteService(IRepository<int, Models.DBModels.Route> RouteRepository)
         {
             _RouteRepository = RouteRepository;
         }
 
+
+        // Get Route ID with Source and Destination
         public async Task<int> GetRoute(string source, string destination)
         {
             var Routes = await _RouteRepository.GetAll();
@@ -24,20 +27,25 @@ namespace BusBookingAppln.Services.Classes
             throw new NoRoutesFoundForGivenSourceAndDest(source, destination);
         }
 
+
+        // Get Route ID with ID
         public async Task<Models.DBModels.Route> GetRoute(int RouteId)
         {
             return await _RouteRepository.GetById(RouteId);
         }
 
+
+        // Add Route with stops
         public async Task<AddRouteDTO> AddRoute(AddRouteDTO addRouteDTO)
         {
             Models.DBModels.Route route = MapAddRouteDTOToRoute(addRouteDTO);
-            await _RouteRepository.Add(route);
             route.RouteStops = MapAddRouteDetailToRouteDetail(route.Id, addRouteDTO);
-            await _RouteRepository.Update(route, route.Id);
+            await _RouteRepository.Add(route);
             return addRouteDTO;
         }
 
+
+        // Map AddRouteDTO to RouteDetail
         private List<RouteDetail> MapAddRouteDetailToRouteDetail(int RouteId, AddRouteDTO addRouteDTO)
         {
             List<RouteDetail> routeDetails = new List<RouteDetail>();
@@ -53,6 +61,8 @@ namespace BusBookingAppln.Services.Classes
             return routeDetails;
         }
 
+
+        // Map AddRouteDTO to Route
         private Models.DBModels.Route MapAddRouteDTOToRoute(AddRouteDTO addRouteDTO)
         {
             Models.DBModels.Route route = new Models.DBModels.Route();

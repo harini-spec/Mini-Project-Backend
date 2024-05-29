@@ -15,6 +15,7 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRouteService _RouteService;
         private readonly IDriverService _DriverService;
 
+
         public ScheduleService(IRepository<int, Driver> driverWithSchedulesRepo, IRepository<int, Schedule> ScheduleRepository, IBusService busService, IRouteService RouteService, IDriverService driverService)
         {
             _ScheduleRepo = ScheduleRepository;
@@ -24,10 +25,16 @@ namespace BusBookingAppln.Services.Classes
             _driverWithSchedulesRepo = driverWithSchedulesRepo;
         }
 
+
+        // Add schedule
         public async Task<AddScheduleDTO> AddSchedule(AddScheduleDTO addSchedulesDTO)
         {
+            // Check if given Bus is present
             await _busService.GetBusByBusNumber(addSchedulesDTO.BusNumber);
+
+
             List<Schedule> Schedules = new List<Schedule>();
+            // If no schedules present, add schedule without checking for driver and bus availability
             try
             {
                  Schedules = (List<Schedule>)await _ScheduleRepo.GetAll();
@@ -38,9 +45,13 @@ namespace BusBookingAppln.Services.Classes
                 await _ScheduleRepo.Add(schedule);
                 return addSchedulesDTO;
             }
+
+
+            // Check if bus is free on given date and time
             if (!_busService.CheckIfBusAlreadyBooked(Schedules, addSchedulesDTO))
             {
-                if(await _DriverService.CheckIfDriverAvailable(addSchedulesDTO, addSchedulesDTO.DriverId))
+                // Check if driver is free on given date and time
+                if (await _DriverService.CheckIfDriverAvailable(addSchedulesDTO, addSchedulesDTO.DriverId))
                 {
                     Schedule schedule = MapAddScheduleDTOToSchedule(addSchedulesDTO);
                     await _ScheduleRepo.Add(schedule);
@@ -51,28 +62,60 @@ namespace BusBookingAppln.Services.Classes
             throw new BusAlreadyBookedException();
         }
 
-        private Schedule MapAddScheduleDTOToSchedule(AddScheduleDTO addSchedulesDTO)
-        {
-            Schedule schedule = new Schedule();
-            schedule.DriverId = addSchedulesDTO.DriverId;
-            schedule.DateTimeOfDeparture = addSchedulesDTO.DateTimeOfDeparture;
-            schedule.DateTimeOfArrival = addSchedulesDTO.DateTimeOfArrival;
-            schedule.BusNumber = addSchedulesDTO.BusNumber;
-            schedule.RouteId = addSchedulesDTO.RouteId;
-            return schedule;
-        }
 
+        // Get all schedules for given date and route
         public async Task<List<ScheduleReturnDTO>> GetAllSchedulesForAGivenDateAndRoute(UserInputDTOForSchedule userInputDTOForSchedule)
         {
+            // Get route by source and dest
             int RouteId = await _RouteService.GetRoute(userInputDTOForSchedule.Source, userInputDTOForSchedule.Destination);
+
+            // Filter all schedules in the given route, date of departure and arrival
             var schedules = await _ScheduleRepo.GetAll();
             var result = schedules.ToList().Where(x => x.RouteId == RouteId && x.DateTimeOfDeparture.Date == userInputDTOForSchedule.DateTimeOfDeparture.Date);
+            
             if (result.ToList().Count == 0)
                 throw new NoSchedulesFoundForGivenRouteAndDate();
             List<ScheduleReturnDTO> scheduleReturnDTOs = MapScheduleListToScheduleReturnDTOList(result.ToList(), userInputDTOForSchedule.Source, userInputDTOForSchedule.Destination);
             return scheduleReturnDTOs;
         }
 
+
+        public async Task<Schedule> GetScheduleById(int ScheduleId)
+        {
+            return await _ScheduleRepo.GetById(ScheduleId);
+        }
+
+
+        // Get all future schedules
+        public async Task<List<ScheduleReturnDTO>> GetAllSchedules()
+        {
+            var schedules = await _ScheduleRepo.GetAll();
+
+            // Get Schedules scheduled after this point of time
+            schedules = schedules.Where(schedule => schedule.DateTimeOfDeparture > DateTime.Now).ToList();
+            List<ScheduleReturnDTO> scheduleReturnDTOs = await MapScheduleListToScheduleReturnDTOList(schedules.ToList());
+            return scheduleReturnDTOs;
+        }
+
+
+        // Get all the schedules of driver
+        public async Task<List<ScheduleReturnDTO>> GetAllSchedulesOfDriver(int DriverId)
+        {
+            Driver driver = await _driverWithSchedulesRepo.GetById(DriverId);
+            List<Schedule> schedules = driver.SchedulesForDriver.ToList();
+
+            // Get Schedules scheduled after this point of time
+            schedules = schedules.Where(schedule => schedule.DateTimeOfDeparture > DateTime.Now).ToList();
+            List<ScheduleReturnDTO> scheduleReturnDTOs = await MapScheduleListToScheduleReturnDTOList(schedules);
+            if (schedules.Count == 0)
+            {
+                throw new NoItemsFoundException($"No Schedules are found for Driver with Id {DriverId}.");
+            }
+            return scheduleReturnDTOs;
+        }
+
+
+        // Map Schedule List to ScheduleReturnDTO List
         private List<ScheduleReturnDTO> MapScheduleListToScheduleReturnDTOList(List<Schedule> result, string source, string dest)
         {
             List<ScheduleReturnDTO> scheduleReturnDTOs = new List<ScheduleReturnDTO>();
@@ -84,11 +127,21 @@ namespace BusBookingAppln.Services.Classes
             return scheduleReturnDTOs;
         }
 
-        public async Task<Schedule> GetScheduleById(int ScheduleId)
+
+        // Map AddScheduleDTO to Schedule
+        private Schedule MapAddScheduleDTOToSchedule(AddScheduleDTO addSchedulesDTO)
         {
-            return await _ScheduleRepo.GetById(ScheduleId);
+            Schedule schedule = new Schedule();
+            schedule.DriverId = addSchedulesDTO.DriverId;
+            schedule.DateTimeOfDeparture = addSchedulesDTO.DateTimeOfDeparture;
+            schedule.DateTimeOfArrival = addSchedulesDTO.DateTimeOfArrival;
+            schedule.BusNumber = addSchedulesDTO.BusNumber;
+            schedule.RouteId = addSchedulesDTO.RouteId;
+            return schedule;
         }
 
+
+        // Map Schedule List to ScheduleReturnDTO List
         private async Task<List<ScheduleReturnDTO>> MapScheduleListToScheduleReturnDTOList(List<Schedule> schedules)
         {
             List<ScheduleReturnDTO> scheduleReturnDTOs = new List<ScheduleReturnDTO>();
@@ -101,6 +154,8 @@ namespace BusBookingAppln.Services.Classes
             return scheduleReturnDTOs;
         }
 
+
+        // Map Schedule to ScheduleReturnDTO
         private ScheduleReturnDTO MapScheduleToScheduleReturnDTO(Schedule schedule, string source, string dest)
         {
             ScheduleReturnDTO scheduleReturnDTO = new ScheduleReturnDTO();
@@ -113,23 +168,5 @@ namespace BusBookingAppln.Services.Classes
             return scheduleReturnDTO;
         }
 
-        public async Task<List<ScheduleReturnDTO>> GetAllSchedules()
-        {
-            var schedules = await _ScheduleRepo.GetAll();
-            List<ScheduleReturnDTO> scheduleReturnDTOs = await MapScheduleListToScheduleReturnDTOList(schedules.ToList());
-            return scheduleReturnDTOs;
-        }
-
-        public async Task<List<ScheduleReturnDTO>> GetAllSchedulesOfDriver(int DriverId)
-        {
-            Driver driver = await _driverWithSchedulesRepo.GetById(DriverId);
-            List<Schedule> schedules = driver.SchedulesForDriver.ToList();
-            List<ScheduleReturnDTO> scheduleReturnDTOs = await MapScheduleListToScheduleReturnDTOList(schedules);
-            if (schedules.Count == 0)
-            {
-                throw new NoItemsFoundException($"No Schedules are found for Driver with Id {DriverId}.");
-            }
-            return scheduleReturnDTOs;
-        }
     }
 }

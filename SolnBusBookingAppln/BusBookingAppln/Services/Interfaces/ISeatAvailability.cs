@@ -5,6 +5,7 @@ namespace BusBookingAppln.Services.Interfaces
 {
     public interface ISeatAvailability
     {
+        public Task DeleteNotBookedTickets();
         public Task<List<GetSeatsDTO>> GetAllAvailableSeatsInABusSchedule(int ScheduleId);
         public Task<bool> CheckSeatAvailability(Schedule schedule, int SeatID);
     }

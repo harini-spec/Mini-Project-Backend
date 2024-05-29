@@ -11,17 +11,24 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRepository<int, Feedback> _FeedbackRepository;
         private readonly ITicketService _ticketService;
 
+
         public FeedbackService(IRepository<int, Feedback> FeedbackRepository, ITicketService ticketService)
         {
             _FeedbackRepository = FeedbackRepository;
             _ticketService = ticketService;
         }
 
+
+        // Add feedback for Rides which are over - Can add one feedback for one ticket
         public async Task<string> AddFeedback(int UserId, AddFeedbackDTO feedbackDTO)
         {
             Ticket ticket = await _ticketService.GetTicketById(feedbackDTO.TicketId);
+
+            // Check if the ticket belongs to the user
             if(ticket.UserId != UserId)
                 throw new UnauthorizedUserException("You can't provide feedback for this ticket");
+
+            // Check if the ride is over
             if (ticket.Status == "Ride Over") 
             {
                 Feedback feedback = MapFeedbackDTOToFeedback(feedbackDTO);
@@ -31,6 +38,23 @@ namespace BusBookingAppln.Services.Classes
             throw new IncorrectOperationException("You cannot add feedback to this ticket");
         }
 
+
+        // Get all feedbacks for a schedule
+        public async Task<List<GetFeedbackDTO>> GetAllFeedbacksForARide(int ScheduleId)
+        {
+            var feedbacks = await _FeedbackRepository.GetAll();
+
+            // Filter feedbacks of given Schedule
+            List<Feedback> result = feedbacks.ToList().Where(x => x.FeedbackForTicket.ScheduleId == ScheduleId).ToList();
+            if (result.Count == 0)
+                throw new NoItemsFoundException("No feedbacks found");
+
+            List<GetFeedbackDTO> getFeedbackDTOs = MapFeedbackListToGetFeedbackDTOList(result);
+            return getFeedbackDTOs;
+        }
+
+
+        // Map AddFeedbackDTO to feedback
         private Feedback MapFeedbackDTOToFeedback(AddFeedbackDTO feedbackDTO)
         {
             Feedback feedback = new Feedback();
@@ -41,16 +65,8 @@ namespace BusBookingAppln.Services.Classes
             return feedback;
         }
 
-        public async Task<List<GetFeedbackDTO>> GetAllFeedbacksForARide(int ScheduleId)
-        {
-            var feedbacks = await _FeedbackRepository.GetAll();
-            List<Feedback> result = feedbacks.ToList().Where(x => x.FeedbackForTicket.ScheduleId == ScheduleId).ToList();
-            if (result.Count == 0)
-                throw new NoItemsFoundException("No feedbacks found");
-            List<GetFeedbackDTO> getFeedbackDTOs = MapFeedbackListToGetFeedbackDTOList(result);
-            return getFeedbackDTOs;
-        }
 
+        // Map Feedback List to GetFeedbackDTO List
         private List<GetFeedbackDTO> MapFeedbackListToGetFeedbackDTOList(List<Feedback> result)
         {
             List<GetFeedbackDTO> GetFeedbackDTOs = new List<GetFeedbackDTO>();
@@ -62,6 +78,8 @@ namespace BusBookingAppln.Services.Classes
             return GetFeedbackDTOs;
         }
 
+
+        // Map Feedback to GetFeedbackDTO
         private GetFeedbackDTO MapFeedbackToFeedbackDTO(Feedback feedback)
         {
             GetFeedbackDTO getFeedbackDTO = new GetFeedbackDTO();

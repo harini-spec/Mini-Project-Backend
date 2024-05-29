@@ -11,22 +11,99 @@ namespace BusBookingAppln.Services.Classes
     public class TicketService : ITicketService
     {
         private readonly IRepository<int, Ticket> _TicketRepository;
+        private readonly IRepository<int, Reward> _RewardRepository;
         private readonly IRepositoryCompositeKey<int, int, TicketDetail> _TicketDetailRepository;
         private readonly ISeatService _SeatService;
         private readonly ISeatAvailability _SeatAvailabilityService;
         private readonly IScheduleService _ScheduleService;
-        private readonly ITransactionService _TransactionService;
 
-        public TicketService(IRepositoryCompositeKey<int, int, TicketDetail> TicketDetailRepository, ISeatAvailability SeatAvailabilityService, IRepository<int, Ticket> TicketRepository, ISeatService seatService, IScheduleService scheduleService, ITransactionService transactionService)
+
+        public TicketService(IRepository<int, Reward> RewardRepository, IRepositoryCompositeKey<int, int, TicketDetail> TicketDetailRepository, ISeatAvailability SeatAvailabilityService, IRepository<int, Ticket> TicketRepository, ISeatService seatService, IScheduleService scheduleService)
         {
+            _RewardRepository = RewardRepository;
             _TicketRepository = TicketRepository;
             _SeatAvailabilityService = SeatAvailabilityService;
             _ScheduleService = scheduleService;
             _SeatService = seatService;
             _TicketDetailRepository = TicketDetailRepository;
-            _TransactionService = transactionService;
         }
 
+
+        // Add ticket
+        public async Task<AddedTicketDTO> AddTicket(int UserId, InputTicketDTO inputTicketDTO)
+        {
+            // Check if given schedule is present 
+            Schedule schedule = await _ScheduleService.GetScheduleById(inputTicketDTO.ScheduleId);
+
+            List<int> seatsAvailable = new List<int>();
+            List<int> SeatsNotAvailable = new List<int>();
+
+            // Check if all the seats user gave are available 
+            foreach (var ticketDetail in inputTicketDTO.TicketDetails)
+            {
+                if (await _SeatAvailabilityService.CheckSeatAvailability(schedule, ticketDetail.SeatId))
+                {
+                    seatsAvailable.Add(ticketDetail.SeatId);
+                }
+                else
+                {
+                    SeatsNotAvailable.Add(ticketDetail.SeatId);
+                }
+            }
+
+            // Return exception along with unavailable seat IDs
+            if (seatsAvailable.Count != inputTicketDTO.TicketDetails.Count)
+                throw new NoSeatsAvailableException(SeatsNotAvailable);
+
+
+            // Create Ticket
+            Ticket ticket = new Ticket();
+            ticket.UserId = UserId;
+            ticket.ScheduleId = schedule.Id;
+            ticket.Status = "Not Booked";
+            ticket.DateAndTimeOfAdding = DateTime.Now;
+            ticket.Total_Cost = await CalculateTicketTotalCost(seatsAvailable);
+            ticket.DiscountPercentage = await CalculateDiscountPercentage(UserId);
+            ticket.Final_Amount = CalculateTicketFinalCost(ticket.Total_Cost, ticket.DiscountPercentage, ticket.GSTPercentage);
+            ticket.TicketDetails = await MapInputTicketDetailsToTicketDetails(inputTicketDTO);
+            await _TicketRepository.Add(ticket);
+
+            // Map ticket to Output DTO
+            AddedTicketDTO addedTicketDTO = await MapTicketToAddedTicketDTO(ticket);
+            return addedTicketDTO;
+        }
+
+
+        // Calculate total ticket cost from seats list
+        private async Task<float> CalculateTicketTotalCost(List<int> seatsAvailable)
+        {
+            float Total_Cost = 0;
+            foreach (int seatId in seatsAvailable)
+            {
+                Seat seat = await _SeatService.GetSeatById(seatId);
+                Total_Cost += seat.SeatPrice;
+            }
+            return Total_Cost;
+        }
+
+
+        // Update the status of all tickets with given schedule to 'Ride Over'
+        public async Task<string> UpdateTicketStatusToRideOver(int ScheduleId)
+        {
+            var tickets = await GetAllTickets();
+            foreach (var ticket in tickets)
+            {
+                if (ticket.ScheduleId == ScheduleId && ticket.Status == "Booked")
+                {
+                    ticket.Status = "Ride Over";
+                    await _TicketRepository.Update(ticket, ticket.Id);
+                }
+            }
+            return "Status successfully updated";
+        }
+
+
+        // Checks if user has any Booked tickets where the Ride is not over yet 
         public async Task<bool> CheckIfUserHasActiveTickets(int userId)
         {
             var tickets = new List<Ticket>();
@@ -44,14 +121,21 @@ namespace BusBookingAppln.Services.Classes
             return true;
         }
 
+
+        // Remove added ticket
         public async Task<string> RemoveTicket(int UserId, int TicketId)
         {
             var ticket = await GetTicketById(TicketId);
+
+            // Check if its the user's ticket
             if (ticket.UserId == UserId)
             {
                 if (ticket.Status == "Not Booked")
                 {
+                    // Remove all ticket items
                     await DeleteTicketItems(ticket);
+
+                    // Remove ticket
                     await DeleteTicketById(TicketId);
                     return "Ticket Successfully Removed";
                 }
@@ -63,6 +147,8 @@ namespace BusBookingAppln.Services.Classes
             throw new UnauthorizedUserException("You can't remove this ticket");
         }
 
+
+        // Delete all ticket Items of ticket
         private async Task DeleteTicketItems(Ticket ticket)
         {
             var ticketDetailsCopy = ticket.TicketDetails.ToList();
@@ -72,25 +158,16 @@ namespace BusBookingAppln.Services.Classes
             }
         }
 
-        public async Task<string> UpdateTicketStatusToRideOver(int ScheduleId)
-        {
-            var tickets = await GetAllTickets();
-            foreach (var ticket in tickets)
-            {
-                if (ticket.ScheduleId == ScheduleId && ticket.Status == "Booked")
-                {
-                    ticket.Status = "Ride Over";
-                    await _TicketRepository.Update(ticket, ticket.Id);
-                }
-            }
-            return "Status successfully updated";
-        }
 
+        // Remove Ticket Item from Added Ticket
         public async Task<AddedTicketDetailDTO> RemoveTicketItem(int UserId, int TicketId, int SeatId)
         {
             var ticket = await GetTicketById(TicketId);
+
+            // Check if its the user's ticket
             if (ticket.UserId == UserId)
             {
+                // Check if the ticket is not booked
                 if (ticket.Status == "Not Booked")
                 {
                     foreach (var ticketItem in ticket.TicketDetails)
@@ -98,11 +175,14 @@ namespace BusBookingAppln.Services.Classes
                         if (ticketItem.SeatId == SeatId)
                         {
                             TicketDetail ticketDetail = new TicketDetail();
+
+                            // If only one item is present, delete the ticket as well
                             if (ticket.TicketDetails.Count == 1)
                             {
                                 ticketDetail = await _TicketDetailRepository.Delete(TicketId, SeatId);
                                 await DeleteTicketById(ticket.Id);
                             }
+                            // Else delete only the ticket item
                             else
                             {
                                 ticketDetail = await _TicketDetailRepository.Delete(TicketId, SeatId);
@@ -121,6 +201,8 @@ namespace BusBookingAppln.Services.Classes
             throw new UnauthorizedUserException("You can't remove this ticket item");
         }
 
+
+        // Get all tickets of Customer - Not booked, Booked, Ride over, Cancelled
         public async Task<List<AddedTicketDTO>> GetAllTicketsOfCustomer(int CustomerId)
         {
             var tickets = new List<Ticket>();
@@ -139,68 +221,61 @@ namespace BusBookingAppln.Services.Classes
             }
         }
 
-        public async Task<AddedTicketDTO> AddTicket(int UserId, InputTicketDTO inputTicketDTO)
-        {
-            Schedule schedule = await _ScheduleService.GetScheduleById(inputTicketDTO.ScheduleId);
-            List<int> seatsAvailable = new List<int>();
-            List<int> SeatsNotAvailable = new List<int>();
 
-            foreach(var ticketDetail in inputTicketDTO.TicketDetails)
+        // Calculate ticket final cost -> total + gst - discount
+        public float CalculateTicketFinalCost(float total_Cost, float discountPercentage, float GSTPercentage)
+        {
+            float GSTAmount = 0;
+            float DiscountAmount = 0;
+            if (GSTPercentage != 0)
+                GSTAmount = total_Cost * GSTPercentage / 100;
+            if (discountPercentage != 0)
+                DiscountAmount = total_Cost * discountPercentage / 100;
+            float finalAmount = total_Cost + GSTAmount - DiscountAmount;
+            return finalAmount;
+        }
+
+
+        // Calculate discount percentage based on reward points
+        public async Task<float> CalculateDiscountPercentage(int userId)
+        {
+            Reward reward = null;
+            try
             {
-                if(await _SeatAvailabilityService.CheckSeatAvailability(schedule, ticketDetail.SeatId))
+                reward = await _RewardRepository.GetById(userId);
+                if (reward.RewardPoints >= 100)
                 {
-                    seatsAvailable.Add(ticketDetail.SeatId);
+                    return 10;
                 }
                 else
-                {
-                    SeatsNotAvailable.Add(ticketDetail.SeatId);
-                }
+                    return 0;
             }
-
-            if (seatsAvailable.Count != inputTicketDTO.TicketDetails.Count)
-                throw new NoSeatsAvailableException(SeatsNotAvailable);
-
-            Ticket ticket = new Ticket();
-            ticket.UserId = UserId;
-            ticket.ScheduleId = schedule.Id;
-            ticket.Status = "Not Booked";
-            ticket.DateAndTimeOfAdding = DateTime.Now;
-            ticket.Total_Cost = await CalculateTicketTotalCost(seatsAvailable);
-            ticket.DiscountPercentage = await _TransactionService.CalculateDiscountPercentage(UserId);
-            ticket.Final_Amount = _TransactionService.CalculateTicketFinalCost(ticket.Total_Cost, ticket.DiscountPercentage, ticket.GSTPercentage);
-            ticket.TicketDetails = await MapInputTicketDetailsToTicketDetails(inputTicketDTO);
-            await _TicketRepository.Add(ticket);
-            AddedTicketDTO addedTicketDTO = await MapTicketToAddedTicketDTO(ticket);
-            return addedTicketDTO;
-        }
-
-        private async Task<float> CalculateTicketTotalCost(List<int> seatsAvailable)
-        {
-            float Total_Cost = 0;
-            foreach(int seatId in seatsAvailable)
+            catch (EntityNotFoundException)
             {
-                Seat seat = await _SeatService.GetSeatById(seatId);
-                Total_Cost += seat.SeatPrice;
+                return 0;
             }
-            return Total_Cost;
         }
+
 
         public async Task<List<Ticket>> GetAllTickets()
         {
             return (List<Ticket>)await _TicketRepository.GetAll();
         }
 
+
         public async Task<Ticket> GetTicketById(int ticketId)
         {
             return await _TicketRepository.GetById(ticketId);
         }
+
 
         public async Task<Ticket> DeleteTicketById(int ticketId)
         {
             return await _TicketRepository.Delete(ticketId);
         }
 
-        // Input TicketDetail List to Model TicketDetail List
+
+        // Map InputTicketDTO.TicketDetail List to TicketDetail List
         private async Task<List<TicketDetail>> MapInputTicketDetailsToTicketDetails(InputTicketDTO inputTicketDTO)
         {
             List<TicketDetail> ticketDetails = new List<TicketDetail>();
@@ -212,7 +287,8 @@ namespace BusBookingAppln.Services.Classes
             return ticketDetails;
         }
 
-        // Input TicketDetail to Model TicketDetail
+
+        // Input InputTicketDetailDTO to TicketDetail
         private async Task<TicketDetail> MapInputTicketDetailToTicketDetail(InputTicketDetailDTO inputTicketDetail)
         {
             Seat seat = await _SeatService.GetSeatById(inputTicketDetail.SeatId);
@@ -227,7 +303,8 @@ namespace BusBookingAppln.Services.Classes
             return ticketDetail;
         }
 
-        // Model Ticket List to Output Ticket DTO List 
+
+        // Map Ticket List to AddedTicketDTO List 
         private async Task<List<AddedTicketDTO>> MapTicketsToAddedTicketDTOs(List<Ticket> tickets)
         {
             List<AddedTicketDTO> result = new List<AddedTicketDTO>();
@@ -239,7 +316,8 @@ namespace BusBookingAppln.Services.Classes
             return result;
         }
 
-        // Model Ticket to Output Ticket DTO
+
+        // Model Ticket to AddedTicketDTO
         private async Task<AddedTicketDTO> MapTicketToAddedTicketDTO(Ticket ticket)
         {
             AddedTicketDTO addedTicketDTO = new AddedTicketDTO();
@@ -255,7 +333,8 @@ namespace BusBookingAppln.Services.Classes
             return addedTicketDTO;
         }
 
-        // Model TicketDetail List to Output TicketDetail List DTO
+
+        // Map TicketDetail List to AddedTicketDetailDTO List 
         private async Task<List<AddedTicketDetailDTO>> MapTicketDetailListToAddedTicketDetailDTOList(List<TicketDetail> ticketDetails)
         {
             List<AddedTicketDetailDTO> addedTicketDetailDTOs = new List<AddedTicketDetailDTO>();
@@ -267,7 +346,7 @@ namespace BusBookingAppln.Services.Classes
         }
 
 
-        // Model TicketDetail to Output TicketDetail DTO
+        // Map TicketDetail to AddedTicketDetailDTO
         private async Task<AddedTicketDetailDTO> MapTicketDetailToAddedTicketDetailDTO(TicketDetail ticketDetail)
         {
             Seat seat = await _SeatService.GetSeatById(ticketDetail.SeatId);
@@ -283,7 +362,5 @@ namespace BusBookingAppln.Services.Classes
             addedTicketDetailDTO.Status = ticketDetail.Status;
             return addedTicketDetailDTO;
         }
-
-
     }
 }

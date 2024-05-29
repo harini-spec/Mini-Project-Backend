@@ -9,13 +9,17 @@ namespace BusBookingAppln.Services.Classes
 {
     public class TransactionService : ITransactionService
     {
+        private readonly ISeatAvailability _SeatAvailability;
         private readonly IRepository<string, Payment> _PaymentRepository;
         private readonly IRepository<string, Refund> _RefundRepository;
         private readonly IRepository<int, Schedule> _ScheduleRepository;
         private readonly IRepository<int, Ticket> _TicketRepository;
         private readonly IRepository<int, Reward> _RewardRepository;
-        public TransactionService(IRepository<int, Schedule> ScheduleRepository, IRepository<string, Payment> PaymentRepository, IRepository<int, Reward> RewardRepository, IRepository<int, Ticket> TicketRepository, IRepository<string, Refund> RefundRepository) 
+        
+        
+        public TransactionService(ISeatAvailability seatAvailability, IRepository<int, Schedule> ScheduleRepository, IRepository<string, Payment> PaymentRepository, IRepository<int, Reward> RewardRepository, IRepository<int, Ticket> TicketRepository, IRepository<string, Refund> RefundRepository) 
         {
+            _SeatAvailability = seatAvailability;
             _PaymentRepository = PaymentRepository;
             _RewardRepository = RewardRepository;
             _TicketRepository = TicketRepository;
@@ -23,6 +27,12 @@ namespace BusBookingAppln.Services.Classes
             _RefundRepository = RefundRepository;
         }
 
+
+        // Checks for the following conditions before cancelling a ticket
+            // Check if ticket belongs to the user 
+            // Check if ticket is Booked
+            // Check if it's not within 24 hrs of the date and time of departure
+            // Check if the user's payment for the ticket was successful 
         public async Task CheckCancellationValidity(int UserId, Ticket ticket)
         {
             if (ticket.Status == "Booked")
@@ -54,8 +64,9 @@ namespace BusBookingAppln.Services.Classes
             else
                 throw new IncorrectOperationException("You can't cancel this ticket: It is not booked/Cancelled/Ride over");
         }
-            
+        
 
+        // Cancel Booked ticket
         public async Task<RefundOutputDTO> CancelTicket(int UserId, int TicketId)
         {
             try
@@ -65,10 +76,12 @@ namespace BusBookingAppln.Services.Classes
 
                 await changeTicketStatus(ticket, "Cancelled");
 
+                // Reduce provided reward points while booking
                 Reward reward = await _RewardRepository.GetById(UserId);
                 reward.RewardPoints -= (10 * ticket.TicketDetails.Count());
                 await _RewardRepository.Update(reward, UserId);
 
+                // Create refund object -> Refund amount = Total cost of the ticket / 2
                 Refund refund = CreateRefund(ticket, ticket.Total_Cost/2);
                 await _RefundRepository.Add(refund);
 
@@ -78,6 +91,8 @@ namespace BusBookingAppln.Services.Classes
             catch (Exception) { throw; }
         }
 
+
+        // Map Refund to RefundOutputDTO
         private RefundOutputDTO MapRefundToRefundOutputDTO(Refund refund)
         {
             RefundOutputDTO refundOutputDTO = new RefundOutputDTO();
@@ -88,6 +103,8 @@ namespace BusBookingAppln.Services.Classes
             return refundOutputDTO;
         }
 
+
+        // Creates refund object
         private Refund CreateRefund(Ticket ticket, float Refund_Amount)
         {
             Refund refund = new Refund();
@@ -99,6 +116,8 @@ namespace BusBookingAppln.Services.Classes
             return refund;
         }
 
+
+        // Change ticket status to given status
         private async Task changeTicketStatus(Ticket ticket, string status)
         {
             ticket.Status = status;
@@ -109,11 +128,28 @@ namespace BusBookingAppln.Services.Classes
             await _TicketRepository.Update(ticket, ticket.Id);
         }
 
+
+        // Book ticket - Make payment
         public async Task<PaymentOutputDTO> BookTicket(int UserId, int TicketId, string PaymentMethod)
         {
-            Ticket ticket = await _TicketRepository.GetById(TicketId);
+            // Check if its been less than 1 hr of adding
+            await _SeatAvailability.DeleteNotBookedTickets();
+
+            Ticket ticket = null;
+            try
+            {
+                ticket = await _TicketRepository.GetById(TicketId);
+            }
+            catch (EntityNotFoundException)
+            // Ticket would've been deleted if it's been more than an hour
+            {
+                throw new IncorrectOperationException("Time limit to book ticket exceeded");
+            }
+
+            // Check if ticket belongs to the user
             if (ticket.UserId != UserId)
                 throw new UnauthorizedUserException("You can't book this ticket");
+                
 
             Payment payment = CreatePayment(ticket, PaymentMethod);
 
@@ -134,6 +170,7 @@ namespace BusBookingAppln.Services.Classes
                     await _RewardRepository.Update(reward, UserId);
                 }
             }
+            // If it's user's first booking - no reward would be present, so create one
             catch
             {
                 reward.UserId = UserId;
@@ -147,6 +184,9 @@ namespace BusBookingAppln.Services.Classes
             return paymentOutputDTO;
         }
 
+
+
+        // Create payment object
         private Payment CreatePayment(Ticket ticket, string PaymentMethod)
         {
             Payment payment = new Payment();
@@ -159,6 +199,8 @@ namespace BusBookingAppln.Services.Classes
             return payment;
         }
 
+
+        // Map Payment to PaymentOutputDTO
         private PaymentOutputDTO MapPaymentToPaymentOutputDTO(Payment payment)
         {
             PaymentOutputDTO paymentOutputDTO = new PaymentOutputDTO();
@@ -170,37 +212,8 @@ namespace BusBookingAppln.Services.Classes
             return paymentOutputDTO;
         }
 
-        public float CalculateTicketFinalCost(float total_Cost, float discountPercentage, float GSTPercentage)
-        {
-            float GSTAmount = 0;
-            float DiscountAmount = 0;
-            if (GSTPercentage != 0)
-                GSTAmount = total_Cost * GSTPercentage / 100;
-            if (discountPercentage != 0)
-                DiscountAmount = total_Cost * discountPercentage / 100;
-            float finalAmount = total_Cost + GSTAmount - DiscountAmount;
-            return finalAmount;
-        }
 
-        public async Task<float> CalculateDiscountPercentage(int userId)
-        {
-            Reward reward = null;
-            try
-            {
-                reward = await _RewardRepository.GetById(userId);
-                if (reward.RewardPoints >= 100)
-                {
-                    return 10;
-                }
-                else
-                    return 0;
-            }
-            catch (EntityNotFoundException)
-            {
-                return 0;
-            }
-        }
-
+        // Cancel seats in a booked ticket
         public async Task<RefundOutputDTO> CancelSeats(int UserId, CancelSeatsInputDTO cancelSeatsInputDTO)
         {
             try
@@ -212,12 +225,12 @@ namespace BusBookingAppln.Services.Classes
                     await CheckCancellationValidity(UserId, ticket);
                     await CheckIfSeatAlreadyCancelled(ticket, cancelSeatsInputDTO);
 
-                    float Refund_Amount = CalculateRefundAmount(cancelSeatsInputDTO, ticket);
+                    float Refund_Amount = CalculateRefundAmountForCancelledSeats(cancelSeatsInputDTO, ticket);
                     Refund refund = CreateRefund(ticket, Refund_Amount);
                     await _RefundRepository.Add(refund);
 
                     await UpdateRewardPointsForSeatCancellation(UserId, cancelSeatsInputDTO);
-                    await UpdateTicketDetailStatus(cancelSeatsInputDTO);
+                    await UpdateTicketDetailStatusToCancelled(cancelSeatsInputDTO);
 
                     RefundOutputDTO refundOutputDTO = MapRefundToRefundOutputDTO(refund);
                     return refundOutputDTO;
@@ -228,6 +241,28 @@ namespace BusBookingAppln.Services.Classes
             catch(Exception) { throw; }
         }
 
+
+        // Checks if all seats to be cancelled are in the ticket
+        private async Task<bool> CheckIfSeatsInTicket(CancelSeatsInputDTO cancelSeatsInputDTO)
+        {
+            Ticket ticket = await _TicketRepository.GetById(cancelSeatsInputDTO.TicketId);
+            bool allSeatsPresent = cancelSeatsInputDTO.SeatIds.All(seatId => ticket.TicketDetails.Any(td => td.SeatId == seatId));
+            return allSeatsPresent;
+        }
+
+
+
+        //Checks if all the seats are cancelled. If so, updates ticket status to cancelled
+        private async Task CheckIfAllSeatsCancelled(Ticket ticket)
+        {
+            bool allSeatsCancelled = ticket.TicketDetails.All(ticketDetail => ticketDetail.Status == "Cancelled");
+            if (allSeatsCancelled)
+                ticket.Status = "Cancelled";
+            await _TicketRepository.Update(ticket, ticket.Id);
+        }
+
+
+        //Checks if all seats to be cancelled are booked, and not cancelled
         private async Task CheckIfSeatAlreadyCancelled(Ticket ticket, CancelSeatsInputDTO cancelSeatsInputDTO)
         {
             foreach (var seatId in cancelSeatsInputDTO.SeatIds)
@@ -243,7 +278,9 @@ namespace BusBookingAppln.Services.Classes
             }
         }
 
-        private async Task UpdateTicketDetailStatus(CancelSeatsInputDTO cancelSeatsInputDTO)
+
+        // Update TicketDetails Status to Cancelled
+        private async Task UpdateTicketDetailStatusToCancelled(CancelSeatsInputDTO cancelSeatsInputDTO)
         {
             Ticket ticket = await _TicketRepository.GetById(cancelSeatsInputDTO.TicketId);
             foreach (var seatId in cancelSeatsInputDTO.SeatIds)
@@ -257,15 +294,9 @@ namespace BusBookingAppln.Services.Classes
             await _TicketRepository.Update(ticket, ticket.Id);
             await CheckIfAllSeatsCancelled(ticket);
         }
+       
 
-        private async Task CheckIfAllSeatsCancelled(Ticket ticket)
-        {
-            bool allSeatsCancelled = ticket.TicketDetails.All(ticketDetail => ticketDetail.Status == "Cancelled");
-            if(allSeatsCancelled)
-                ticket.Status = "Cancelled";
-            await _TicketRepository.Update(ticket, ticket.Id);
-        }
-
+        // Reduce reward points provided while booking
         private async Task UpdateRewardPointsForSeatCancellation(int UserId, CancelSeatsInputDTO cancelSeatsInputDTO)
         {
             Reward reward = await _RewardRepository.GetById(UserId);
@@ -273,20 +304,15 @@ namespace BusBookingAppln.Services.Classes
             await _RewardRepository.Update(reward, UserId);
         }
 
-        private float CalculateRefundAmount(CancelSeatsInputDTO cancelSeatsInputDTO, Ticket ticket)
+
+        // Refund amount for cancelled seats - Refund amount = add seat price and then divide by 2 
+        private float CalculateRefundAmountForCancelledSeats(CancelSeatsInputDTO cancelSeatsInputDTO, Ticket ticket)
         {
             float refundAmount = cancelSeatsInputDTO.SeatIds
                                 .Select(seatId => ticket.TicketDetails.FirstOrDefault(td => td.SeatId == seatId))
                                 .Where(ticketDetail => ticketDetail != null) // Filter out null ticket details (for invalid seat IDs)
                                 .Sum(ticketDetail => ticketDetail.SeatPrice);
             return refundAmount/2;
-        }
-
-        private async Task<bool> CheckIfSeatsInTicket(CancelSeatsInputDTO cancelSeatsInputDTO)
-        {
-            Ticket ticket = await _TicketRepository.GetById(cancelSeatsInputDTO.TicketId);
-            bool allSeatsPresent = cancelSeatsInputDTO.SeatIds.All(seatId => ticket.TicketDetails.Any(td => td.SeatId == seatId));
-            return allSeatsPresent;
         }
     }
 }

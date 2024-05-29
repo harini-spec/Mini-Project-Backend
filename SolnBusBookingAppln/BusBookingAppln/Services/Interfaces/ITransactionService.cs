@@ -7,8 +7,6 @@ namespace BusBookingAppln.Services.Interfaces
     {
         public Task<PaymentOutputDTO> BookTicket(int UserId, int TicketId, string PaymentMethod);
         public Task<RefundOutputDTO> CancelTicket(int UserId, int TicketId);
-        public float CalculateTicketFinalCost(float total_Cost, float discountPercentage, float gSTPercentage);
-        public Task<float> CalculateDiscountPercentage(int userId);
         public Task<RefundOutputDTO> CancelSeats(int UserId, CancelSeatsInputDTO cancelSeatsInputDTO);
     }
 }

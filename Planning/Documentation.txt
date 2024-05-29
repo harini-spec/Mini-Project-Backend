@@ -1,31 +1,11 @@
-Models: 
+Pointers to remember:
 
-    [] - Key
+    Customer and Admin - active by default
+    Roles: Admin, Customer, Driver
+    Gst percentage - in ticket 
 
-    Bus: [Bus ID] (Number Plate), Total no.of seats 
-    Schedule: [Scehdule ID], Bus ID, Route ID, Date of Departure, Date of Arrival, Driver ID
-    Route: [Route ID], From, To 
-    Route Details: [Route ID, Stop number], From, To
-
-    Driver: [Driver ID], Name, Age, Phone, Experience years
-    Driver Details: [Driver ID], Password Hash, Password encrypted, Status (for soft delete)
-    User: [User ID], Name, Age, Phone, Email, Role(Customer, Admin)
-    Rewards: [User ID], Reward points
-    User Details: [User ID], Password Hash, Password encrypted, Status (for soft delete)
-    Feedback: [Ticket ID], Feedback Date, Feedback Message, Rating
-
-    Seats: [Seat ID], Bus ID, Seat Number, Seat Type, Price of seat  
-
-    Tickets: 
-        [Ticket ID], User ID, Schedule ID, GST, Discount, Final amt  
-        Status(Not Booked / Booked / Ride Completed / Cancelled (all the tickets are cancelled)), 
-        Total cost, Date and Time of adding 
-
-    Ticket Details: [Ticket ID, Seat ID], Seat price, Passenger Name, Age, Gender, Status (Not Booked / Booked / Cancelled)
-
-    Payment: [Payment Transaction ID], Ticket ID, Payment method, Payment date, Payment status (Success / Fail)
-
-    Refund: [Refund Transaction ID], Ticket ID, Refund Amount(Total cost in Ticket if full ticket cancelled, else calculate total seat cost from Ticket Details), Refund Date, Refund Status (Success / Fail)
+    1 Ticket - n Payments (For fail case)
+    1 Payment - n Refund (For fail case)
 
 -----------------------------------------------------------------------------------------------------------------------------------/
 

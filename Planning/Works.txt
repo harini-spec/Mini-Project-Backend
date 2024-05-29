@@ -1,15 +1,21 @@
 Topic: Bus Booking System 
 Deadline: Tuesday 28/05/2024
 
-Expectation
-1. All end point properly planned
-2. Have understanding of data flow
-3. Arrange the Postman workspace for testing
-4. Handle the open API documentations - ProducesResponseType, etc 
-5. DTOs for handling the flow.
-6. Layer separation- DTO for that as well
-7. Validations
-8. Authentication and Authorization
-9. All exceptions - don't return bad request for all
-10. Logging 
-11. Unit Test 
+-----------------------------------------------------------------------------------------------------------------------------------/
+
+Exceptions: OperationCanceledException, DbUpdateException, DbUpdateConcurrencyException, same key? - InvalidOperationException
+Catch general exception and throw it in service / seperate exceptions in controller 
+
+Add summary in Interfaces
+Logging 
+All dtos have validation?
+check authorize part 
+check all files - crct ones are present 
+
+Unit test repos, services 
+
+Have understanding of data flow
+Check all endpoints once 
+Try to combine driver with user 
+Clean git unwanted folders
+-----------------------------------------------------------------------------------------------------------------------------------/

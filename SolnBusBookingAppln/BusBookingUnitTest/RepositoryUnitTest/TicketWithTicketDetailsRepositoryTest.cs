@@ -9,7 +9,7 @@ using System;
 
 namespace BusBookingUnitTest.RepositoryUnitTest
 {
-    public class TicketRepositoryTest
+    public class TicketWithTicketDetailsRepositoryTest
     {
         BusBookingContext context;
         [SetUp]

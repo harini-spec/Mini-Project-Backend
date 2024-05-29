@@ -15,6 +15,7 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRepository<int, DriverDetail> _driverDetailRepo;
         private readonly ITokenService _tokenService;
 
+
         public DriverService(IRepository<int, Driver> driverWithScheduleRepo, ITokenService tokenService, IRepository<int, DriverDetail> driverDetailRepo)
         {
             _tokenService = tokenService;
@@ -22,10 +23,22 @@ namespace BusBookingAppln.Services.Classes
             _driverWithSchedulesRepo = driverWithScheduleRepo;
         }
 
+
+        // Get driver object by Email ID
+        public async Task<Driver> GetDriverByEmail(string email)
+        {
+            var drivers = await _driverWithSchedulesRepo.GetAll();
+            var driver = drivers.ToList().FirstOrDefault(x => x.Email == email);
+            return driver;
+        }
+
+
+        // Login driver if their account is active
         public async Task<LoginDriverOutputDTO> LoginDriver(LoginDriverInputDTO loginInputDTO)
         {
             try
             {
+                // Checking is Email ID is present 
                 Driver driver = await GetDriverByEmail(loginInputDTO.Email);
                 if (driver == null)
                 {
@@ -37,8 +50,11 @@ namespace BusBookingAppln.Services.Classes
                 HMACSHA512 hMACSHA = new HMACSHA512(driverDetail.PasswordHashKey);
                 var encryptedPass = hMACSHA.ComputeHash(Encoding.UTF8.GetBytes(loginInputDTO.Password));
                 bool isPasswordSame = ComparePassword(encryptedPass, driverDetail.PasswordEncrypted);
+
+                // Checking if password is correct
                 if (isPasswordSame)
                 {
+                    // Checking if account is active
                     if(driverDetail.Status == "Active")
                     {
                         LoginDriverOutputDTO loginOutputDTO = MapDriverToLoginDriverReturnDTO(driver);
@@ -54,6 +70,8 @@ namespace BusBookingAppln.Services.Classes
             }
         }
 
+
+        // Map Driver to LoginDriverOutputDTO
         private LoginDriverOutputDTO MapDriverToLoginDriverReturnDTO(Driver driver)
         {
             LoginDriverOutputDTO loginDriverOutputDTO = new LoginDriverOutputDTO();
@@ -64,6 +82,8 @@ namespace BusBookingAppln.Services.Classes
             return loginDriverOutputDTO;
         }
 
+
+        // Compare password in db to user's password - Both encrypted using same key 
         private bool ComparePassword(byte[] encryptedPass, byte[] passwordEncrypted)
         {
             for (int i = 0; i < encryptedPass.Length; i++)
@@ -76,17 +96,14 @@ namespace BusBookingAppln.Services.Classes
             return true;
         }
 
-        public async Task<Driver> GetDriverByEmail(string email)
-        {
-            var drivers = await _driverWithSchedulesRepo.GetAll();
-            var driver = drivers.ToList().FirstOrDefault(x => x.Email == email);
-            return driver;
-        }
 
+        // Change password of driver account
         public async Task<string> ChangePassword(string email, string NewPassword)
         {
+            // Validation - password must be atleast 8 characters
             if(NewPassword.Length >= 8)
             {
+                // Checking if driver account present
                 Driver driver = await GetDriverByEmail(email);
                 DriverDetail driverDetail = await _driverDetailRepo.GetById(driver.Id);
 
@@ -100,6 +117,8 @@ namespace BusBookingAppln.Services.Classes
             throw new ValidationErrorExcpetion("Password must be atleast 8 characters");
         }
 
+
+        // Check if driver is booked/available during a period of time
         public async Task<bool> CheckIfDriverAvailable(AddScheduleDTO addScheduleDTO, int driverId)
         {
             Driver driver = await GetDriverById(driverId);
@@ -117,6 +136,7 @@ namespace BusBookingAppln.Services.Classes
                 }
             return true;
         }
+
 
         public async Task<Driver> GetDriverById(int DriverId)
         {

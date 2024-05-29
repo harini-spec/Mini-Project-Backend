@@ -14,17 +14,16 @@ namespace BusBookingAppln.Services.Classes
     {
         private readonly IRepository<int, Driver> _driverRepo;
         private readonly IRepository<int, DriverDetail> _driverDetailRepo;
-        private readonly ITokenService _tokenService;
-        private readonly IDriverService _driverService;
 
-        public AdminService(IDriverService driverService, ITokenService tokenService, IRepository<int, Driver> driverRepo, IRepository<int, DriverDetail> driverDetailRepo)
+
+        public AdminService(IRepository<int, Driver> driverRepo, IRepository<int, DriverDetail> driverDetailRepo)
         {
-            _tokenService = tokenService;
             _driverRepo = driverRepo;
             _driverDetailRepo = driverDetailRepo;
-            _driverService = driverService;
         }
 
+
+        // Register Driver : Status = Inactive 
         public async Task<RegisterDriverOutputDTO> RegisterDriver(RegisterDriverInputDTO registerInputDTO)
         {
             Driver driver = null;
@@ -35,6 +34,8 @@ namespace BusBookingAppln.Services.Classes
             try
             {
                 driver = MapRegisterDriverInputDTOToDriver(registerInputDTO);
+
+                // Checking for duplicate key - Email ID 
                 try
                 {
                     InsertedDriver = await _driverRepo.Add(driver);
@@ -44,6 +45,7 @@ namespace BusBookingAppln.Services.Classes
                 driverDetail = MapRegisterInputDTOToDriverDetail(registerInputDTO);
                 driverDetail.DriverId = driver.Id;
                 InsertedDriverDetail = await _driverDetailRepo.Add(driverDetail);
+
                 RegisterDriverOutputDTO registerDriverOutputDTO = MapDriverToRegisterDriverOutputDTO(InsertedDriver);
                 return registerDriverOutputDTO;
             }
@@ -60,11 +62,52 @@ namespace BusBookingAppln.Services.Classes
             throw new UnableToRegisterException("Not able to register at this moment");
         }
 
+
         private async Task RevertDriverInsert(Driver driver)
         {
             await _driverRepo.Delete(driver.Id);
         }
 
+
+        // Activate Driver account : Status = Active 
+        public async Task<DriverActivateReturnDTO> ActivateDriver(int DriverId)
+        {
+            DriverDetail driverDetail = await _driverDetailRepo.GetById(DriverId);
+            driverDetail.Status = "Active";
+            await _driverDetailRepo.Update(driverDetail, DriverId);
+            Driver driver = await _driverRepo.GetById(DriverId);
+            DriverActivateReturnDTO driverActivateReturnDTO = MapDriverToDriverActivateReturnDTO(driver, "Active");
+            return driverActivateReturnDTO;
+        }
+
+
+        // Map RegisterDriverInputDTO to Driver
+        private Driver MapRegisterDriverInputDTOToDriver(RegisterDriverInputDTO registerInputDTO)
+        {
+            Driver driver = new Driver();
+            driver.Name = registerInputDTO.Name;
+            driver.Age = registerInputDTO.Age;
+            driver.Email = registerInputDTO.Email;
+            driver.Phone = registerInputDTO.Phone;
+            driver.YearsOfExperience = registerInputDTO.YearsOfExperience;
+            return driver;
+        }
+
+
+        // Map RegisterDriverInputDTO to DriverDetail 
+        private DriverDetail MapRegisterInputDTOToDriverDetail(RegisterDriverInputDTO registerInputDTO)
+        {
+            DriverDetail driverDetail = new DriverDetail();
+            driverDetail.Status = "Inactive";
+
+            HMACSHA512 hMACSHA = new HMACSHA512();
+            driverDetail.PasswordHashKey = hMACSHA.Key;
+            driverDetail.PasswordEncrypted = hMACSHA.ComputeHash(Encoding.UTF8.GetBytes(registerInputDTO.Password));
+            return driverDetail;
+        }
+
+
+        // Map Driver to RegisterDriverOutputDTO
         private RegisterDriverOutputDTO MapDriverToRegisterDriverOutputDTO(Driver driver)
         {
             RegisterDriverOutputDTO registerDriverOutputDTO = new RegisterDriverOutputDTO();
@@ -77,38 +120,8 @@ namespace BusBookingAppln.Services.Classes
             return registerDriverOutputDTO;
         }
 
-        private DriverDetail MapRegisterInputDTOToDriverDetail(RegisterDriverInputDTO registerInputDTO)
-        {
-            DriverDetail driverDetail = new DriverDetail();
-            driverDetail.Status = "Inactive";
 
-            HMACSHA512 hMACSHA = new HMACSHA512();
-            driverDetail.PasswordHashKey = hMACSHA.Key;
-            driverDetail.PasswordEncrypted = hMACSHA.ComputeHash(Encoding.UTF8.GetBytes(registerInputDTO.Password));
-            return driverDetail;
-        }
-
-        private Driver MapRegisterDriverInputDTOToDriver(RegisterDriverInputDTO registerInputDTO)
-        {
-            Driver driver = new Driver();
-            driver.Name = registerInputDTO.Name;
-            driver.Age = registerInputDTO.Age;
-            driver.Email = registerInputDTO.Email;
-            driver.Phone = registerInputDTO.Phone;
-            driver.YearsOfExperience = registerInputDTO.YearsOfExperience;
-            return driver;
-        }
-
-        public async Task<DriverActivateReturnDTO> ActivateDriver(int DriverId)
-        {
-            DriverDetail driverDetail = await _driverDetailRepo.GetById(DriverId);
-            driverDetail.Status = "Active";
-            driverDetail = await _driverDetailRepo.Update(driverDetail, DriverId);
-            Driver driver = await _driverRepo.GetById(DriverId);
-            DriverActivateReturnDTO driverActivateReturnDTO = MapDriverToDriverActivateReturnDTO(driver, "Active");
-            return driverActivateReturnDTO;
-        }
-
+        // Map Driver to DriverActivateReturnDTO
         private DriverActivateReturnDTO MapDriverToDriverActivateReturnDTO(Driver driver, string status)
         {
             DriverActivateReturnDTO driverActivateReturnDTO = new DriverActivateReturnDTO();

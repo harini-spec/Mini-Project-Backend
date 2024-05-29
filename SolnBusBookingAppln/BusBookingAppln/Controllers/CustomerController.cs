@@ -85,7 +85,7 @@ namespace BusBookingAppln.Controllers
             return BadRequest("All details are not provided. Please check the object");
         }
 
-        [HttpDelete("DeleteCustomerAccount")]
+        [HttpPut("DeleteCustomerAccount")]
         [Authorize(Roles = "Customer")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]

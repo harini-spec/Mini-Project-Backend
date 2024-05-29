@@ -14,5 +14,7 @@ namespace BusBookingAppln.Services.Interfaces
         public Task<string> UpdateTicketStatusToRideOver(int ScheduleId);
         public Task<bool> CheckIfUserHasActiveTickets(int userId);
         public Task<List<AddedTicketDTO>> GetAllTicketsOfCustomer(int CustomerId);
+        public float CalculateTicketFinalCost(float total_Cost, float discountPercentage, float gSTPercentage);
+        public Task<float> CalculateDiscountPercentage(int userId);
     }
 }

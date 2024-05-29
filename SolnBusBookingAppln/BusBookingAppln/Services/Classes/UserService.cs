@@ -16,6 +16,7 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRepository<int, UserDetail> _userDetailRepo;
         private readonly ITokenService _tokenService;
 
+
         public UserService(IRepository<int, User> userRepo, IRepository<int, UserDetail> userDetailRepo, ITokenService tokenService)
         {
             _userRepo = userRepo;
@@ -23,6 +24,8 @@ namespace BusBookingAppln.Services.Classes
             _tokenService = tokenService;
         }
 
+
+        // Get User object by Email ID
         public async Task<User> GetUserByEmail(string email)
         {
             var users = await _userRepo.GetAll();
@@ -34,18 +37,24 @@ namespace BusBookingAppln.Services.Classes
             return user;
         }
 
+
+        // Login Admin/Customer if their account is active
         public async Task<LoginOutputDTO> LoginAdminAndCustomer(LoginInputDTO loginInputDTO)
         {
             try
             {
+                // Checking is Email ID is present 
                 User user = await GetUserByEmail(loginInputDTO.Email);
                 UserDetail userDetail = await _userDetailRepo.GetById(user.Id);
 
                 HMACSHA512 hMACSHA = new HMACSHA512(userDetail.PasswordHashKey);
                 var encryptedPass = hMACSHA.ComputeHash(Encoding.UTF8.GetBytes(loginInputDTO.Password));
                 bool isPasswordSame = ComparePassword(encryptedPass, userDetail.PasswordEncrypted);
+
+                // Checking if password is correct
                 if (isPasswordSame)
                 {
+                    // Checking if account is active
                     if (userDetail.Status == "Active")
                     {
                         LoginOutputDTO loginOutputDTO = MapUserToLoginReturnDTO(user);
@@ -61,6 +70,8 @@ namespace BusBookingAppln.Services.Classes
             }
         }
 
+
+        // Map User to LoginOutputDTO
         private LoginOutputDTO MapUserToLoginReturnDTO(User user)
         {
             LoginOutputDTO loginOutputDTO = new LoginOutputDTO();
@@ -83,6 +94,8 @@ namespace BusBookingAppln.Services.Classes
             return true;
         }
 
+
+        // Register Driver : Status = Active 
         public async Task<RegisterOutputDTO> RegisterAdminAndCustomer(RegisterInputDTO registerInputDTO, string Role)
         {
             User user = null;
@@ -93,6 +106,7 @@ namespace BusBookingAppln.Services.Classes
             {   user = MapRegisterInputDTOToUser(registerInputDTO);
                 user.Role = Role;
 
+                // Checking for duplicate key - Email ID 
                 try
                 {
                     InsertedUser = await _userRepo.Add(user);
@@ -117,22 +131,14 @@ namespace BusBookingAppln.Services.Classes
             throw new UnableToRegisterException("Not able to register at this moment");
         }
 
+
         private async Task RevertUserInsert(User user)
         {
             await _userRepo.Delete(user.Id);
         }
 
-        private RegisterOutputDTO MapUserToRegisterOutputDTO(User user)
-        {
-            RegisterOutputDTO registerOutputDTO = new RegisterOutputDTO();
-            registerOutputDTO.Id = user.Id;
-            registerOutputDTO.Name = user.Name;
-            registerOutputDTO.Phone = user.Phone;
-            registerOutputDTO.Age = user.Age;
-            registerOutputDTO.Email = user.Email;
-            return registerOutputDTO;
-        }
 
+        // Map RegisterInputDTO to User
         private User MapRegisterInputDTOToUser(RegisterInputDTO registerDTO)
         {
             User user = new User();
@@ -143,6 +149,8 @@ namespace BusBookingAppln.Services.Classes
             return user;
         }
 
+
+        // Map RegisterInputDTO to UserDetail
         private UserDetail MapRegisterInputDTOToUserDetail(RegisterInputDTO registerDTO)
         {
             UserDetail userDetail = new UserDetail();
@@ -152,6 +160,19 @@ namespace BusBookingAppln.Services.Classes
             userDetail.PasswordHashKey = hMACSHA.Key;
             userDetail.PasswordEncrypted = hMACSHA.ComputeHash(Encoding.UTF8.GetBytes(registerDTO.Password));
             return userDetail;
+        }
+
+
+        // Map User to RegisterOutputDTO
+        private RegisterOutputDTO MapUserToRegisterOutputDTO(User user)
+        {
+            RegisterOutputDTO registerOutputDTO = new RegisterOutputDTO();
+            registerOutputDTO.Id = user.Id;
+            registerOutputDTO.Name = user.Name;
+            registerOutputDTO.Phone = user.Phone;
+            registerOutputDTO.Age = user.Age;
+            registerOutputDTO.Email = user.Email;
+            return registerOutputDTO;
         }
     }
 }

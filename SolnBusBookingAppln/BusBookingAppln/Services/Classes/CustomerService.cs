@@ -12,6 +12,7 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRepository<int, UserDetail> _userDetailRepo;
         private readonly IUserService _userService;
 
+
         public CustomerService(ITicketService ticketService, IRepository<int, UserDetail> userDetailRepo, IUserService userService)
         {
             _ticketService = ticketService;
@@ -19,12 +20,16 @@ namespace BusBookingAppln.Services.Classes
             _userService = userService;
         }
 
+
+        // Soft delete account : Status = "Inactive"
         public async Task<string> SoftDeleteCustomerAccount(int UserId)
         {
             UserDetail userDetail = await _userDetailRepo.GetById(UserId);
             if (userDetail.Status == "Active")
             {
+                // If user has active tickets(Booked), account won't be deleted
                 bool result = await _ticketService.CheckIfUserHasActiveTickets(UserId);
+
                 if (!result)
                 {
                     userDetail.Status = "Inactive";
@@ -32,20 +37,28 @@ namespace BusBookingAppln.Services.Classes
                     return "Account successfully deleted";
                 }
                 return "Sorry, you have active tickets. Cannot delete your account now";
+
             }
             throw new UserNotActiveException("User account is already deleted");
         }
 
+
+        // Activate deleted account : Status = "Active"
         public async Task<LoginOutputDTO> ActivateDeletedCustomerAccount(LoginInputDTO loginInputDTO)
         {
             User user = null;
             UserDetail userDetail = null;
             try
             {
+                // Check if user account is available 
                 user = await _userService.GetUserByEmail(loginInputDTO.Email);
                 userDetail = await _userDetailRepo.GetById(user.Id);
+
+                // Only customer account can be activated
                 if (user.Role == "Customer")
                 {
+
+                    // Checks if user is Inactive. If already active, throws an error.
                     if (userDetail.Status == "Inactive")
                     {
                         userDetail.Status = "Active";
@@ -53,11 +66,15 @@ namespace BusBookingAppln.Services.Classes
                         LoginOutputDTO loginOutputDTO = await _userService.LoginAdminAndCustomer(loginInputDTO);
                         return loginOutputDTO;
                     }
-                    throw new IncorrectOperationException("User account is already active");
+                    else
+                        throw new IncorrectOperationException("User account is already active");
                 }
-                throw new UnauthorizedUserException("Only Customer account can be activated here");
+                else 
+                    throw new UnauthorizedUserException("Only Customer account can be activated here");
             }
             catch (IncorrectOperationException) { throw; }
+
+            // If username or password is wrong, user is made Inactive again
             catch (Exception)
             {
                 if(userDetail != null)

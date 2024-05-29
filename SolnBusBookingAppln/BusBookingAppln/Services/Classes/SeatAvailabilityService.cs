@@ -14,6 +14,7 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRepositoryCompositeKey<int, int, TicketDetail> _TicketDetailRepository;
         private readonly IRepository<int, Ticket> _TicketRepository;
     
+
         public SeatAvailabilityService(IScheduleService ScheduleService, IBusService busService, IRepository<int, Ticket> TicketRepository, IRepositoryCompositeKey<int, int, TicketDetail> TicketDetailRepository) 
         {
             _scheduleService = ScheduleService;
@@ -21,14 +22,20 @@ namespace BusBookingAppln.Services.Classes
             _TicketDetailRepository = TicketDetailRepository;
             _TicketRepository = TicketRepository;
         }
+
+
+        // Check seat availability in a particular schedule - True : Available, False : Not Available
         public async Task<bool> CheckSeatAvailability(Schedule schedule, int SeatID)
         {
             try
             {
                 await DeleteNotBookedTickets();
+
                 List<Ticket> tickets = (List<Ticket>)await _TicketRepository.GetAll();
+
                 foreach (Ticket ticket in tickets)
                 {
+                    // Check if seat is already Booked
                     if (ticket.ScheduleId == schedule.Id && ticket.Status == "Booked")
                     {
                         foreach (var ticketDetail in ticket.TicketDetails)
@@ -39,9 +46,11 @@ namespace BusBookingAppln.Services.Classes
                             }
                         }
                     }
+
                     // If it's not been more than an hour from adding the ticket
                     else if(ticket.ScheduleId == schedule.Id && ticket.Status == "Not Booked")
                     {
+                        // If seat is already reserved
                         foreach(var ticketDetail in ticket.TicketDetails)
                             if(ticketDetail.SeatId == SeatID)
                                 return false;
@@ -52,6 +61,27 @@ namespace BusBookingAppln.Services.Classes
             catch (NoItemsFoundException) { return true; }
         }
 
+
+        // Delete tickets where reservation time limit has exceeded - 1 hr
+        public async Task DeleteNotBookedTickets()
+        {
+            List<Ticket> tickets = (List<Ticket>)await _TicketRepository.GetAll();
+            foreach (var ticket in tickets)
+            {
+                if (ticket.Status == "Not Booked" && (DateTime.Now.Hour - ticket.DateAndTimeOfAdding.Hour > 1))
+                {
+                    var ticketDetailCopy = ticket.TicketDetails.ToList();
+                    foreach (var ticketDetail in ticketDetailCopy)
+                    {
+                        await _TicketDetailRepository.Delete(ticketDetail.TicketId, ticketDetail.SeatId);
+                    }
+                    await _TicketRepository.Delete(ticket.Id);
+                }
+            }
+        }
+
+
+        // Get all available seats in a schedule
         public async Task<List<GetSeatsDTO>> GetAllAvailableSeatsInABusSchedule(int ScheduleId)
         {
             Schedule schedule = await _scheduleService.GetScheduleById(ScheduleId);
@@ -71,6 +101,8 @@ namespace BusBookingAppln.Services.Classes
             throw new NoSeatsAvailableException();
         }
 
+
+        // Map Seat to GetSeatsDTO
         private GetSeatsDTO MapSeatToGetSeatsDTO(Seat seat)
         {
             GetSeatsDTO getSeatsDTO = new GetSeatsDTO();
@@ -79,23 +111,6 @@ namespace BusBookingAppln.Services.Classes
             getSeatsDTO.SeatType = seat.SeatType;
             getSeatsDTO.SeatPrice = seat.SeatPrice;
             return getSeatsDTO;
-        }
-
-        public async Task DeleteNotBookedTickets()
-        {
-            List<Ticket> tickets = (List<Ticket>)await _TicketRepository.GetAll();
-            foreach (var ticket in tickets)
-            {
-                if (ticket.Status == "Not Booked" && (DateTime.Now.Hour - ticket.DateAndTimeOfAdding.Hour > 1))
-                {
-                    var ticketDetailCopy = ticket.TicketDetails.ToList();
-                    foreach (var ticketDetail in ticketDetailCopy)
-                    {
-                        await _TicketDetailRepository.Delete(ticketDetail.TicketId, ticketDetail.SeatId);
-                    }
-                    await _TicketRepository.Delete(ticket.Id);
-                }
-            }
         }
     }
 }

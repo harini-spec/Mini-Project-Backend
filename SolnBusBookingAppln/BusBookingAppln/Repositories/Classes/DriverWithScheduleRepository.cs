@@ -10,7 +10,7 @@ namespace BusBookingAppln.Repositories.Classes
     {
         public DriverWithScheduleRepository(BusBookingContext context) : base(context) { }
 
-        public virtual async Task<Driver> Add(Driver entity)
+        public override async Task<Driver> Add(Driver entity)
         {
             try
             {
@@ -24,7 +24,7 @@ namespace BusBookingAppln.Repositories.Classes
             }
         }
 
-        public virtual async Task<IList<Driver>> GetAll()
+        public override async Task<IList<Driver>> GetAll()
         {
             var items = _context.Drivers.Include(x => x.SchedulesForDriver).ToList();
             if (items.Count == 0)

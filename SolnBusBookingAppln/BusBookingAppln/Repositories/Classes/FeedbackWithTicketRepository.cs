@@ -14,7 +14,7 @@ namespace BusBookingAppln.Repositories.Classes
 
         public override async Task<IList<Feedback>> GetAll()
         {
-            var items = _context.Feedbacks.Include(x => x.FeedbackForTicket).ToList();
+            var items = await _context.Feedbacks.Include(x => x.FeedbackForTicket).ToListAsync();
             if (items.Count == 0)
             {
                 throw new NoItemsFoundException("No entities of type Feedback are found.");

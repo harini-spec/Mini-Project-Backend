@@ -11,26 +11,12 @@ namespace BusBookingAppln.Repositories.Classes
         public BusWithSeatsRepository(BusBookingContext context) : base(context) 
         {}
 
-        public virtual async Task<Bus> Add(Bus entity)
+        public override async Task<IList<Bus>> GetAll()
         {
-            try
-            {
-                _context.Add(entity);
-                await _context.SaveChangesAsync();
-                return entity;
-            }
-            catch (InvalidOperationException)
-            {
-                throw new InvalidOperationCustomException();
-            }
-        }
-
-        public virtual async Task<IList<Bus>> GetAll()
-        {
-            var items = _context.Buses.Include(x => x.SeatsInBus).ToList();
+            var items = await _context.Buses.Include(x => x.SeatsInBus).ToListAsync();
             if (items.Count == 0)
             {
-                throw new NoItemsFoundException("No entities of type Bus are found.");
+                throw new NoItemsFoundException($"No entities of type Bus are found.");
             }
             return items;
         }

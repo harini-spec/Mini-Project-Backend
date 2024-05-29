@@ -19,3 +19,21 @@ Check all endpoints once
 Try to combine driver with user 
 Clean git unwanted folders
 -----------------------------------------------------------------------------------------------------------------------------------/
+
+Repository tests:
+
+**User** 
+**User Details** 
+**Driver Details** 
+**Payment** 
+**Refund** 
+**Feedback** 
+
+Service tests:
+
+User 
+Customer
+Feedback
+SeatAvailabilityService
+Ticket
+Transaction

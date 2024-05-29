@@ -20,6 +20,7 @@ Installed Packages:
     EF Core - Tools
     EF Core - JWT Bearer 
     EF Core - InMemory
+    MOQ
 
 Repository Layer:
     For Primary Key     - IRepository - Base Repository - Main Repository

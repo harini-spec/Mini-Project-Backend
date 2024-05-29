@@ -2,8 +2,7 @@
 
 namespace BusBookingAppln.Exceptions
 {
-    [Serializable]
-    internal class ValidationErrorExcpetion : Exception
+    public class ValidationErrorExcpetion : Exception
     {
         public ValidationErrorExcpetion()
         {

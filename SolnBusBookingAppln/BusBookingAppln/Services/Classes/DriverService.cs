@@ -105,6 +105,10 @@ namespace BusBookingAppln.Services.Classes
             {
                 // Checking if driver account present
                 Driver driver = await GetDriverByEmail(email);
+                if (driver == null)
+                {
+                    throw new UnauthorizedUserException("Invalid username or password");
+                }
                 DriverDetail driverDetail = await _driverDetailRepo.GetById(driver.Id);
 
                 HMACSHA512 hMACSHA = new HMACSHA512();

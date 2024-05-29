@@ -2,8 +2,7 @@
 
 namespace BusBookingAppln.Exceptions
 {
-    [Serializable]
-    internal class UserNotActiveException : Exception
+    public class UserNotActiveException : Exception
     {
         public UserNotActiveException()
         {

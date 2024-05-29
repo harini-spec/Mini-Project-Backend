@@ -94,6 +94,10 @@ namespace BusBookingAppln.Services.Classes
             // Get Schedules scheduled after this point of time
             schedules = schedules.Where(schedule => schedule.DateTimeOfDeparture > DateTime.Now).ToList();
             List<ScheduleReturnDTO> scheduleReturnDTOs = await MapScheduleListToScheduleReturnDTOList(schedules.ToList());
+            if(scheduleReturnDTOs.Count == 0)
+            {
+                throw new NoItemsFoundException("No Schedules are found");
+            }
             return scheduleReturnDTOs;
         }
 

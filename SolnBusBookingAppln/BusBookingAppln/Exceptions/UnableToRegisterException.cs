@@ -2,8 +2,7 @@
 
 namespace BusBookingAppln.Exceptions
 {
-    [Serializable]
-    internal class UnableToRegisterException : Exception
+    public class UnableToRegisterException : Exception
     {
         public UnableToRegisterException()
         {

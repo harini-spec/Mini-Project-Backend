@@ -8,6 +8,8 @@ namespace BusBookingAppln.Models.DBModels
         public Ticket()
         {
             Status = string.Empty;
+            DiscountPercentage = 0;
+            GSTPercentage = 5;
         }
 
 
@@ -39,6 +41,19 @@ namespace BusBookingAppln.Models.DBModels
 
         [Required(ErrorMessage = "Date and Time of adding can't be empty")]
         public DateTime DateAndTimeOfAdding { get; set; }
+
+
+        [Range(0, float.MaxValue, ErrorMessage = "GST can't be negative")]
+        public float GSTPercentage { get; set; }
+
+
+        [Range(0, float.MaxValue, ErrorMessage = "GST can't be negative")]
+        public float DiscountPercentage { get; set; }
+
+
+        [Required(ErrorMessage = "Final cost can't be empty")]
+        [Range(0, float.MaxValue, ErrorMessage = "Cost can't be negative")]
+        public float Final_Amount { get; set; }
 
 
         public Feedback? FeedbackForRide { get; set; }

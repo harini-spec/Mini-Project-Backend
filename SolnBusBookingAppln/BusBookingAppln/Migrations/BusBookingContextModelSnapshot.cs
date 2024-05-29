@@ -35,29 +35,6 @@ namespace BusBookingAppln.Migrations
                     b.ToTable("Buses");
                 });
 
-            modelBuilder.Entity("BusBookingAppln.Models.DBModels.BusRoute", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Destination")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Source")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Routes");
-                });
-
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Driver", b =>
                 {
                     b.Property<int>("Id")
@@ -143,10 +120,7 @@ namespace BusBookingAppln.Migrations
                     b.Property<string>("TransactionId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<float>("DiscountPercentage")
-                        .HasColumnType("real");
-
-                    b.Property<float>("GSTPercentage")
+                    b.Property<float>("AmountPaid")
                         .HasColumnType("real");
 
                     b.Property<DateTime>("PaymentDate")
@@ -162,9 +136,6 @@ namespace BusBookingAppln.Migrations
 
                     b.Property<int>("TicketId")
                         .HasColumnType("int");
-
-                    b.Property<float>("TotalAmount")
-                        .HasColumnType("real");
 
                     b.HasKey("TransactionId");
 
@@ -209,6 +180,29 @@ namespace BusBookingAppln.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Rewards");
+                });
+
+            modelBuilder.Entity("BusBookingAppln.Models.DBModels.Route", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Destination")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Routes");
                 });
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.RouteDetail", b =>
@@ -308,6 +302,15 @@ namespace BusBookingAppln.Migrations
 
                     b.Property<DateTime>("DateAndTimeOfAdding")
                         .HasColumnType("datetime2");
+
+                    b.Property<float>("DiscountPercentage")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Final_Amount")
+                        .HasColumnType("real");
+
+                    b.Property<float>("GSTPercentage")
+                        .HasColumnType("real");
 
                     b.Property<int>("ScheduleId")
                         .HasColumnType("int");
@@ -486,7 +489,7 @@ namespace BusBookingAppln.Migrations
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.RouteDetail", b =>
                 {
-                    b.HasOne("BusBookingAppln.Models.DBModels.BusRoute", "ForRoute")
+                    b.HasOne("BusBookingAppln.Models.DBModels.Route", "ForRoute")
                         .WithMany("RouteStops")
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -509,7 +512,7 @@ namespace BusBookingAppln.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("BusBookingAppln.Models.DBModels.BusRoute", "ScheduledRoute")
+                    b.HasOne("BusBookingAppln.Models.DBModels.Route", "ScheduledRoute")
                         .WithMany("SchedulesInThisRoute")
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -589,19 +592,19 @@ namespace BusBookingAppln.Migrations
                     b.Navigation("SeatsInBus");
                 });
 
-            modelBuilder.Entity("BusBookingAppln.Models.DBModels.BusRoute", b =>
-                {
-                    b.Navigation("RouteStops");
-
-                    b.Navigation("SchedulesInThisRoute");
-                });
-
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Driver", b =>
                 {
                     b.Navigation("DriverDetails")
                         .IsRequired();
 
                     b.Navigation("SchedulesForDriver");
+                });
+
+            modelBuilder.Entity("BusBookingAppln.Models.DBModels.Route", b =>
+                {
+                    b.Navigation("RouteStops");
+
+                    b.Navigation("SchedulesInThisRoute");
                 });
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Schedule", b =>

@@ -89,14 +89,15 @@ namespace BusBookingAppln.Services.Classes
             User InsertedUser = null;
             UserDetail userDetail = null;
             UserDetail InsertedUserDetail = null;
-
             try
-            {
-                User ExistingUser = await GetUserByEmail(registerInputDTO.Email);
-                if (ExistingUser != null) { throw new UnableToRegisterException("Email ID already exists"); }
-                user = MapRegisterInputDTOToUser(registerInputDTO);
+            {   user = MapRegisterInputDTOToUser(registerInputDTO);
                 user.Role = Role;
-                InsertedUser = await _userRepo.Add(user);
+
+                try
+                {
+                    InsertedUser = await _userRepo.Add(user);
+                }
+                catch (DbUpdateException) { throw new UnableToRegisterException("Email ID already exists"); }
                 userDetail = MapRegisterInputDTOToUserDetail(registerInputDTO);
                 userDetail.UserId = InsertedUser.Id;
                 InsertedUserDetail = await _userDetailRepo.Add(userDetail);
@@ -105,7 +106,7 @@ namespace BusBookingAppln.Services.Classes
             }
             catch (UnableToRegisterException) { throw; }
             catch (Exception) { }
-            if (user == null)
+            if (InsertedUser == null)
             {
                 throw new UnableToRegisterException("Not able to register at this moment");
             }

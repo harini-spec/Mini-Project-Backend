@@ -17,10 +17,12 @@ namespace BusBookingAppln.Services.Classes
             _ticketService = ticketService;
         }
 
-        public async Task<string> AddFeedback(AddFeedbackDTO feedbackDTO)
+        public async Task<string> AddFeedback(int UserId, AddFeedbackDTO feedbackDTO)
         {
             Ticket ticket = await _ticketService.GetTicketById(feedbackDTO.TicketId);
-            if(ticket.Status == "Ride Over") 
+            if(ticket.UserId != UserId)
+                throw new UnauthorizedUserException("You can't provide feedback for this ticket");
+            if (ticket.Status == "Ride Over") 
             {
                 Feedback feedback = MapFeedbackDTOToFeedback(feedbackDTO);
                 await _FeedbackRepository.Add(feedback);

@@ -78,7 +78,7 @@ namespace BusBookingAppln
             builder.Services.AddScoped<IRepository<string, Payment>, MainRepository<string, Payment>>();
             builder.Services.AddScoped<IRepository<string, Refund>, MainRepository<string, Refund>>();
             builder.Services.AddScoped<IRepository<int, Reward>, MainRepository<int, Reward>>();
-            builder.Services.AddScoped<IRepository<int, BusRoute>, MainRepository<int, BusRoute>>();
+            builder.Services.AddScoped<IRepository<int, Models.DBModels.Route>, MainRepository<int, Models.DBModels.Route>>();
             builder.Services.AddScoped<IRepository<int, Schedule>, MainRepository<int, Schedule>>();
             builder.Services.AddScoped<IRepository<int, Seat>, MainRepository<int, Seat>>();
             builder.Services.AddScoped<IRepository<int, Ticket>, TicketWithTicketDetailsRepository>();
@@ -102,7 +102,7 @@ namespace BusBookingAppln
             builder.Services.AddScoped<ISeatAvailability, SeatAvailabilityService>();
             builder.Services.AddScoped<IFeedbackService, FeedbackService>();
             builder.Services.AddScoped<ICustomerService, CustomerService>();
-
+            builder.Services.AddScoped<ITransactionService, TransactionService>();
             #endregion
 
 

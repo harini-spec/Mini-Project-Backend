@@ -8,9 +8,9 @@ namespace BusBookingAppln.Services.Classes
 {
     public class RouteService : IRouteService
     {
-        private readonly IRepository<int, BusRoute> _RouteRepository;
+        private readonly IRepository<int, Models.DBModels.Route> _RouteRepository;
 
-        public RouteService(IRepository<int, BusRoute> RouteRepository)
+        public RouteService(IRepository<int, Models.DBModels.Route> RouteRepository)
         {
             _RouteRepository = RouteRepository;
         }
@@ -24,14 +24,14 @@ namespace BusBookingAppln.Services.Classes
             throw new NoRoutesFoundForGivenSourceAndDest(source, destination);
         }
 
-        public async Task<BusRoute> GetRoute(int RouteId)
+        public async Task<Models.DBModels.Route> GetRoute(int RouteId)
         {
             return await _RouteRepository.GetById(RouteId);
         }
 
         public async Task<AddRouteDTO> AddRoute(AddRouteDTO addRouteDTO)
         {
-            BusRoute route = MapAddRouteDTOToRoute(addRouteDTO);
+            Models.DBModels.Route route = MapAddRouteDTOToRoute(addRouteDTO);
             await _RouteRepository.Add(route);
             route.RouteStops = MapAddRouteDetailToRouteDetail(route.Id, addRouteDTO);
             await _RouteRepository.Update(route, route.Id);
@@ -53,9 +53,9 @@ namespace BusBookingAppln.Services.Classes
             return routeDetails;
         }
 
-        private BusRoute MapAddRouteDTOToRoute(AddRouteDTO addRouteDTO)
+        private Models.DBModels.Route MapAddRouteDTOToRoute(AddRouteDTO addRouteDTO)
         {
-            BusRoute route = new BusRoute();
+            Models.DBModels.Route route = new Models.DBModels.Route();
             route.Source = addRouteDTO.Source;
             route.Destination = addRouteDTO.Destination;
             return route;

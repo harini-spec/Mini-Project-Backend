@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BusBookingAppln.Models.DBModels
 {
-    public class BusRoute
+    public class Route
     {
-        public BusRoute()
+        public Route()
         {
             Source = string.Empty;
             Destination = string.Empty;

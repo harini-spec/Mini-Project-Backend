@@ -2,59 +2,37 @@ Pointers to remember:
 
     Customer and Admin - active by default
     Roles: Admin, Customer, Driver
+    Gst percentage - in ticket 
+
+    Ticket status = Not booked, Booked, Cancelled, Ride Over 
+    Ticket detail status = Not booked, Booked, Cancelled
+
+    1 Ticket - n Payments (For fail case)
+    1 Payment - n Refund (For fail case)
+
 
 Exceptions: OperationCanceledException, DbUpdateException, DbUpdateConcurrencyException, same key? - InvalidOperationException
 Catch general exception and throw it in service / seperate exceptions in controller 
 Validations for DTOs too 
 Model state - check in controller (When you check this, it checks if the required fields are empty, else only when inserting to db)
 
-Postman requests 
-Try all endpoints once 
-Left over APIs
 Clean git unwanted folders
 Valid new password of driver 
 For repos with Include - check for exception for the included part
 
 Try to combine driver with user 
-Do not use composite key 
-Unit test buswithseatsrepo , feedbackwithticket
+Unit test repos, services 
 check authorize part 
 Add summary for every method 
 Logging 
 check all files - crct ones are present 
 
-Ticket status = Not booked, Booked, Cancelled, Ride Over 
-Ticket detail status = '' 
-
 clean documentation 
-Add migration once 
 
 -----------------------------------------------------------------------------------------------------------------------------------/
 
 Endpoints: 
 Customer:
-    Post/Make Payment 
-        Input:
-            - Ticket ID, Payment method
-        Logic:
-            - Calculate discount %:
-                - Reward system 
-                - Reduce user points if any present and if discount provided 
-            - Caculate total = total + gst - discount 
-            - Update status = Succes 
-            - Add 10 reward points to user
-
-    Delete/Cancel Ticket 
-        Input: 
-            - Ticket Id
-        Logic:
-            - Check if its on the day of the ride - No refund 
-            - Refund (total amount - gst amount) in payment (get Payemnt Id by ticket Id and status = success)
-            - Deduct 10 reward points provided to user while booking 
-            - Ticket status = Cancelled 
-            - Fill refund object 
-        Output:
-            - Refund object
 
     Delete/Cancel Seats
         Input:
@@ -71,39 +49,6 @@ Customer:
 -----------------------------------------------------------------------------------------------------------------------------------/
 
 Business logic:
-
-    User Input : 
-        Bus ID, Route ID, Date of Departure, List of seats 
-
-    Add seats to Ticket Details table : 
-        Take each seat from the customer's input, first check completely if all the seats are available 
-        If yes, add them to the database one by one 
-        
-    CheckTicketAvailability: Params - Schedule ID, Seat ID 
-        Get all Tickets of given -- Schedule ID (Bus ID, Date of Depature), and of Status = Booked (double checking)
-        Get their Ticket IDs
-        Now get all the Ticket Details for given Ticket ID 
-        Check if given seat ID is available or already booked (status)
-        If available - true, else false 
-
-    Update Ride Status:
-        Once the ride is over, mark the ticket Status as - Completed 
-        This can be used to get customer's ticket booking history (Status = Completed --> History)
-
-    Calculate Total cost for Ticket: 
-        In Seats table, get the Unit price of given seat.
-        Add them 
-
-    During Payment:
-        Calculate Reward points:
-            With each ticket booking, add 10 Reward points to customer. 
-                Reward points system:
-                    1 ticket booking  = 10 Reward points 
-                    100 reward points = 10% off 
-        Calculate Discount:
-            Get Customer's reward points and convert to %
-            Minus the rewards points of customer 
-            Minus the discount from total amount in ticket (exclude GST)
 
     Ticket cancellation:
         Cancellation DTO object: TicketID, seat ID
@@ -122,19 +67,5 @@ Business logic:
             -- Change ticket status - cancelled 
         Partial:
             -- Change ticket details status - cancelled 
-
-    Adding feedback: - can only provide for finished rides
-        Check if the status of the ticket is completed before inserting the feedback 
-
-    Payment : 
-        Once the payment is done, change the ticket status to booked. For payment, put some % of gst 
-
-    Release tickets :
-        While doing the payment - check
-        Delete ticket if status = Not booked, delete ticket details too 
-        If it's been 1 hr from the time of adding the ticket, release it - ticket status = Not booked 
-
-    1 Ticket - n Payments (For fail case)
-    1 Payment - n Refund (For fail case)
 
 -----------------------------------------------------------------------------------------------------------------------------------/

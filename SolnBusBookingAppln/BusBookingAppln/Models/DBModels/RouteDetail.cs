@@ -14,7 +14,7 @@ namespace BusBookingAppln.Models.DBModels
         [Required(ErrorMessage = "Route ID can't be empty")]
         [Range(1, int.MaxValue, ErrorMessage = "Route ID must be greater than 0")]
         public int RouteId { get; set; }
-        public BusRoute ForRoute { get; set; }
+        public Route ForRoute { get; set; }
 
 
         [Required(ErrorMessage = "Stop number can't be empty")]

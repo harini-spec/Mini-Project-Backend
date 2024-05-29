@@ -94,7 +94,7 @@ namespace BusBookingAppln.Services.Classes
             List<ScheduleReturnDTO> scheduleReturnDTOs = new List<ScheduleReturnDTO>();
             foreach (var schedule in schedules)
             {
-                BusRoute route = await _RouteService.GetRoute(schedule.RouteId);
+                Models.DBModels.Route route = await _RouteService.GetRoute(schedule.RouteId);
                 ScheduleReturnDTO scheduleReturnDTO = MapScheduleToScheduleReturnDTO(schedule, route.Source, route.Destination);
                 scheduleReturnDTOs.Add(scheduleReturnDTO);
             }

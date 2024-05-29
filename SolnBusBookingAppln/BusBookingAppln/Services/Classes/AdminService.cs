@@ -4,6 +4,7 @@ using BusBookingAppln.Models.DTOs.Driver;
 using BusBookingAppln.Models.DTOs.RegisterAndLogin;
 using BusBookingAppln.Repositories.Interfaces;
 using BusBookingAppln.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -27,20 +28,23 @@ namespace BusBookingAppln.Services.Classes
         public async Task<RegisterDriverOutputDTO> RegisterDriver(RegisterDriverInputDTO registerInputDTO)
         {
             Driver driver = null;
+            Driver InsertedDriver = null;
             DriverDetail driverDetail = null;
             DriverDetail InsertedDriverDetail = null;
 
             try
             {
-                Driver ExistingDriver = await _driverService.GetDriverByEmail(registerInputDTO.Email);
-                if (ExistingDriver != null) { throw new UnableToRegisterException("Email ID already exists"); }
                 driver = MapRegisterDriverInputDTOToDriver(registerInputDTO);
-                driver = await _driverRepo.Add(driver);
+                try
+                {
+                    InsertedDriver = await _driverRepo.Add(driver);
+                }
+                catch (DbUpdateException) { throw new UnableToRegisterException("Email ID already exists"); }
 
                 driverDetail = MapRegisterInputDTOToDriverDetail(registerInputDTO);
                 driverDetail.DriverId = driver.Id;
                 InsertedDriverDetail = await _driverDetailRepo.Add(driverDetail);
-                RegisterDriverOutputDTO registerDriverOutputDTO = MapDriverToRegisterDriverOutputDTO(driver);
+                RegisterDriverOutputDTO registerDriverOutputDTO = MapDriverToRegisterDriverOutputDTO(InsertedDriver);
                 return registerDriverOutputDTO;
             }
             catch (UnableToRegisterException) { throw; }

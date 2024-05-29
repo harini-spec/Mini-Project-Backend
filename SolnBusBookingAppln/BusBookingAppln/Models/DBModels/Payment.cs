@@ -9,25 +9,11 @@ namespace BusBookingAppln.Models.DBModels
         {
             Status = string.Empty;
             PaymentMethod = string.Empty;
-            GSTPercentage = 5;
         }
 
 
         [Key]
         public string TransactionId { get; set; }
-
-
-        [Range(0, 100, ErrorMessage = "GST percentage must be between 0 and 100")]
-        public float GSTPercentage { get; set; }
-
-
-        [Range(0, 100, ErrorMessage = "Discount percentage must be between 0 and 100")]
-        public float DiscountPercentage { get; set; }
-
-
-        [Required(ErrorMessage = "Amount can't be empty")]
-        [Range(0, float.MaxValue, ErrorMessage = "Total amount can't be negative")]
-        public float TotalAmount { get; set; }
 
 
         [Required(ErrorMessage = "Payment method can't be empty")]
@@ -36,6 +22,10 @@ namespace BusBookingAppln.Models.DBModels
 
         [Required(ErrorMessage = "Payment date can't be empty")]
         public DateTime PaymentDate { get; set; }
+
+        [Required(ErrorMessage = "Cost can't be empty")]
+        [Range(0, float.MaxValue, ErrorMessage = "Cost can't be negative")]
+        public float AmountPaid { get; set; }
 
 
         [Required(ErrorMessage = "Payment status can't be empty")]

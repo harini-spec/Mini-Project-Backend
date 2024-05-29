@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BusBookingAppln.Models.DTOs.Feedback;
+using System.Security.Claims;
 
 namespace BusBookingAppln.Controllers
 {
@@ -48,6 +49,7 @@ namespace BusBookingAppln.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
@@ -57,8 +59,13 @@ namespace BusBookingAppln.Controllers
             {
                 try
                 {
-                    var result = await _feedbackService.AddFeedback(addFeedbackDTO);
+                    int CustomerId = Convert.ToInt32(User.FindFirstValue("ID"));
+                    var result = await _feedbackService.AddFeedback(CustomerId, addFeedbackDTO);
                     return Ok(result);
+                }
+                catch (UnauthorizedUserException uau)
+                {
+                    return Unauthorized(new ErrorModel(401, uau.Message));
                 }
                 catch (InvalidOperationException ioe)
                 {

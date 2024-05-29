@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusBookingAppln.Migrations
 {
     [DbContext(typeof(BusBookingContext))]
-    [Migration("20240523081213_DriverDetailsAdded")]
-    partial class DriverDetailsAdded
+    [Migration("20240528135731_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -93,7 +93,7 @@ namespace BusBookingAppln.Migrations
 
                     b.HasKey("DriverId");
 
-                    b.ToTable("DriverDetail");
+                    b.ToTable("DriversDetails");
                 });
 
             modelBuilder.Entity("BusBookingAppln.Models.DBModels.Feedback", b =>
@@ -122,12 +122,6 @@ namespace BusBookingAppln.Migrations
                     b.Property<string>("TransactionId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<float>("DiscountPercentage")
-                        .HasColumnType("real");
-
-                    b.Property<float>("GSTPercentage")
-                        .HasColumnType("real");
-
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
@@ -141,9 +135,6 @@ namespace BusBookingAppln.Migrations
 
                     b.Property<int>("TicketId")
                         .HasColumnType("int");
-
-                    b.Property<float>("TotalAmount")
-                        .HasColumnType("real");
 
                     b.HasKey("TransactionId");
 
@@ -310,6 +301,15 @@ namespace BusBookingAppln.Migrations
 
                     b.Property<DateTime>("DateAndTimeOfAdding")
                         .HasColumnType("datetime2");
+
+                    b.Property<float>("DiscountPercentage")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Final_Amount")
+                        .HasColumnType("real");
+
+                    b.Property<float>("GSTPercentage")
+                        .HasColumnType("real");
 
                     b.Property<int>("ScheduleId")
                         .HasColumnType("int");

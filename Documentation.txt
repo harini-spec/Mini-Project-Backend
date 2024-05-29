@@ -17,13 +17,13 @@ Models:
     Seats: [Seat ID], Bus ID, Seat Number, Seat Type, Price of seat  
 
     Tickets: 
-        [Ticket ID], User ID, Schedule ID, 
+        [Ticket ID], User ID, Schedule ID, GST, Discount, Final amt  
         Status(Not Booked / Booked / Ride Completed / Cancelled (all the tickets are cancelled)), 
         Total cost, Date and Time of adding 
 
     Ticket Details: [Ticket ID, Seat ID], Seat price, Passenger Name, Age, Gender, Status (Not Booked / Booked / Cancelled)
 
-    Payment: [Payment Transaction ID], Ticket ID, GST, Total Amount, Discount% (Based on reward points), Payment method, Payment date, Payment status (Success / Fail)
+    Payment: [Payment Transaction ID], Ticket ID, Payment method, Payment date, Payment status (Success / Fail)
 
     Refund: [Refund Transaction ID], Ticket ID, Refund Amount(Total cost in Ticket if full ticket cancelled, else calculate total seat cost from Ticket Details), Refund Date, Refund Status (Success / Fail)
 
@@ -124,9 +124,10 @@ Customer:
         Input: 
             - Ticket Id
         Logic:
-            - Check if its on the day of the ride - No refund 
-            - Refund (total amount - gst amount) in payment (get Payemnt Id by ticket Id and status = success)
+            - Check if its on the day of the ride - No cancellation 
+            - Refund (final amt) in payment (get Payemnt Id by ticket Id and status = success)
             - Deduct 10 reward points provided to user while booking 
+            - 100 pts while booking - loss
             - Ticket status = Cancelled 
             - Fill refund object 
         Output:
@@ -184,8 +185,9 @@ Business logic:
         Calculate Reward points:
             With each ticket booking, add 10 Reward points to customer. 
                 Reward points system:
-                    1 ticket booking  = 10 Reward points 
+                    1 seat booking  = 10 Reward points for each seat booked
                     100 reward points = 10% off 
+                    Can only use 10% off on every ticket total 
         Calculate Discount:
             Get Customer's reward points and convert to %
             Minus the rewards points of customer 

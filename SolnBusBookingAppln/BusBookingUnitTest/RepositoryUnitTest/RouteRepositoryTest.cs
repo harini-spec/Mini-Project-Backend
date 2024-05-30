@@ -20,6 +20,12 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             RouteRepository = new MainRepository<int, Route>(context);
         }
 
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
 
         [Test]
         public async Task AddRouteSuccessTest()
@@ -34,7 +40,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            await RouteRepository.Delete(1);
         }
 
         [Test]
@@ -43,7 +48,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             var result = await RouteRepository.Add(new Route
             {
-                Id = 2,
+                Id = 1,
                 Source = "Chennai",
                 Destination = "Bangalore"
             });
@@ -51,7 +56,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Action
             var exception = Assert.ThrowsAsync<InvalidOperationCustomException>(() => RouteRepository.Add(new Route
             {
-                Id = 2,
+                Id = 1,
                 Source = "Chennai",
                 Destination = "Bangalore"
             }));
@@ -66,18 +71,16 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await RouteRepository.Add(new Route
             {
-                Id = 3,
+                Id = 1,
                 Source = "Chennai",
                 Destination = "Bangalore"
             });
 
             // Action
-            var result = await RouteRepository.GetById(3);
+            var result = await RouteRepository.GetById(1);
 
             // Assert
-            Assert.That(result.Id, Is.EqualTo(3));
-
-            await RouteRepository.Delete(3);
+            Assert.That(result.Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -98,7 +101,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             Route route = new Route
             {
-                Id = 3,
+                Id = 100,
                 Source = "Chennai",
                 Destination = "Bangalore"
             };
@@ -109,8 +112,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         [Test]
         public async Task GetAllRoutesFailTest()
         {
-            // Arrange
-            await RouteRepository.Delete(2);
 
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(() => RouteRepository.GetAll());
@@ -125,7 +126,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await RouteRepository.Add(new Route
             {
-                Id = 4,
+                Id = 1,
                 Source = "Chennai",
                 Destination = "Bangalore"
             });
@@ -135,7 +136,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result.Count, Is.EqualTo(1));
-            await RouteRepository.Delete(4);
         }
 
         [Test]
@@ -144,16 +144,16 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await RouteRepository.Add(new Route
             {
-                Id = 5,
+                Id = 1,
                 Source = "Chennai",
                 Destination = "Bangalore"
             });
 
             // Action
-            var entity = await RouteRepository.Delete(5);
+            var entity = await RouteRepository.Delete(1);
 
             // Assert
-            Assert.That(entity.Id, Is.EqualTo(5));
+            Assert.That(entity.Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -162,19 +162,18 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await RouteRepository.Add(new Route
             {
-                Id = 6,
+                Id = 1,
                 Source = "Chennai",
                 Destination = "Bangalore"
             });
-            var entity = await RouteRepository.GetById(6);
+            var entity = await RouteRepository.GetById(1);
             entity.Source = "Vellore";
 
             // Action
-            var result = await RouteRepository.Update(entity, 6);
+            var result = await RouteRepository.Update(entity, 1);
 
             // Assert
             Assert.That(result.Source, Is.EqualTo("Vellore"));
-            await RouteRepository.Delete(6);
         }
     }
 }

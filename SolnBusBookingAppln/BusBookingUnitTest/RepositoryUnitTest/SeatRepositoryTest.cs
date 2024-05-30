@@ -20,6 +20,13 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             SeatRepository = new MainRepository<int, Seat>(context);
         }
 
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
+
 
         [Test]
         public async Task AddSeatSuccessTest()
@@ -36,7 +43,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            await SeatRepository.Delete(1);
         }
 
         [Test]
@@ -45,7 +51,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             var result = await SeatRepository.Add(new Seat
             {
-                Id = 2,
+                Id = 1,
                 BusNumber = "TN11AA1111",
                 SeatNumber = "U1",
                 SeatType = "Upper",
@@ -55,7 +61,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Action
             var exception = Assert.ThrowsAsync<InvalidOperationCustomException>(() => SeatRepository.Add(new Seat
             {
-                Id = 2,
+                Id = 1,
                 BusNumber = "TN11AA1111",
                 SeatNumber = "U1",
                 SeatType = "Upper",
@@ -72,7 +78,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await SeatRepository.Add(new Seat
             {
-                Id = 3,
+                Id = 1,
                 BusNumber = "TN11AA1111",
                 SeatNumber = "U1",
                 SeatType = "Upper",
@@ -80,12 +86,10 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             });
 
             // Action
-            var result = await SeatRepository.GetById(3);
+            var result = await SeatRepository.GetById(1);
 
             // Assert
-            Assert.That(result.Id, Is.EqualTo(3));
-
-            await SeatRepository.Delete(3);
+            Assert.That(result.Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -119,9 +123,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         [Test]
         public async Task GetAllSeatsFailTest()
         {
-            // Arrange
-            await SeatRepository.Delete(2);
-
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(() => SeatRepository.GetAll());
 
@@ -135,7 +136,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await SeatRepository.Add(new Seat
             {
-                Id = 4,
+                Id = 1,
                 BusNumber = "TN11AA1111",
                 SeatNumber = "U1",
                 SeatType = "Upper",
@@ -147,7 +148,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result.Count, Is.EqualTo(1));
-            await SeatRepository.Delete(4);
         }
 
         [Test]
@@ -156,7 +156,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await SeatRepository.Add(new Seat
             {
-                Id = 5,
+                Id = 1,
                 BusNumber = "TN11AA1111",
                 SeatNumber = "U1",
                 SeatType = "Upper",
@@ -164,10 +164,10 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             });
 
             // Action
-            var entity = await SeatRepository.Delete(5);
+            var entity = await SeatRepository.Delete(1);
 
             // Assert
-            Assert.That(entity.Id, Is.EqualTo(5));
+            Assert.That(entity.Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -176,21 +176,20 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await SeatRepository.Add(new Seat
             {
-                Id = 6,
+                Id = 1,
                 BusNumber = "TN11AA1111",
                 SeatNumber = "U1",
                 SeatType = "Upper",
                 SeatPrice = 50
             });
-            var entity = await SeatRepository.GetById(6);
+            var entity = await SeatRepository.GetById(1);
             entity.BusNumber = "TN11BB1111";
 
             // Action
-            var result = await SeatRepository.Update(entity, 6);
+            var result = await SeatRepository.Update(entity, 1);
 
             // Assert
             Assert.That(result.BusNumber, Is.EqualTo("TN11BB1111"));
-            await SeatRepository.Delete(6);
         }
     }
 }

@@ -18,14 +18,19 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             context = new BusBookingContext(optionsBuilder.Options);
         }
 
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
 
         [Test]
         public async Task AddFeedbackSuccessTest()
         {
             // Arrange
             IRepository<int, Feedback> feedbackRepository = new FeedbackWithTicketRepository(context);
-
-            Ticket ticket = new Ticket(){Id = 1};
+            Ticket ticket = new Ticket() { Id = 1 };
 
             // Action
             var result = await feedbackRepository.Add(new Feedback
@@ -36,10 +41,9 @@ namespace BusBookingUnitTest.RepositoryUnitTest
                 TicketId = 1,
                 FeedbackForTicket = ticket
             });
-            var entity = await feedbackRepository.GetAll();
+
             // Assert
             Assert.That(result.TicketId, Is.EqualTo(1));
-            await feedbackRepository.Delete(1);
         }
 
         [Test]
@@ -47,13 +51,13 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepository<int, Feedback> feedbackRepository = new FeedbackWithTicketRepository(context);
-            Ticket ticket = new Ticket() { Id = 2 };
+            Ticket ticket = new Ticket() { Id = 1 };
             await feedbackRepository.Add(new Feedback
             {
                 FeedbackDate = DateTime.Now,
                 Message = "Timely arrival",
                 Rating = 9,
-                TicketId = 2,
+                TicketId = 1,
                 FeedbackForTicket = ticket
             });
 
@@ -63,7 +67,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
                 FeedbackDate = DateTime.Now,
                 Message = "Timely arrival",
                 Rating = 9,
-                TicketId = 2,
+                TicketId = 1,
                 FeedbackForTicket = ticket
             }));
 
@@ -76,23 +80,21 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepository<int, Feedback> feedbackRepository = new FeedbackWithTicketRepository(context);
-            Ticket ticket = new Ticket() { Id = 3 };
+            Ticket ticket = new Ticket() { Id = 1 };
             await feedbackRepository.Add(new Feedback
             {
                 FeedbackDate = DateTime.Now,
                 Message = "Timely arrival",
                 Rating = 9,
-                TicketId = 3,
+                TicketId = 1,
                 FeedbackForTicket = ticket
             });
 
             // Action
-            var result = await feedbackRepository.GetById(3);
+            var result = await feedbackRepository.GetById(1);
 
             // Assert
-            Assert.That(result.TicketId, Is.EqualTo(3));
-
-            await feedbackRepository.Delete(3);
+            Assert.That(result.TicketId, Is.EqualTo(1));
         }
 
         [Test]
@@ -102,7 +104,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<int, Feedback> feedbackRepository = new FeedbackWithTicketRepository(context);
 
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(() => feedbackRepository.GetById(100));
-
         }
 
         [Test]
@@ -119,13 +120,13 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepository<int, Feedback> feedbackRepository = new FeedbackWithTicketRepository(context);
-            Ticket ticket = new Ticket() { Id = 3 };
+            Ticket ticket = new Ticket() { Id = 100 };
             Feedback feedback = new Feedback
             {
                 FeedbackDate = DateTime.Now,
                 Message = "Timely arrival",
                 Rating = 9,
-                TicketId = 3,
+                TicketId = 100,
                 FeedbackForTicket = ticket
             };
 
@@ -137,7 +138,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepository<int, Feedback> feedbackRepository = new FeedbackWithTicketRepository(context);
-            await feedbackRepository.Delete(2);
 
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(() => feedbackRepository.GetAll());
@@ -151,13 +151,13 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepository<int, Feedback> feedbackRepository = new FeedbackWithTicketRepository(context);
-            Ticket ticket = new Ticket() { Id = 4 };
+            Ticket ticket = new Ticket() { Id = 1 };
             await feedbackRepository.Add(new Feedback
             {
                 FeedbackDate = DateTime.Now,
                 Message = "Timely arrival",
                 Rating = 9,
-                TicketId = 4,
+                TicketId = 1,
                 FeedbackForTicket = ticket
             });
 
@@ -166,7 +166,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result.Count, Is.EqualTo(1));
-            await feedbackRepository.Delete(4);
         }
 
         [Test]
@@ -174,21 +173,21 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepository<int, Feedback> feedbackRepository = new FeedbackWithTicketRepository(context);
-            Ticket ticket = new Ticket() { Id = 5 };
+            Ticket ticket = new Ticket() { Id = 1 };
             await feedbackRepository.Add(new Feedback
             {
                 FeedbackDate = DateTime.Now,
                 Message = "Timely arrival",
                 Rating = 9,
-                TicketId = 5,
+                TicketId = 1,
                 FeedbackForTicket = ticket
             });
 
             // Action
-            var entity = await feedbackRepository.Delete(5);
+            var entity = await feedbackRepository.Delete(1);
 
             // Assert
-            Assert.That(entity.TicketId, Is.EqualTo(5));
+            Assert.That(entity.TicketId, Is.EqualTo(1));
         }
 
         [Test]
@@ -196,24 +195,23 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepository<int, Feedback> feedbackRepository = new FeedbackWithTicketRepository(context);
-            Ticket ticket = new Ticket() { Id = 6 };
+            Ticket ticket = new Ticket() { Id = 1 };
             await feedbackRepository.Add(new Feedback
             {
                 FeedbackDate = DateTime.Now,
                 Message = "Timely arrival",
                 Rating = 9,
-                TicketId = 6,
+                TicketId = 1,
                 FeedbackForTicket = ticket
             });
-            var entity = await feedbackRepository.GetById(6);
+            var entity = await feedbackRepository.GetById(1);
             entity.Message = "Good work";
 
             // Action
-            var result = await feedbackRepository.Update(entity, 6);
+            var result = await feedbackRepository.Update(entity, 1);
 
             // Assert
             Assert.That(result.Message, Is.EqualTo("Good work"));
-            await feedbackRepository.Delete(6);
         }
     }
 }

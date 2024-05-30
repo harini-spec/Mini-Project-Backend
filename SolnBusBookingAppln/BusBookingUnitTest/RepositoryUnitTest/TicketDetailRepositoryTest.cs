@@ -19,6 +19,12 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             context = new BusBookingContext(optionsBuilder.Options);
         }
 
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
 
         [Test]
         public async Task AddTicketDetailSuccessTest()
@@ -41,8 +47,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result.TicketId, Is.EqualTo(1));
-
-            await ticketDetailRepository.Delete(1, 1);
         }
 
         [Test]
@@ -52,7 +56,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             var result = await ticketDetailRepository.Add(new TicketDetail
             {
-                TicketId = 2,
+                TicketId = 1,
                 SeatId = 1,
                 SeatPrice = 500,
                 PassengerName = "Ram",
@@ -65,7 +69,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Action
             var exception = Assert.ThrowsAsync<InvalidOperationCustomException>(async () => await ticketDetailRepository.Add(new TicketDetail
             {
-                TicketId = 2,
+                TicketId = 1,
                 SeatId = 1,
                 SeatPrice = 500,
                 PassengerName = "Ram",
@@ -87,7 +91,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             await ticketDetailRepository.Add(new TicketDetail
             {
-                TicketId = 3,
+                TicketId = 1,
                 SeatId = 1,
                 SeatPrice = 500,
                 PassengerName = "Ram",
@@ -98,12 +102,10 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             });
 
             // Action
-            var result = await ticketDetailRepository.GetById(3, 1);
+            var result = await ticketDetailRepository.GetById(1, 1);
 
             // Assert
-            Assert.That(result.TicketId, Is.EqualTo(3));
-
-            await ticketDetailRepository.Delete(3, 1);
+            Assert.That(result.TicketId, Is.EqualTo(1));
         }
 
         [Test]
@@ -113,10 +115,10 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
 
             // Action
-            var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await ticketDetailRepository.GetById(100, 3));
+            var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await ticketDetailRepository.GetById(100, 1));
 
             // Assert
-            Assert.That(exception.Message, Is.EqualTo("Entity of type TicketDetail with TicketId = 100 and SeatId = 3 not found."));
+            Assert.That(exception.Message, Is.EqualTo("Entity of type TicketDetail with TicketId = 100 and SeatId = 1 not found."));
         }
 
         [Test]
@@ -126,10 +128,10 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
 
             // Action
-            var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await ticketDetailRepository.Delete(100, 3));
+            var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await ticketDetailRepository.Delete(100, 1));
 
             // Assert
-            Assert.That(exception.Message, Is.EqualTo("Entity of type TicketDetail with TicketId = 100 and SeatId = 3 not found."));
+            Assert.That(exception.Message, Is.EqualTo("Entity of type TicketDetail with TicketId = 100 and SeatId = 1 not found."));
         }
 
         [Test]
@@ -137,7 +139,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
-            await ticketDetailRepository.Delete(2, 1);
 
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(async () => await ticketDetailRepository.GetAll());
@@ -153,7 +154,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             await ticketDetailRepository.Add(new TicketDetail
             {
-                TicketId = 4,
+                TicketId = 1,
                 SeatId = 1,
                 SeatPrice = 500,
                 PassengerName = "Ram",
@@ -168,8 +169,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result.Count, Is.EqualTo(1));
-
-            await ticketDetailRepository.Delete(4, 1);
         }
 
         [Test]
@@ -203,7 +202,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             await ticketDetailRepository.Add(new TicketDetail
             {
-                TicketId = 5,
+                TicketId = 1,
                 SeatId = 1,
                 SeatPrice = 500,
                 PassengerName = "Ram",
@@ -214,10 +213,10 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             });
 
             // Action
-            var entity = await ticketDetailRepository.Delete(5, 1);
+            var entity = await ticketDetailRepository.Delete(1, 1);
 
             // Assert
-            Assert.That(entity.TicketId, Is.EqualTo(5));
+            Assert.That(entity.TicketId, Is.EqualTo(1));
         }
 
         [Test]
@@ -227,16 +226,16 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, TicketDetail> ticketDetailRepository = new TicketDetailRepository(context);
             await ticketDetailRepository.Add(new TicketDetail
             {
-                TicketId = 6,
+                TicketId = 1,
                 SeatId = 1,
                 SeatPrice = 500,
                 PassengerName = "Ram",
                 PassengerAge = 23,
                 PassengerGender = "Male",
                 PassengerPhone = "9999999999",
-                Status = "Not Booked"
+                Status = "Booked"
             });
-            var entity = await ticketDetailRepository.GetById(6, 1);
+            var entity = await ticketDetailRepository.GetById(1, 1);
             entity.Status = "Booked";
 
             // Action

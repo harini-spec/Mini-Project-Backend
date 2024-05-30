@@ -19,6 +19,12 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             context = new BusBookingContext(optionsBuilder.Options);
         }
 
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
 
         [Test]
         public async Task AddRouteDetailSuccessTest()
@@ -37,8 +43,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result.RouteId, Is.EqualTo(1));
-
-            await routeDetailRepository.Delete(1, 1);
         }
 
         [Test]
@@ -48,7 +52,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             var result = await routeDetailRepository.Add(new RouteDetail
             {
-                RouteId = 2,
+                RouteId = 1,
                 StopNumber = 1,
                 From_Location = "Chennai",
                 To_Location = "Bangalore"
@@ -57,7 +61,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Action
             var exception = Assert.ThrowsAsync<InvalidOperationCustomException>(async () => await routeDetailRepository.Add(new RouteDetail
             {
-                RouteId = 2,
+                RouteId = 1,
                 StopNumber = 1,
                 From_Location = "Chennai",
                 To_Location = "Bangalore"
@@ -75,19 +79,17 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             await routeDetailRepository.Add(new RouteDetail
             {
-                RouteId = 3,
+                RouteId = 1,
                 StopNumber = 1,
                 From_Location = "Chennai",
                 To_Location = "Bangalore"
             });
 
             // Action
-            var result = await routeDetailRepository.GetById(3, 1);
+            var result = await routeDetailRepository.GetById(1, 1);
 
             // Assert
-            Assert.That(result.RouteId, Is.EqualTo(3));
-
-            await routeDetailRepository.Delete(3, 1);
+            Assert.That(result.RouteId, Is.EqualTo(1));
         }
 
         [Test]
@@ -121,7 +123,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
-            await routeDetailRepository.Delete(2, 1);
 
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(async () => await routeDetailRepository.GetAll());
@@ -137,7 +138,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             await routeDetailRepository.Add(new RouteDetail
             {
-                RouteId = 4,
+                RouteId = 1,
                 StopNumber = 1,
                 From_Location = "Chennai",
                 To_Location = "Bangalore"
@@ -148,8 +149,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result.Count, Is.EqualTo(1));
-
-            await routeDetailRepository.Delete(4, 1);
         }
 
         [Test]
@@ -179,17 +178,17 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             await routeDetailRepository.Add(new RouteDetail
             {
-                RouteId = 5,
+                RouteId = 1,
                 StopNumber = 1,
                 From_Location = "Chennai",
                 To_Location = "Bangalore"
             });
 
             // Action
-            var entity = await routeDetailRepository.Delete(5, 1);
+            var entity = await routeDetailRepository.Delete(1, 1);
 
             // Assert
-            Assert.That(entity.RouteId, Is.EqualTo(5));
+            Assert.That(entity.RouteId, Is.EqualTo(1));
         }
 
         [Test]
@@ -199,12 +198,12 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepositoryCompositeKey<int, int, RouteDetail> routeDetailRepository = new RouteDetailRepository(context);
             await routeDetailRepository.Add(new RouteDetail
             {
-                RouteId = 6,
+                RouteId = 1,
                 StopNumber = 1,
                 From_Location = "Chennai",
                 To_Location = "Bangalore"
             });
-            var entity = await routeDetailRepository.GetById(6, 1);
+            var entity = await routeDetailRepository.GetById(1, 1);
             entity.To_Location = "Kerala";
 
             // Action

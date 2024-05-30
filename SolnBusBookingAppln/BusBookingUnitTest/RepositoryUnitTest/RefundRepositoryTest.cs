@@ -18,7 +18,14 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             context = new BusBookingContext(optionsBuilder.Options);
         }
 
-        [Test, Order(1)]
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
+
+        [Test]
         public async Task GetAllRefundsFailTest()
         {
             // Arrange
@@ -31,7 +38,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             Assert.That(exception.Message, Is.EqualTo("No entities of type Refund are found."));
         }
 
-        [Test, Order(2)]
+        [Test]
         public async Task AddRefundSuccessTest()
         {
             // Arrange
@@ -51,7 +58,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             Assert.That(result, Is.Not.Null);
         }
 
-        [Test, Order(3)]
+        [Test]
         public async Task AddRefundInvalidOperationExceptionTest()
         {
             // Arrange
@@ -79,7 +86,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             Assert.That(exception.Message, Is.EqualTo("Invalid operation : Key already present in DB"));
         }
 
-        [Test, Order(4)]
+        [Test]
         public async Task GetByTransactionIdSuccessTest()
         {
             // Arrange
@@ -100,7 +107,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             Assert.That(result.TransactionId, Is.EqualTo(entity.TransactionId));
         }
 
-        [Test, Order(5)]
+        [Test]
         public async Task GetByTransactionIdFailureTest()
         {
             // Arrange
@@ -109,7 +116,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(() => RefundRepository.GetById("ABC"));
         }
 
-        [Test, Order(6)]
+        [Test]
         public async Task DeleteByTransactionIdExceptionTest()
         {
             // Arrange
@@ -118,7 +125,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(() => RefundRepository.Delete("ABC"));
         }
 
-        [Test, Order(7)]
+        [Test]
         public async Task UpdateByTransactionIdExceptionTest()
         {
             // Arrange
@@ -136,20 +143,28 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
         }
 
-        [Test, Order(8)]
+        [Test]
         public async Task GetAllRefundSuccessTest()
         {
             // Arrange
             IRepository<string, Refund> RefundRepository = new MainRepository<string, Refund>(context);
+            await RefundRepository.Add(new Refund
+            {
+                TransactionId = Guid.NewGuid().ToString(),
+                RefundAmount = 50,
+                RefundDate = DateTime.Now,
+                Status = "Success",
+                TicketId = 1
+            });
 
             // Action
             var result = await RefundRepository.GetAll();
 
             // Assert
-            Assert.That(result.Count, Is.EqualTo(3));
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
-        [Test, Order(9)]
+        [Test]
         public async Task DeleteRefundSuccessTest()
         {
             // Arrange

@@ -19,6 +19,12 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             context = new BusBookingContext(optionsBuilder.Options);
         }
 
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
 
         [Test]
         public async Task AddTicketSuccessTest()
@@ -39,8 +45,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result.Id, Is.EqualTo(1));
-
-            await ticketRepository.Delete(1);
         }
 
         [Test]
@@ -50,7 +54,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             var result = await ticketRepository.Add(new Ticket
             {
-                Id = 2,
+                Id = 1,
                 UserId = 1,
                 ScheduleId = 1,
                 Status = "Booked",
@@ -61,7 +65,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Action
             var exception = Assert.ThrowsAsync<InvalidOperationCustomException>(async () => await ticketRepository.Add(new Ticket
             {
-                Id = 2,
+                Id = 1,
                 UserId = 1,
                 ScheduleId = 1,
                 Status = "Booked",
@@ -81,7 +85,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             await ticketRepository.Add(new Ticket
             {
-                Id = 3,
+                Id = 1,
                 UserId = 1,
                 ScheduleId = 1,
                 Status = "Booked",
@@ -90,12 +94,10 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             });
 
             // Action
-            var result = await ticketRepository.GetById(3);
+            var result = await ticketRepository.GetById(1);
 
             // Assert
-            Assert.That(result.Id, Is.EqualTo(3));
-
-            await ticketRepository.Delete(3);
+            Assert.That(result.Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -129,7 +131,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
-            await ticketRepository.Delete(2);
 
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(async () => await ticketRepository.GetAll());
@@ -145,7 +146,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             await ticketRepository.Add(new Ticket
             {
-                Id = 4,
+                Id = 1,
                 UserId = 1,
                 ScheduleId = 1,
                 Status = "Booked",
@@ -158,8 +159,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result.Count, Is.EqualTo(1));
-
-            await ticketRepository.Delete(4);
         }
 
         [Test]
@@ -191,7 +190,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             await ticketRepository.Add(new Ticket
             {
-                Id = 5,
+                Id = 1,
                 UserId = 1,
                 ScheduleId = 1,
                 Status = "Booked",
@@ -200,10 +199,10 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             });
 
             // Action
-            var entity = await ticketRepository.Delete(5);
+            var entity = await ticketRepository.Delete(1);
 
             // Assert
-            Assert.That(entity.Id, Is.EqualTo(5));
+            Assert.That(entity.Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -213,18 +212,18 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<int, Ticket> ticketRepository = new TicketWithTicketDetailsRepository(context);
             await ticketRepository.Add(new Ticket
             {
-                Id = 6,
+                Id = 1,
                 UserId = 1,
                 ScheduleId = 1,
                 Status = "Booked",
                 Total_Cost = 1000,
                 DateAndTimeOfAdding = DateTime.Now
             });
-            var entity = await ticketRepository.GetById(6);
+            var entity = await ticketRepository.GetById(1);
             entity.Status = "Cancelled";
 
             // Action
-            var result = await ticketRepository.Update(entity, 6);
+            var result = await ticketRepository.Update(entity, 1);
 
             // Assert
             Assert.That(result.Status, Is.EqualTo("Cancelled"));

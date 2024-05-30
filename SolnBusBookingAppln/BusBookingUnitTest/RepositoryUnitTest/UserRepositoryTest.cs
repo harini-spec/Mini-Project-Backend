@@ -13,6 +13,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
     {
         IRepository<int, User> UserRepo;
         BusBookingContext context;
+
         [SetUp]
         public void Setup()
         {
@@ -21,14 +22,21 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             UserRepo = new MainRepository<int, User>(context);
         }
 
-        [Test, Order(1)]
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
+
+        [Test]
         public async Task GetAllUsersFailTest()
         {
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(async () => await UserRepo.GetAll());
         }
 
-        [Test, Order(2)]
+        [Test]
         public async Task AddUserSuccessTest()
         {
             // Action
@@ -48,13 +56,13 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             await UserRepo.Delete(1);
         }
 
-        [Test, Order(3)]
+        [Test]
         public async Task AddUserInvalidOperationExceptionTest()
         {
             // Arrange
             await UserRepo.Add(new User
             {
-                Id = 2,
+                Id = 1,
                 Name = "Sam",
                 Age = 25,
                 Email = "sam@gmail.com",
@@ -65,7 +73,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Action
             var exception = Assert.ThrowsAsync<InvalidOperationCustomException>(async () => await UserRepo.Add(new User
             {
-                Id = 2,
+                Id = 1,
                 Name = "Sam",
                 Age = 25,
                 Email = "sam@gmail.com",
@@ -79,13 +87,13 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             Assert.That(exception.Message, Is.EqualTo("Invalid operation : Key already present in DB"));
         }
 
-        [Test, Order(3)]
+        [Test]
         public async Task GetByUserIdSuccessTest()
         {
             // Arrange
             await UserRepo.Add(new User
             {
-                Id = 3,
+                Id = 1,
                 Name = "Sam",
                 Age = 25,
                 Email = "sam@gmail.com",
@@ -94,31 +102,40 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             });
 
             // Action
-            var result = await UserRepo.GetById(3);
+            var result = await UserRepo.GetById(1);
 
             // Assert
-            Assert.That(result.Id, Is.EqualTo(3));
-
-            await UserRepo.Delete(3);
+            Assert.That(result.Id, Is.EqualTo(1));
         }
 
-        [Test, Order(4)]
+        [Test]
         public async Task GetByUserIdFailureTest()
         {
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await UserRepo.GetById(100));
         }
 
-        [Test, Order(5)]
+        [Test]
         public async Task DeleteByUserIdExceptionTest()
         {
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await UserRepo.Delete(100));
         }
 
-        [Test, Order(6)]
+        [Test]
         public async Task GetAllUsersSuccessTest()
         {
+            // Arrange
+            await UserRepo.Add(new User
+            {
+                Id = 1,
+                Name = "Sam",
+                Age = 25,
+                Email = "sam@gmail.com",
+                Phone = "9999999999",
+                Role = "Customer"
+            });
+
             // Action
             var result = await UserRepo.GetAll();
 
@@ -127,7 +144,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
         }
 
-        [Test, Order(7)]
+        [Test]
         public async Task UpdateUserExceptionTest()
         {
             // Arrange
@@ -148,13 +165,13 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             Assert.That(exception.Message, Is.EqualTo("Entity of type User with ID 100 not found."));
         }
 
-        [Test, Order(8)]
+        [Test]
         public async Task DeleteUserSuccessTest()
         {
             // Arrange
             await UserRepo.Add(new User
             {
-                Id = 4,
+                Id = 1,
                 Name = "Sam",
                 Age = 25,
                 Email = "sam@gmail.com",
@@ -163,30 +180,30 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             });
 
             // Action
-            var entity = await UserRepo.Delete(4);
+            var entity = await UserRepo.Delete(1);
 
             // Assert
-            Assert.That(entity.Id, Is.EqualTo(4));
+            Assert.That(entity.Id, Is.EqualTo(1));
         }
 
-        [Test, Order(9)]
+        [Test]
         public async Task UpdateUserSuccessTest()
         {
             // Arrange
             await UserRepo.Add(new User
             {
-                Id = 5,
+                Id = 1,
                 Name = "Sam",
                 Age = 25,
                 Email = "sam@gmail.com",
                 Phone = "9999999999",
                 Role = "Customer"
             });
-            var entity = await UserRepo.GetById(5);
+            var entity = await UserRepo.GetById(1);
             entity.Role = "Admin";
 
             // Action
-            var result = await UserRepo.Update(entity, 5);
+            var result = await UserRepo.Update(entity, 1);
 
             // Assert
             Assert.That(result.Role, Is.EqualTo("Admin"));

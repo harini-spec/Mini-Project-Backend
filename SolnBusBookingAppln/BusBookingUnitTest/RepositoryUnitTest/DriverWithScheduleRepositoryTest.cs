@@ -19,6 +19,12 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             context = new BusBookingContext(optionsBuilder.Options);
         }
 
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
 
         [Test]
         public async Task AddDriverSuccessTest()
@@ -35,13 +41,10 @@ namespace BusBookingUnitTest.RepositoryUnitTest
                 Email = "sam@gmail.com",
                 Phone = "9999999999",
                 YearsOfExperience = 2
-
             });
 
             // Assert
             Assert.That(result.Id, Is.EqualTo(1));
-
-            await driverRepository.Delete(1);
         }
 
         [Test]
@@ -51,25 +54,23 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             var result = await driverRepository.Add(new Driver
             {
-                Id = 2,
-                Name = "Ram",
+                Id = 1,
+                Name = "Sam",
                 Age = 25,
-                Email = "ram@gmail.com",
-                Phone = "9999999988",
+                Email = "sam@gmail.com",
+                Phone = "9999999999",
                 YearsOfExperience = 2
-
             });
 
             // Action
             var exception = Assert.ThrowsAsync<InvalidOperationCustomException>(async () => await driverRepository.Add(new Driver
             {
-                Id = 2,
-                Name = "Ram",
+                Id = 1,
+                Name = "Sam",
                 Age = 25,
-                Email = "ram@gmail.com",
-                Phone = "9999999988",
+                Email = "sam@gmail.com",
+                Phone = "9999999999",
                 YearsOfExperience = 2
-
             }));
 
 
@@ -84,22 +85,19 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             await driverRepository.Add(new Driver
             {
-                Id = 3,
-                Name = "Ramu",
+                Id = 1,
+                Name = "Sam",
                 Age = 25,
-                Email = "ramu@gmail.com",
-                Phone = "9999999977",
+                Email = "sam@gmail.com",
+                Phone = "9999999999",
                 YearsOfExperience = 2
-
             });
 
             // Action
-            var result = await driverRepository.GetById(3);
+            var result = await driverRepository.GetById(1);
 
             // Assert
-            Assert.That(result.Id, Is.EqualTo(3));
-
-            await driverRepository.Delete(3);
+            Assert.That(result.Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -133,8 +131,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
-            // Used here becuz if used in exception, add in exception is not async so order is changing 
-            await driverRepository.Delete(2);
 
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(async () => await driverRepository.GetAll());
@@ -150,13 +146,12 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             await driverRepository.Add(new Driver
             {
-                Id = 4,
-                Name = "Ramu",
+                Id = 1,
+                Name = "Sam",
                 Age = 25,
-                Email = "ramu@gmail.com",
-                Phone = "9999999977",
+                Email = "sam@gmail.com",
+                Phone = "9999999999",
                 YearsOfExperience = 2
-
             });
 
             // Action
@@ -164,8 +159,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result.Count, Is.EqualTo(1));
-
-            await driverRepository.Delete(4);
         }
 
         [Test]
@@ -176,12 +169,11 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             var driver = new Driver
             {
                 Id = 100,
-                Name = "Ramu",
+                Name = "Sam",
                 Age = 25,
-                Email = "ramu@gmail.com",
-                Phone = "9999999977",
+                Email = "sam@gmail.com",
+                Phone = "9999999999",
                 YearsOfExperience = 2
-
             };
 
             // Action
@@ -198,19 +190,19 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             await driverRepository.Add(new Driver
             {
-                Id = 3,
-                Name = "Ramu",
+                Id = 1,
+                Name = "Sam",
                 Age = 25,
-                Email = "ramu@gmail.com",
-                Phone = "9999999977",
+                Email = "sam@gmail.com",
+                Phone = "9999999999",
                 YearsOfExperience = 2
             });
 
             // Action
-            var entity = await driverRepository.Delete(3);
+            var entity = await driverRepository.Delete(1);
 
             // Assert
-            Assert.That(entity.Id, Is.EqualTo(3));
+            Assert.That(entity.Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -220,18 +212,18 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<int, Driver> driverRepository = new DriverWithScheduleRepository(context);
             await driverRepository.Add(new Driver
             {
-                Id = 3,
-                Name = "Ramu",
+                Id = 1,
+                Name = "Sam",
                 Age = 25,
-                Email = "ramu@gmail.com",
-                Phone = "9999999977",
+                Email = "sam@gmail.com",
+                Phone = "9999999999",
                 YearsOfExperience = 2
             });
-            var entity = await driverRepository.GetById(3);
+            var entity = await driverRepository.GetById(1);
             entity.YearsOfExperience = 3;
 
             // Action
-            var result = await driverRepository.Update(entity, 3);
+            var result = await driverRepository.Update(entity, 1);
 
             // Assert
             Assert.That(result.YearsOfExperience, Is.EqualTo(3));

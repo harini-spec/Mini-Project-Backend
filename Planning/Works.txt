@@ -17,6 +17,7 @@ Add ticket - seat not available
     - Check if seat belongs to schedule 
 Get Reward points of user 
 Seperate Admin and Customer to diff table - same email id checking pblm 
+Check if deletion/updation id sent and entity id are same 
 -----------------------------------------------------------------------------------------------------------------------------------/
 
 Repository tests:

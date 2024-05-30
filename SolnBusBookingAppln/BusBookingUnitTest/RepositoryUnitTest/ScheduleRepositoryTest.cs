@@ -20,6 +20,13 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             ScheduleRepository = new MainRepository<int, Schedule>(context);
         }
 
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
+
 
         [Test]
         public async Task AddScheduleSuccessTest()
@@ -37,7 +44,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            await ScheduleRepository.Delete(1);
         }
 
         [Test]
@@ -46,7 +52,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             var result = await ScheduleRepository.Add(new Schedule
             {
-                Id = 2,
+                Id = 1,
                 DateTimeOfArrival = DateTime.Now,
                 DateTimeOfDeparture = DateTime.Now,
                 BusNumber = "TN11AA1111",
@@ -57,7 +63,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Action
             var exception = Assert.ThrowsAsync<InvalidOperationCustomException>(() => ScheduleRepository.Add(new Schedule
             {
-                Id = 2,
+                Id = 1,
                 DateTimeOfArrival = DateTime.Now,
                 DateTimeOfDeparture = DateTime.Now,
                 BusNumber = "TN11AA1111",
@@ -75,7 +81,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await ScheduleRepository.Add(new Schedule
             {
-                Id = 3,
+                Id = 1,
                 DateTimeOfArrival = DateTime.Now,
                 DateTimeOfDeparture = DateTime.Now,
                 BusNumber = "TN11AA1111",
@@ -84,12 +90,10 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             });
 
             // Action
-            var result = await ScheduleRepository.GetById(3);
+            var result = await ScheduleRepository.GetById(1);
 
             // Assert
-            Assert.That(result.Id, Is.EqualTo(3));
-
-            await ScheduleRepository.Delete(3);
+            Assert.That(result.Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -124,9 +128,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         [Test]
         public async Task GetAllSchedulesFailTest()
         {
-            // Arrange
-            await ScheduleRepository.Delete(2);
-
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(() => ScheduleRepository.GetAll());
 
@@ -140,7 +141,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await ScheduleRepository.Add(new Schedule
             {
-                Id = 4,
+                Id = 1,
                 DateTimeOfArrival = DateTime.Now,
                 DateTimeOfDeparture = DateTime.Now,
                 BusNumber = "TN11AA1111",
@@ -153,7 +154,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
 
             // Assert
             Assert.That(result.Count, Is.EqualTo(1));
-            await ScheduleRepository.Delete(4);
         }
 
         [Test]
@@ -162,7 +162,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await ScheduleRepository.Add(new Schedule
             {
-                Id = 5,
+                Id = 1,
                 DateTimeOfArrival = DateTime.Now,
                 DateTimeOfDeparture = DateTime.Now,
                 BusNumber = "TN11AA1111",
@@ -171,10 +171,10 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             });
 
             // Action
-            var entity = await ScheduleRepository.Delete(5);
+            var entity = await ScheduleRepository.Delete(1);
 
             // Assert
-            Assert.That(entity.Id, Is.EqualTo(5));
+            Assert.That(entity.Id, Is.EqualTo(1));
         }
 
         [Test]
@@ -183,22 +183,21 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             // Arrange
             await ScheduleRepository.Add(new Schedule
             {
-                Id = 6,
+                Id = 1,
                 DateTimeOfArrival = DateTime.Now,
                 DateTimeOfDeparture = DateTime.Now,
                 BusNumber = "TN11AA1111",
                 RouteId = 1,
                 DriverId = 1
             });
-            var entity = await ScheduleRepository.GetById(6);
+            var entity = await ScheduleRepository.GetById(1);
             entity.BusNumber = "TN11BB1111";
 
             // Action
-            var result = await ScheduleRepository.Update(entity, 6);
+            var result = await ScheduleRepository.Update(entity, 1);
 
             // Assert
             Assert.That(result.BusNumber, Is.EqualTo("TN11BB1111"));
-            await ScheduleRepository.Delete(6);
         }
     }
 }

@@ -18,6 +18,12 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             context = new BusBookingContext(optionsBuilder.Options);
         }
 
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
 
         [Test]
         public async Task AddRewardSuccessTest()
@@ -117,7 +123,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepository<int, Reward> RewardRepository = new MainRepository<int, Reward>(context);
-            await RewardRepository.Delete(2);
 
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(() => RewardRepository.GetAll());

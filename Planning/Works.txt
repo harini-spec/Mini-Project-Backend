@@ -14,14 +14,13 @@ Catch general exception and throw it in service / seperate exceptions in control
 Add ticket - seat not available 
     - Check if seat belongs to schedule 
 Get Reward points of user 
+Seperate Admin and Customer to diff table - same email id checking pblm 
 -----------------------------------------------------------------------------------------------------------------------------------/
 
 Repository tests:
-    User
     User Details
     Driver Details 
 
 Service tests:
-    SeatAvailabilityService
     Ticket
     Transaction

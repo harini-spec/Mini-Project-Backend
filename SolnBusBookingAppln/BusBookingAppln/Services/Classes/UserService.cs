@@ -28,13 +28,16 @@ namespace BusBookingAppln.Services.Classes
         // Get User object by Email ID
         public async Task<User> GetUserByEmail(string email)
         {
-            var users = await _userRepo.GetAll();
-            var user = users.ToList().FirstOrDefault(x => x.Email == email);
-            if(user == null)
+            try
             {
-                throw new UnauthorizedUserException("Invalid username or password");
+                var users = await _userRepo.GetAll();
+                var user = users.ToList().FirstOrDefault(x => x.Email == email);
+                return user;
             }
-            return user;
+            catch(NoItemsFoundException) 
+            {
+                return null;
+            }
         }
 
 
@@ -43,8 +46,13 @@ namespace BusBookingAppln.Services.Classes
         {
             try
             {
-                // Checking is Email ID is present 
+                // Checking if Email ID is present 
                 User user = await GetUserByEmail(loginInputDTO.Email);
+                if (user == null)
+                {
+                    throw new UnauthorizedUserException("Invalid username or password");
+                }
+
                 UserDetail userDetail = await _userDetailRepo.GetById(user.Id);
 
                 HMACSHA512 hMACSHA = new HMACSHA512(userDetail.PasswordHashKey);
@@ -102,16 +110,18 @@ namespace BusBookingAppln.Services.Classes
             User InsertedUser = null;
             UserDetail userDetail = null;
             UserDetail InsertedUserDetail = null;
+
+            // Checking for duplicate value - Email ID 
+            var ExistingUser = await GetUserByEmail(registerInputDTO.Email);
+            if (ExistingUser != null)
+            {
+                throw new UnableToRegisterException("Email ID already exists");
+            }
+
             try
             {   user = MapRegisterInputDTOToUser(registerInputDTO);
                 user.Role = Role;
-
-                // Checking for duplicate key - Email ID 
-                try
-                {
-                    InsertedUser = await _userRepo.Add(user);
-                }
-                catch (DbUpdateException) { throw new UnableToRegisterException("Email ID already exists"); }
+                InsertedUser = await _userRepo.Add(user);
                 userDetail = MapRegisterInputDTOToUserDetail(registerInputDTO);
                 userDetail.UserId = InsertedUser.Id;
                 InsertedUserDetail = await _userDetailRepo.Add(userDetail);

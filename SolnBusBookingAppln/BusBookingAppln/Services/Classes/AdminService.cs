@@ -14,12 +14,13 @@ namespace BusBookingAppln.Services.Classes
     {
         private readonly IRepository<int, Driver> _driverRepo;
         private readonly IRepository<int, DriverDetail> _driverDetailRepo;
+        private readonly IDriverService _driverService;
 
-
-        public AdminService(IRepository<int, Driver> driverRepo, IRepository<int, DriverDetail> driverDetailRepo)
+        public AdminService(IRepository<int, Driver> driverRepo, IRepository<int, DriverDetail> driverDetailRepo, IDriverService driverService)
         {
             _driverRepo = driverRepo;
             _driverDetailRepo = driverDetailRepo;
+            _driverService = driverService;
         }
 
 
@@ -31,17 +32,17 @@ namespace BusBookingAppln.Services.Classes
             DriverDetail driverDetail = null;
             DriverDetail InsertedDriverDetail = null;
 
+            // Checking for duplicate value - Email ID 
+            var ExistingDriver = await _driverService.GetDriverByEmail(registerInputDTO.Email);
+            if(ExistingDriver != null) 
+            {
+                throw new UnableToRegisterException("Email ID already exists");
+            }
+
             try
             {
                 driver = MapRegisterDriverInputDTOToDriver(registerInputDTO);
-
-                // Checking for duplicate key - Email ID 
-                try
-                {
-                    InsertedDriver = await _driverRepo.Add(driver);
-                }
-                catch (DbUpdateException) { throw new UnableToRegisterException("Email ID already exists"); }
-
+                InsertedDriver = await _driverRepo.Add(driver);
                 driverDetail = MapRegisterInputDTOToDriverDetail(registerInputDTO);
                 driverDetail.DriverId = driver.Id;
                 InsertedDriverDetail = await _driverDetailRepo.Add(driverDetail);
@@ -49,9 +50,8 @@ namespace BusBookingAppln.Services.Classes
                 RegisterDriverOutputDTO registerDriverOutputDTO = MapDriverToRegisterDriverOutputDTO(InsertedDriver);
                 return registerDriverOutputDTO;
             }
-            catch (UnableToRegisterException) { throw; }
             catch (Exception) { }
-            if (driver == null)
+            if (InsertedDriver == null)
             {
                 throw new UnableToRegisterException("Not able to register at this moment");
             }

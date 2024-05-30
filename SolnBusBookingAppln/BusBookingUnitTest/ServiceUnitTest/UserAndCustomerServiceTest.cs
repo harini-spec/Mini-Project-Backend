@@ -254,5 +254,44 @@ namespace BusBookingUnitTest.ServiceUnitTest
             // Assert
             Assert.That(exception.Message, Is.EqualTo("User account is already deleted"));
         }
+
+        [Test, Order(9)]
+        public async Task RegisterUserFailTest()
+        {
+            // Arrange
+            RegisterInputDTO admin = new RegisterInputDTO()
+            {
+                Name = "Sarah",
+                Age = 30,
+                Phone = "8877887788",
+                Password = "sarahroot",
+            };
+
+            // Action
+            var exception = Assert.ThrowsAsync<UnableToRegisterException>(async () => await userService.RegisterAdminAndCustomer(admin, "Admin"));
+
+            // Assert
+            Assert.That(exception.Message, Is.EqualTo("Not able to register at this moment"));
+        }
+
+        [Test, Order(10)]
+        public async Task RegisterUserEmailAlreadyExistsExceptionTest()
+        {
+            // Arrange
+            RegisterInputDTO admin = new RegisterInputDTO()
+            {
+                Name = "Sarah",
+                Age = 30,
+                Email = "sam@gmail.com",
+                Phone = "8877887788",
+                Password = "sarahroot",
+            };
+
+            // Action
+            var exception = Assert.ThrowsAsync<UnableToRegisterException>(async () => await userService.RegisterAdminAndCustomer(admin, "Admin"));
+
+            // Assert
+            Assert.That(exception.Message, Is.EqualTo("Email ID already exists"));
+        }
     }
 }

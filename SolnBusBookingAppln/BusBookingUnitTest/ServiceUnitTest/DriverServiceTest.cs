@@ -31,7 +31,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
         [SetUp]
         public void Setup()
         {
-            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("DriverDB");
+            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("DriverServiceDB");
             context = new BusBookingContext(optionsBuilder.Options);
 
             driverDetailRepo = new MainRepository<int, DriverDetail>(context);
@@ -46,7 +46,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             tokenService = new TokenService(mockConfig.Object);
 
             DriverService = new DriverService(driverWithSchedulesRepo, tokenService, driverDetailRepo);
-            AdminService = new AdminService(driverWithSchedulesRepo, driverDetailRepo);
+            AdminService = new AdminService(driverWithSchedulesRepo, driverDetailRepo, DriverService);
         }
 
 
@@ -158,6 +158,47 @@ namespace BusBookingUnitTest.ServiceUnitTest
 
             // Assert
             Assert.That(result, Is.EqualTo("Password successfully changed"));
+        }
+
+        [Test, Order(7)]
+        public async Task RegisterDriverFailTest()
+        {
+            // Arrange
+            RegisterDriverInputDTO driver = new RegisterDriverInputDTO()
+            {
+                Name = "Sarah",
+                Age = 30,
+                Phone = "8877887788",
+                YearsOfExperience = 4,
+                Password = "sarahroot"
+            };
+
+            // Action
+            var exception = Assert.ThrowsAsync<UnableToRegisterException>(async () => await AdminService.RegisterDriver(driver));
+
+            // Assert
+            Assert.That(exception.Message, Is.EqualTo("Not able to register at this moment"));
+        }
+
+        [Test, Order(8)]
+        public async Task RegisterDriverEmailAlreadyExistsExceptionTest()
+        {
+            // Arrange
+            RegisterDriverInputDTO driver = new RegisterDriverInputDTO()
+            {
+                Name = "Sarah",
+                Age = 30,
+                Email = "sarah@gmail.com",
+                Phone = "8877887788",
+                YearsOfExperience = 4,
+                Password = "sarahroot"
+            };
+
+            // Action
+            var exception = Assert.ThrowsAsync<UnableToRegisterException>(async () => await AdminService.RegisterDriver(driver));
+
+            // Assert
+            Assert.That(exception.Message, Is.EqualTo("Email ID already exists"));
         }
     }
 }

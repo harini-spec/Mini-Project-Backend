@@ -27,9 +27,16 @@ namespace BusBookingAppln.Services.Classes
         // Get driver object by Email ID
         public async Task<Driver> GetDriverByEmail(string email)
         {
-            var drivers = await _driverWithSchedulesRepo.GetAll();
-            var driver = drivers.ToList().FirstOrDefault(x => x.Email == email);
-            return driver;
+            try
+            {
+                var drivers = await _driverWithSchedulesRepo.GetAll();
+                var driver = drivers.ToList().FirstOrDefault(x => x.Email == email);
+                return driver;
+            }
+            catch(NoItemsFoundException)
+            {
+                return null;
+            }
         }
 
 
@@ -38,7 +45,7 @@ namespace BusBookingAppln.Services.Classes
         {
             try
             {
-                // Checking is Email ID is present 
+                // Checking if Email ID is present 
                 Driver driver = await GetDriverByEmail(loginInputDTO.Email);
                 if (driver == null)
                 {

@@ -68,7 +68,7 @@ namespace BusBookingAppln.Services.Classes
             List<Ticket> tickets = (List<Ticket>)await _TicketRepository.GetAll();
             foreach (var ticket in tickets)
             {
-                if (ticket.Status == "Not Booked" && (DateTime.Now.Hour - ticket.DateAndTimeOfAdding.Hour > 1))
+                if (ticket.Status == "Not Booked" && ((DateTime.Now - ticket.DateAndTimeOfAdding).TotalHours > 1))
                 {
                     var ticketDetailCopy = ticket.TicketDetails.ToList();
                     foreach (var ticketDetail in ticketDetailCopy)

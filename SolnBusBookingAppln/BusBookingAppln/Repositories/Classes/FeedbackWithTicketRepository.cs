@@ -41,7 +41,9 @@ namespace BusBookingAppln.Repositories.Classes
         {
             var item = _context.Feedbacks.Include(x => x.FeedbackForTicket).ToList().FirstOrDefault(x => x.TicketId == key);
             if (item == null)
+            {
                 throw new EntityNotFoundException($"Entity of type Feedback with ID = {key} not found.");
+            }
             return item;
         }
 
@@ -54,7 +56,9 @@ namespace BusBookingAppln.Repositories.Classes
                 int result = await _context.SaveChangesAsync();
                 return entity;
             }
-            catch (EntityNotFoundException) { throw; }
+            catch (EntityNotFoundException) {
+                throw; 
+            }
         }
     }
 }

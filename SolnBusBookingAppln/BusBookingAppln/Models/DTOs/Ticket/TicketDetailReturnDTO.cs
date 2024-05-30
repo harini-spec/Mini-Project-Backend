@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BusBookingAppln.Models.DTOs.TicketDTOs
 {
-    public class AddedTicketDetailDTO : InputTicketDetailDTO
+    public class TicketDetailReturnDTO : InputTicketDetailDTO
     {
         public string SeatNumber { get; set; }
         public string? SeatType { get; set; }

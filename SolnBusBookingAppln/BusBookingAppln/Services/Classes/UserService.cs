@@ -25,6 +25,8 @@ namespace BusBookingAppln.Services.Classes
         }
 
 
+        #region GetUserByEmail
+
         // Get User object by Email ID
         public async Task<User> GetUserByEmail(string email)
         {
@@ -40,6 +42,10 @@ namespace BusBookingAppln.Services.Classes
             }
         }
 
+        #endregion  
+
+
+        #region LoginAdminAndCustomer
 
         // Login Admin/Customer if their account is active
         public async Task<LoginOutputDTO> LoginAdminAndCustomer(LoginInputDTO loginInputDTO)
@@ -78,18 +84,6 @@ namespace BusBookingAppln.Services.Classes
             }
         }
 
-
-        // Map User to LoginOutputDTO
-        private LoginOutputDTO MapUserToLoginReturnDTO(User user)
-        {
-            LoginOutputDTO loginOutputDTO = new LoginOutputDTO();
-            loginOutputDTO.UserID = user.Id;
-            loginOutputDTO.UserName = user.Name;
-            loginOutputDTO.Token = _tokenService.GenerateToken(user);
-            loginOutputDTO.Role = user.Role;
-            return loginOutputDTO;
-        }
-
         private bool ComparePassword(byte[] encryptedPass, byte[] passwordEncrypted)
         {
             for (int i = 0; i < encryptedPass.Length; i++)
@@ -102,6 +96,10 @@ namespace BusBookingAppln.Services.Classes
             return true;
         }
 
+        #endregion
+
+
+        #region RegisterAdminAndCustomer
 
         // Register Driver : Status = Active 
         public async Task<RegisterOutputDTO> RegisterAdminAndCustomer(RegisterInputDTO registerInputDTO, string Role)
@@ -147,6 +145,10 @@ namespace BusBookingAppln.Services.Classes
             await _userRepo.Delete(user.Id);
         }
 
+        #endregion
+
+
+        #region Mappers
 
         // Map RegisterInputDTO to User
         private User MapRegisterInputDTOToUser(RegisterInputDTO registerDTO)
@@ -184,5 +186,20 @@ namespace BusBookingAppln.Services.Classes
             registerOutputDTO.Email = user.Email;
             return registerOutputDTO;
         }
+
+
+        // Map User to LoginOutputDTO
+        private LoginOutputDTO MapUserToLoginReturnDTO(User user)
+        {
+            LoginOutputDTO loginOutputDTO = new LoginOutputDTO();
+            loginOutputDTO.UserID = user.Id;
+            loginOutputDTO.UserName = user.Name;
+            loginOutputDTO.Token = _tokenService.GenerateToken(user);
+            loginOutputDTO.Role = user.Role;
+            return loginOutputDTO;
+        }
+
+        #endregion
+
     }
 }

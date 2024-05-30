@@ -57,18 +57,18 @@ namespace BusBookingAppln.Controllers
 
         [HttpPost("AddTicket")]
         [Authorize(Roles = "Customer")]
-        [ProducesResponseType(typeof(AddedTicketDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(TicketReturnDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<AddedTicketDTO>> AddTicket(InputTicketDTO inputTicketDTO)
+        public async Task<ActionResult<TicketReturnDTO>> AddTicket(InputTicketDTO inputTicketDTO)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
                     int CustomerId = Convert.ToInt32(User.FindFirstValue("ID"));
-                    AddedTicketDTO result = await _TicketService.AddTicket(CustomerId, inputTicketDTO);
+                    TicketReturnDTO result = await _TicketService.AddTicket(CustomerId, inputTicketDTO);
                     return Ok(result);
                 }
                 catch (EntityNotFoundException enf)
@@ -93,17 +93,17 @@ namespace BusBookingAppln.Controllers
 
         [HttpDelete("RemoveTicketItem")]
         [Authorize(Roles = "Customer")]
-        [ProducesResponseType(typeof(AddedTicketDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(TicketReturnDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<AddedTicketDetailDTO>> RemoveTicketItem(int TicketId, int SeatId)
+        public async Task<ActionResult<TicketDetailReturnDTO>> RemoveTicketItem(int TicketId, int SeatId)
         {
                 try
                 {
                     int CustomerId = Convert.ToInt32(User.FindFirstValue("ID"));
-                    AddedTicketDetailDTO result = await _TicketService.RemoveTicketItem(CustomerId, TicketId, SeatId);
+                    TicketDetailReturnDTO result = await _TicketService.RemoveTicketItem(CustomerId, TicketId, SeatId);
                     return Ok(result);
                 }
                 catch (EntityNotFoundException enf)
@@ -184,7 +184,7 @@ namespace BusBookingAppln.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<AddedTicketDTO>>> GetAllTicketsOfCustomer()
+        public async Task<ActionResult<List<TicketReturnDTO>>> GetAllTicketsOfCustomer()
         {
             try
             {

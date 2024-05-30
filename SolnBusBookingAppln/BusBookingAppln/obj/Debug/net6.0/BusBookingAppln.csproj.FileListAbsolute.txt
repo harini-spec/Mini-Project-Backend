@@ -69,3 +69,5 @@ C:\Users\VC\Desktop\Presidio\Mini-Project-Backend\SolnBusBookingAppln\BusBooking
 C:\Users\VC\Desktop\Presidio\Mini-Project-Backend\SolnBusBookingAppln\BusBookingAppln\obj\Debug\net6.0\ref\BusBookingAppln.dll
 C:\Users\VC\Desktop\Presidio\Mini-Project-Backend\SolnBusBookingAppln\BusBookingAppln\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\VC\Desktop\Presidio\Mini-Project-Backend\SolnBusBookingAppln\BusBookingAppln\bin\Debug\net6.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\VC\Desktop\Presidio\Mini-Project-Backend\SolnBusBookingAppln\BusBookingAppln\bin\Debug\net6.0\log4net.config
+C:\Users\VC\Desktop\Presidio\Mini-Project-Backend\SolnBusBookingAppln\BusBookingAppln\bin\Debug\net6.0\log4net.dll

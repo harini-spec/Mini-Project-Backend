@@ -26,6 +26,8 @@ namespace BusBookingAppln.Services.Classes
         }
 
 
+        #region AddSchedule
+
         // Add schedule
         public async Task<AddScheduleDTO> AddSchedule(AddScheduleDTO addSchedulesDTO)
         {
@@ -62,6 +64,10 @@ namespace BusBookingAppln.Services.Classes
             throw new BusAlreadyBookedException();
         }
 
+        #endregion
+
+
+        #region GetAllSchedulesForAGivenDateAndRoute
 
         // Get all schedules for given date and route
         public async Task<List<ScheduleReturnDTO>> GetAllSchedulesForAGivenDateAndRoute(UserInputDTOForSchedule userInputDTOForSchedule)
@@ -79,12 +85,20 @@ namespace BusBookingAppln.Services.Classes
             return scheduleReturnDTOs;
         }
 
+        #endregion
+
+
+        #region GetScheduleById
 
         public async Task<Schedule> GetScheduleById(int ScheduleId)
         {
             return await _ScheduleRepo.GetById(ScheduleId);
         }
 
+        #endregion
+
+
+        #region GetAllSchedules
 
         // Get all future schedules
         public async Task<List<ScheduleReturnDTO>> GetAllSchedules()
@@ -101,6 +115,10 @@ namespace BusBookingAppln.Services.Classes
             return scheduleReturnDTOs;
         }
 
+        #endregion
+
+
+        #region GetAllSchedulesOfDriver
 
         // Get all the schedules of driver
         public async Task<List<ScheduleReturnDTO>> GetAllSchedulesOfDriver(int DriverId)
@@ -118,6 +136,10 @@ namespace BusBookingAppln.Services.Classes
             return scheduleReturnDTOs;
         }
 
+        #endregion
+
+
+        #region Mappers
 
         // Map Schedule List to ScheduleReturnDTO List
         private List<ScheduleReturnDTO> MapScheduleListToScheduleReturnDTOList(List<Schedule> result, string source, string dest)
@@ -171,6 +193,8 @@ namespace BusBookingAppln.Services.Classes
             scheduleReturnDTO.BusNumber = schedule.BusNumber;
             return scheduleReturnDTO;
         }
+
+        #endregion
 
     }
 }

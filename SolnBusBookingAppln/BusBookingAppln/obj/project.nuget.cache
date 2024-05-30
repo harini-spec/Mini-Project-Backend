@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "acnnJxNtoeUKkmuikXW7QCPKJYMCvr74mcIlaN404pTRkThL+M+F+ZauRLBAJ87yKXlkU6Rl2L4U2U8ERIxJqg==",
+  "dgSpecHash": "2j5ilF2x6hfdjD6sdHdEjbigiLgqE5A6yEoFaVZuutcSripln1WFql7N79Mx+EqFFDGvbK7GuMGT0UhNOsuJUw==",
   "success": true,
   "projectFilePath": "C:\\Users\\VC\\Desktop\\Presidio\\Mini-Project-Backend\\SolnBusBookingAppln\\BusBookingAppln\\BusBookingAppln.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\VC\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
+    "C:\\Users\\VC\\.nuget\\packages\\log4net\\2.0.17\\log4net.2.0.17.nupkg.sha512",
     "C:\\Users\\VC\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\6.0.30\\microsoft.aspnetcore.authentication.jwtbearer.6.0.30.nupkg.sha512",
     "C:\\Users\\VC\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
     "C:\\Users\\VC\\.nuget\\packages\\microsoft.data.sqlclient\\2.1.7\\microsoft.data.sqlclient.2.1.7.nupkg.sha512",

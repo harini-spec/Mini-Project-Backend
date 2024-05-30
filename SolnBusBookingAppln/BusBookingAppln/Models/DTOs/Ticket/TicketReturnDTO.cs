@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BusBookingAppln.Models.DTOs.TicketDTOs
 {
-    public class AddedTicketDTO
+    public class TicketReturnDTO
     {
-        public AddedTicketDTO()
+        public TicketReturnDTO()
         {
             DiscountPercentage = 0;
             GSTPercentage = 0;
@@ -20,6 +20,6 @@ namespace BusBookingAppln.Models.DTOs.TicketDTOs
         public float GSTPercentage { get; set; }
         public float DiscountPercentage { get; set; }
         public float Final_Amount { get; set; }
-        public List<AddedTicketDetailDTO> addedTicketDetailDTOs { get; set; }
+        public List<TicketDetailReturnDTO> addedTicketDetailDTOs { get; set; }
     }
 }

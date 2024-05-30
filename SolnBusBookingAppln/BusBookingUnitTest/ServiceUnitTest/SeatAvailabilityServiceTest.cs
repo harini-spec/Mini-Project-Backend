@@ -7,6 +7,8 @@ using BusBookingAppln.Repositories.Interfaces;
 using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +46,8 @@ namespace BusBookingUnitTest.ServiceUnitTest
             
             seatAvailability = new SeatAvailabilityService(scheduleService, busService, TicketRepository, TicketDetailRepository);
         }
+
+        #region Check Seat Availability Tests
 
         [Test, Order(1)]
         public async Task CheckSeatAvailabilityWithNoTicketsReturnsTrueSuccessTest()
@@ -268,6 +272,10 @@ namespace BusBookingUnitTest.ServiceUnitTest
             Assert.That(result, Is.True);
         }
 
+        #endregion
+
+        #region Delete Not Booked Tickets Tests
+
         [Test, Order(6)]
         public async Task DeleteNotBookedTicketsSuccessTest()
         {
@@ -306,6 +314,10 @@ namespace BusBookingUnitTest.ServiceUnitTest
             // Assert
             Assert.That(result, Is.True);
         }
+
+        #endregion
+
+        #region Get All available seats Tests
 
         [Test, Order(7)]
         public async Task GetAvailableSeatsInScheduleSuccessTest()
@@ -351,5 +363,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             // Action
             var exception = Assert.ThrowsAsync<NoSeatsAvailableException>(async () => await seatAvailability.GetAllAvailableSeatsInABusSchedule(1));
         }
+
+        #endregion
     }
 }

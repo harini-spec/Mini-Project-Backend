@@ -17,6 +17,8 @@ namespace BusBookingAppln.Services.Classes
         }
 
 
+        #region GetRoute With source and dest
+
         // Get Route ID with Source and Destination
         public async Task<int> GetRoute(string source, string destination)
         {
@@ -27,6 +29,10 @@ namespace BusBookingAppln.Services.Classes
             throw new NoRoutesFoundForGivenSourceAndDest(source, destination);
         }
 
+        #endregion
+
+
+        #region GetRoute With Route ID
 
         // Get Route ID with ID
         public async Task<Models.DBModels.Route> GetRoute(int RouteId)
@@ -34,6 +40,10 @@ namespace BusBookingAppln.Services.Classes
             return await _RouteRepository.GetById(RouteId);
         }
 
+        #endregion
+
+
+        #region AddRoute
 
         // Add Route with stops
         public async Task<AddRouteDTO> AddRoute(AddRouteDTO addRouteDTO)
@@ -44,6 +54,10 @@ namespace BusBookingAppln.Services.Classes
             return addRouteDTO;
         }
 
+        #endregion
+
+
+        #region Mappers
 
         // Map AddRouteDTO to RouteDetail
         private List<RouteDetail> MapAddRouteDetailToRouteDetail(int RouteId, AddRouteDTO addRouteDTO)
@@ -70,5 +84,7 @@ namespace BusBookingAppln.Services.Classes
             route.Destination = addRouteDTO.Destination;
             return route;
         }
+
+        #endregion
     }
 }

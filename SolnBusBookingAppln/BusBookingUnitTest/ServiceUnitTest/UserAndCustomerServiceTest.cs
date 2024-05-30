@@ -52,26 +52,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             customerService = new CustomerAccountService(ticketService, UserDetailRepo, userService);
         }
 
-        [Test, Order(1)]
-        public async Task RegisterUserSuccessTest()
-        {
-            // Arrange
-
-            RegisterInputDTO admin = new RegisterInputDTO()
-            {
-                Name = "Sarah",
-                Age = 30,
-                Email = "sarah@gmail.com",
-                Phone = "8877887788",
-                Password = "sarahroot",
-            };
-
-            // Action
-            var result = await userService.RegisterAdminAndCustomer(admin, "Admin");
-            
-            // Assert
-            Assert.That(result.Email, Is.EqualTo("sarah@gmail.com"));
-        }
+        #region Login User Tests
 
         [Test, Order(2)]
         public async Task LoginUserSuccessTest()
@@ -146,6 +127,10 @@ namespace BusBookingUnitTest.ServiceUnitTest
             Assert.That(exception.Message, Is.EqualTo("Your account is not activated"));
         }
 
+        #endregion
+
+        #region Activate Customer Account Tests
+
         [Test, Order(5)]
         public async Task ActivateUserOnlyCustomerCanActiveExceptionTest()
         {
@@ -208,6 +193,10 @@ namespace BusBookingUnitTest.ServiceUnitTest
             Assert.That(result.Role, Is.EqualTo("Customer"));
         }
 
+        #endregion
+
+        #region Soft Delete Customer Account Tests
+
         [Test, Order(7)]
         public async Task SoftDeleteCustomerAccountActiveTicketsFailTest()
         {
@@ -255,6 +244,31 @@ namespace BusBookingUnitTest.ServiceUnitTest
             Assert.That(exception.Message, Is.EqualTo("User account is already deleted"));
         }
 
+        #endregion
+
+        #region Register User Tests
+
+        [Test, Order(1)]
+        public async Task RegisterUserSuccessTest()
+        {
+            // Arrange
+
+            RegisterInputDTO admin = new RegisterInputDTO()
+            {
+                Name = "Sarah",
+                Age = 30,
+                Email = "sarah@gmail.com",
+                Phone = "8877887788",
+                Password = "sarahroot",
+            };
+
+            // Action
+            var result = await userService.RegisterAdminAndCustomer(admin, "Admin");
+
+            // Assert
+            Assert.That(result.Email, Is.EqualTo("sarah@gmail.com"));
+        }
+
         [Test, Order(9)]
         public async Task RegisterUserFailTest()
         {
@@ -293,5 +307,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             // Assert
             Assert.That(exception.Message, Is.EqualTo("Email ID already exists"));
         }
+
+        #endregion
     }
 }

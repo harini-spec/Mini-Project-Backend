@@ -17,6 +17,7 @@ namespace BusBookingAppln.Services.Classes
             _busRepo = BusRepository;
         }
 
+        #region CheckIfBusAlreadyBooked
 
         // Checks if bus already booked during a specific time period. True if booked, false if not
         public bool CheckIfBusAlreadyBooked(List<Schedule> schedules, AddScheduleDTO addScheduleDTO)
@@ -36,6 +37,10 @@ namespace BusBookingAppln.Services.Classes
             return false;
         }
 
+        #endregion
+
+
+        #region AddBus
 
         // Add bus with seats
         public async Task<AddBusDTO> AddBus(AddBusDTO InputBus)
@@ -51,13 +56,20 @@ namespace BusBookingAppln.Services.Classes
             throw new DataDoesNotMatchException();
         }
 
+        #endregion
+
+
+        #region GetBusByBusNumber
 
         public async Task<Bus> GetBusByBusNumber(string BusNumber)
         {
             return await _busRepo.GetById(BusNumber);
         }
 
+        #endregion
 
+
+        #region Mappers
         // Map AddBusDTO to Bus
         private Bus MapAddBusDTOToBus(AddBusDTO inputBus)
         {
@@ -84,5 +96,7 @@ namespace BusBookingAppln.Services.Classes
             }
             return seats;
         }
+        #endregion
+
     }
 }

@@ -31,6 +31,8 @@ namespace BusBookingUnitTest.ServiceUnitTest
         }
 
 
+        #region Get Route Tests
+
         [Test, Order(1)]
         public async Task GetRouteBySourceAndDestExceptionTest()
         {
@@ -96,6 +98,10 @@ namespace BusBookingUnitTest.ServiceUnitTest
             });
         }
 
+        #endregion
+
+        #region Add Route Tests
+
         [Test, Order(4)]
         public async Task AddRouteBySourceAndDestSuccessTest()
         {
@@ -124,5 +130,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
                 Assert.That(result.Destination, Is.EqualTo("Bangalore"));
             });
         }
+
+        #endregion
     }
 }

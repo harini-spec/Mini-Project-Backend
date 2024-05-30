@@ -19,6 +19,8 @@ namespace BusBookingAppln.Services.Classes
         }
 
 
+        #region AddFeedback
+
         // Add feedback for Rides which are over - Can add one feedback for one ticket
         public async Task<string> AddFeedback(int UserId, AddFeedbackDTO feedbackDTO)
         {
@@ -38,6 +40,10 @@ namespace BusBookingAppln.Services.Classes
             throw new IncorrectOperationException("You cannot add feedback to this ticket");
         }
 
+        #endregion
+
+
+        #region GetAllFeedbacksForARide
 
         // Get all feedbacks for a schedule
         public async Task<List<GetFeedbackDTO>> GetAllFeedbacksForARide(int ScheduleId)
@@ -53,6 +59,10 @@ namespace BusBookingAppln.Services.Classes
             return getFeedbackDTOs;
         }
 
+        #endregion
+
+
+        #region Mappers
 
         // Map AddFeedbackDTO to feedback
         private Feedback MapFeedbackDTOToFeedback(AddFeedbackDTO feedbackDTO)
@@ -89,5 +99,8 @@ namespace BusBookingAppln.Services.Classes
             getFeedbackDTO.Rating = feedback.Rating;
             return getFeedbackDTO;
         }
+
+        #endregion
+
     }
 }

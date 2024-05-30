@@ -50,6 +50,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
         }
 
 
+        #region Login Driver Tests
         [Test, Order(1)]
         public async Task LoginDriverAccountNotActiveFailTest()
         {
@@ -129,6 +130,10 @@ namespace BusBookingUnitTest.ServiceUnitTest
             Assert.That(exception.Message, Is.EqualTo("Invalid username or password"));
         }
 
+        #endregion
+
+        #region Change Password Tests
+
         [Test, Order(4)]
         public async Task ChangePasswordValidationExceptionTest()
         {
@@ -159,6 +164,10 @@ namespace BusBookingUnitTest.ServiceUnitTest
             // Assert
             Assert.That(result, Is.EqualTo("Password successfully changed"));
         }
+
+        #endregion
+
+        #region Register Driver Tests
 
         [Test, Order(7)]
         public async Task RegisterDriverFailTest()
@@ -200,5 +209,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             // Assert
             Assert.That(exception.Message, Is.EqualTo("Email ID already exists"));
         }
+
+        #endregion
     }
 }

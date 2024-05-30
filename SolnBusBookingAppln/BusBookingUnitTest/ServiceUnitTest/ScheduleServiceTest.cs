@@ -7,6 +7,8 @@ using BusBookingAppln.Repositories.Interfaces;
 using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +39,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             context = new BusBookingContext(optionsBuilder.Options);
             ScheduleRepository = new MainRepository<int, Schedule>(context);
             driverRepo = new DriverWithScheduleRepository(context);
+
             busRepo = new BusWithSeatsRepository(context);
             RouteRepo = new MainRepository<int, Route>(context);
             DriverDetailRepo = new MainRepository<int, DriverDetail>(context);  
@@ -48,7 +51,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             scheduleService = new ScheduleService(driverRepo, ScheduleRepository, BusService, RouteService, driverService);
         }
 
-
+        #region Get All Schedules Tests
 
         [Test, Order(1)]
         public async Task GetAllSchedulesFailTest()
@@ -212,6 +215,10 @@ namespace BusBookingUnitTest.ServiceUnitTest
             var exception = Assert.ThrowsAsync<NoSchedulesFoundForGivenRouteAndDate>(async () => await scheduleService.GetAllSchedulesForAGivenDateAndRoute(schedule));
         }
 
+        #endregion
+
+        #region Add Schedule
+
         [Test, Order(9)]
         public async Task AddScheduleBusNotFoundExceptionTest()
         {
@@ -351,5 +358,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             var exception = Assert.ThrowsAsync<DriverAlreadyBookedException>(async () => await scheduleService.AddSchedule(addScheduleDTO));
 
         }
+
+        #endregion
     }
 }

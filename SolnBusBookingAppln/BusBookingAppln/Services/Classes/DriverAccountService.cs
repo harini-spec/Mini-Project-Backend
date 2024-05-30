@@ -23,6 +23,7 @@ namespace BusBookingAppln.Services.Classes
             _driverService = driverService;
         }
 
+        #region RegisterDriver
 
         // Register Driver : Status = Inactive 
         public async Task<RegisterDriverOutputDTO> RegisterDriver(RegisterDriverInputDTO registerInputDTO)
@@ -62,12 +63,14 @@ namespace BusBookingAppln.Services.Classes
             throw new UnableToRegisterException("Not able to register at this moment");
         }
 
-
         private async Task RevertDriverInsert(Driver driver)
         {
             await _driverRepo.Delete(driver.Id);
         }
 
+        #endregion
+
+        #region ActivateDriver
 
         // Activate Driver account : Status = Active 
         public async Task<DriverActivateReturnDTO> ActivateDriver(int DriverId)
@@ -80,6 +83,9 @@ namespace BusBookingAppln.Services.Classes
             return driverActivateReturnDTO;
         }
 
+        #endregion
+
+        #region Mappers 
 
         // Map RegisterDriverInputDTO to Driver
         private Driver MapRegisterDriverInputDTOToDriver(RegisterDriverInputDTO registerInputDTO)
@@ -130,5 +136,8 @@ namespace BusBookingAppln.Services.Classes
             driverActivateReturnDTO.Status = status;
             return driverActivateReturnDTO;
         }
+
+        #endregion
+
     }
 }

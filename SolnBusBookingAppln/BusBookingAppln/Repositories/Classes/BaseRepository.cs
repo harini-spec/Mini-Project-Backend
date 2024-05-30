@@ -24,7 +24,7 @@ namespace BusBookingAppln.Repositories.Classes
                 await _context.SaveChangesAsync();
                 return entity;
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ioe)
             {
                 throw new InvalidOperationCustomException();
             }

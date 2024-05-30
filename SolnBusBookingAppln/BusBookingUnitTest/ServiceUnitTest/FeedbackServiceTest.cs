@@ -40,6 +40,8 @@ namespace BusBookingUnitTest.ServiceUnitTest
             feedbackService = new FeedbackService(FeedbackRepo, ticketService);
         }
 
+        #region Add Feedback Tests
+
         [Test, Order(1)]
         public async Task AddFeedbackSuccessTest()
         {
@@ -127,6 +129,10 @@ namespace BusBookingUnitTest.ServiceUnitTest
             Assert.That(exception.Message, Is.EqualTo("You can't provide feedback for this ticket"));
         }
 
+        #endregion
+
+        #region Get Feedbacks Tests
+
         [Test, Order(4)]
         public async Task GetAllFeedbacksSuccessTest()
         {
@@ -146,5 +152,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             // Assert
             Assert.That(exception.Message, Is.EqualTo("No feedbacks found"));
         }
+
+        #endregion
     }
 }

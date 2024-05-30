@@ -3,11 +3,9 @@ Deadline: Tuesday 28/05/2024
 
 -----------------------------------------------------------------------------------------------------------------------------------/
 Logging 
-Unit test repos, services 
 Regions in code too 
-Rewrite tests??
-
 Add summary in Interfaces
+
 Try to combine driver with user 
 Clean git unwanted folders
 Exceptions: OperationCanceledException, DbUpdateException, DbUpdateConcurrencyException, same key? - InvalidOperationException
@@ -18,8 +16,10 @@ Add ticket - seat not available
 Get Reward points of user 
 Seperate Admin and Customer to diff table - same email id checking pblm 
 Check if deletion/updation id sent and entity id are same 
------------------------------------------------------------------------------------------------------------------------------------/
 
 Repository tests:
     User Details
     Driver Details 
+Service tests :- Except ticket and transaction, have to crct others
+-----------------------------------------------------------------------------------------------------------------------------------/
+

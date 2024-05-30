@@ -18,8 +18,10 @@ namespace BusBookingAppln.Services.Classes
             _secretKey = configuration.GetSection("TokenKey").GetSection("JWT").Value.ToString();
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
         }
-        
-        
+
+
+        #region GenerateToken
+
         // Generate JWT token with Symmetric key
         public string GenerateToken<T>(T user)
         {
@@ -68,5 +70,9 @@ namespace BusBookingAppln.Services.Classes
             token = new JwtSecurityTokenHandler().WriteToken(myToken);
             return token;
         }
+
+        #endregion
+
+
     }
 }

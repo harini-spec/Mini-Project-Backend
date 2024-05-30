@@ -8,21 +8,8 @@ namespace BusBookingAppln.Repositories.Classes
 {
     public class DriverWithScheduleRepository : BaseRepository<int, Driver>
     {
-        public DriverWithScheduleRepository(BusBookingContext context) : base(context) { }
 
-        public override async Task<Driver> Add(Driver entity)
-        {
-            try
-            {
-                _context.Add(entity);
-                await _context.SaveChangesAsync();
-                return entity;
-            }
-            catch (InvalidOperationException)
-            {
-                throw new InvalidOperationCustomException();
-            }
-        }
+        public DriverWithScheduleRepository(BusBookingContext context) : base(context) { }
 
         public override async Task<IList<Driver>> GetAll()
         {
@@ -53,7 +40,9 @@ namespace BusBookingAppln.Repositories.Classes
         {
             var item = _context.Drivers.Include(x => x.SchedulesForDriver).ToList().FirstOrDefault(x => x.Id == key);
             if (item == null)
+            {
                 throw new EntityNotFoundException($"Entity of type Driver with ID {key} not found.");
+            }
             return item;
         }
 
@@ -66,7 +55,10 @@ namespace BusBookingAppln.Repositories.Classes
                 int result = await _context.SaveChangesAsync();
                 return entity;
             }
-            catch (EntityNotFoundException) { throw; }
+            catch (EntityNotFoundException) 
+            {
+                throw; 
+            }
         }
     }
 }

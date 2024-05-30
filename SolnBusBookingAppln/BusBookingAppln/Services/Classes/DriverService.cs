@@ -24,6 +24,8 @@ namespace BusBookingAppln.Services.Classes
         }
 
 
+        #region GetDriverByEmail
+
         // Get driver object by Email ID
         public async Task<Driver> GetDriverByEmail(string email)
         {
@@ -39,6 +41,10 @@ namespace BusBookingAppln.Services.Classes
             }
         }
 
+        #endregion
+
+
+        #region LoginDriver
 
         // Login driver if their account is active
         public async Task<LoginDriverOutputDTO> LoginDriver(LoginDriverInputDTO loginInputDTO)
@@ -78,18 +84,6 @@ namespace BusBookingAppln.Services.Classes
         }
 
 
-        // Map Driver to LoginDriverOutputDTO
-        private LoginDriverOutputDTO MapDriverToLoginDriverReturnDTO(Driver driver)
-        {
-            LoginDriverOutputDTO loginDriverOutputDTO = new LoginDriverOutputDTO();
-            loginDriverOutputDTO.DriverID = driver.Id;
-            loginDriverOutputDTO.Name = driver.Name;
-            loginDriverOutputDTO.Token = _tokenService.GenerateToken(driver);
-            loginDriverOutputDTO.Role = "Driver";
-            return loginDriverOutputDTO;
-        }
-
-
         // Compare password in db to user's password - Both encrypted using same key 
         private bool ComparePassword(byte[] encryptedPass, byte[] passwordEncrypted)
         {
@@ -103,6 +97,10 @@ namespace BusBookingAppln.Services.Classes
             return true;
         }
 
+        #endregion
+
+
+        #region ChangePassword
 
         // Change password of driver account
         public async Task<string> ChangePassword(string email, string NewPassword)
@@ -128,6 +126,10 @@ namespace BusBookingAppln.Services.Classes
             throw new ValidationErrorExcpetion("Password must be atleast 8 characters");
         }
 
+        #endregion
+
+
+        #region CheckIfDriverAvailable
 
         // Check if driver is booked/available during a period of time
         public async Task<bool> CheckIfDriverAvailable(AddScheduleDTO addScheduleDTO, int driverId)
@@ -148,10 +150,33 @@ namespace BusBookingAppln.Services.Classes
             return true;
         }
 
+        #endregion
+
+
+        #region GetDriverById
 
         public async Task<Driver> GetDriverById(int DriverId)
         {
             return await _driverWithSchedulesRepo.GetById(DriverId);
         }
+
+        #endregion
+        
+
+        #region Mappers 
+
+        // Map Driver to LoginDriverOutputDTO
+        private LoginDriverOutputDTO MapDriverToLoginDriverReturnDTO(Driver driver)
+        {
+            LoginDriverOutputDTO loginDriverOutputDTO = new LoginDriverOutputDTO();
+            loginDriverOutputDTO.DriverID = driver.Id;
+            loginDriverOutputDTO.Name = driver.Name;
+            loginDriverOutputDTO.Token = _tokenService.GenerateToken(driver);
+            loginDriverOutputDTO.Role = "Driver";
+            return loginDriverOutputDTO;
+        }
+
+        #endregion
+
     }
 }

@@ -27,12 +27,13 @@ namespace BusBookingAppln.Services.Classes
             _RefundRepository = RefundRepository;
         }
 
+        #region CheckCancellationValidity
 
         // Checks for the following conditions before cancelling a ticket
-            // Check if ticket belongs to the user 
-            // Check if ticket is Booked
-            // Check if it's not within 24 hrs of the date and time of departure
-            // Check if the user's payment for the ticket was successful 
+        // Check if ticket belongs to the user 
+        // Check if ticket is Booked
+        // Check if it's not within 24 hrs of the date and time of departure
+        // Check if the user's payment for the ticket was successful 
         public async Task CheckCancellationValidity(int UserId, Ticket ticket)
         {
             if (ticket.Status == "Booked")
@@ -64,7 +65,11 @@ namespace BusBookingAppln.Services.Classes
             else
                 throw new IncorrectOperationException("You can't cancel this ticket: It is not booked/Cancelled/Ride over");
         }
-        
+
+        #endregion
+
+
+        #region CancelTicket
 
         // Cancel Booked ticket
         public async Task<RefundOutputDTO> CancelTicket(int UserId, int TicketId)
@@ -91,20 +96,13 @@ namespace BusBookingAppln.Services.Classes
             catch (Exception) { throw; }
         }
 
+        #endregion
 
-        // Map Refund to RefundOutputDTO
-        private RefundOutputDTO MapRefundToRefundOutputDTO(Refund refund)
-        {
-            RefundOutputDTO refundOutputDTO = new RefundOutputDTO();
-            refundOutputDTO.RefundDate = refund.RefundDate;
-            refundOutputDTO.RefundAmount = refund.RefundAmount;
-            refundOutputDTO.Status = refund.Status;
-            refundOutputDTO.TicketId = refund.TicketId;
-            return refundOutputDTO;
-        }
 
+        #region CreateRefund
 
         // Creates refund object
+
         private Refund CreateRefund(Ticket ticket, float Refund_Amount)
         {
             Refund refund = new Refund();
@@ -116,6 +114,10 @@ namespace BusBookingAppln.Services.Classes
             return refund;
         }
 
+        #endregion
+
+
+        #region changeTicketStatus
 
         // Change ticket status to given status
         private async Task changeTicketStatus(Ticket ticket, string status)
@@ -128,6 +130,10 @@ namespace BusBookingAppln.Services.Classes
             await _TicketRepository.Update(ticket, ticket.Id);
         }
 
+        #endregion
+
+
+        #region BookTicket
 
         // Book ticket - Make payment
         public async Task<PaymentOutputDTO> BookTicket(int UserId, int TicketId, string PaymentMethod)
@@ -194,8 +200,6 @@ namespace BusBookingAppln.Services.Classes
             return paymentOutputDTO;
         }
 
-
-
         // Create payment object
         private Payment CreatePayment(Ticket ticket, string PaymentMethod)
         {
@@ -209,19 +213,10 @@ namespace BusBookingAppln.Services.Classes
             return payment;
         }
 
+        #endregion
 
-        // Map Payment to PaymentOutputDTO
-        private PaymentOutputDTO MapPaymentToPaymentOutputDTO(Payment payment)
-        {
-            PaymentOutputDTO paymentOutputDTO = new PaymentOutputDTO();
-            paymentOutputDTO.TransactionId = payment.TransactionId;
-            paymentOutputDTO.PaymentMethod = payment.PaymentMethod;
-            paymentOutputDTO.PaymentDate = payment.PaymentDate;
-            paymentOutputDTO.AmountPaid = payment.AmountPaid;
-            paymentOutputDTO.Status = payment.Status;
-            return paymentOutputDTO;
-        }
 
+        #region CancelSeats
 
         // Cancel seats in a booked ticket
         public async Task<RefundOutputDTO> CancelSeats(int UserId, CancelSeatsInputDTO cancelSeatsInputDTO)
@@ -251,6 +246,10 @@ namespace BusBookingAppln.Services.Classes
             catch(Exception) { throw; }
         }
 
+        #endregion
+
+
+        #region CheckIfSeatsInTicket
 
         // Checks if all seats to be cancelled are in the ticket
         private async Task<bool> CheckIfSeatsInTicket(CancelSeatsInputDTO cancelSeatsInputDTO)
@@ -260,7 +259,10 @@ namespace BusBookingAppln.Services.Classes
             return allSeatsPresent;
         }
 
+        #endregion
 
+
+        #region CheckIfAllSeatsCancelled
 
         //Checks if all the seats are cancelled. If so, updates ticket status to cancelled
         private async Task CheckIfAllSeatsCancelled(Ticket ticket)
@@ -271,6 +273,10 @@ namespace BusBookingAppln.Services.Classes
             await _TicketRepository.Update(ticket, ticket.Id);
         }
 
+        #endregion
+
+
+        #region CheckIfSeatAlreadyCancelled
 
         //Checks if all seats to be cancelled are booked, and not cancelled
         private async Task CheckIfSeatAlreadyCancelled(Ticket ticket, CancelSeatsInputDTO cancelSeatsInputDTO)
@@ -288,6 +294,10 @@ namespace BusBookingAppln.Services.Classes
             }
         }
 
+        #endregion
+
+
+        #region UpdateTicketDetailStatusToCancelled
 
         // Update TicketDetails Status to Cancelled
         private async Task UpdateTicketDetailStatusToCancelled(CancelSeatsInputDTO cancelSeatsInputDTO)
@@ -304,7 +314,11 @@ namespace BusBookingAppln.Services.Classes
             await _TicketRepository.Update(ticket, ticket.Id);
             await CheckIfAllSeatsCancelled(ticket);
         }
-       
+
+        #endregion
+
+
+        #region UpdateRewardPointsForSeatCancellation
 
         // Reduce reward points provided while booking
         private async Task UpdateRewardPointsForSeatCancellation(int UserId, CancelSeatsInputDTO cancelSeatsInputDTO)
@@ -314,6 +328,10 @@ namespace BusBookingAppln.Services.Classes
             await _RewardRepository.Update(reward, UserId);
         }
 
+        #endregion
+
+
+        #region CalculateRefundAmountForCancelledSeats
 
         // Refund amount for cancelled seats - Refund amount = add seat price and then divide by 2 
         private float CalculateRefundAmountForCancelledSeats(CancelSeatsInputDTO cancelSeatsInputDTO, Ticket ticket)
@@ -324,5 +342,36 @@ namespace BusBookingAppln.Services.Classes
                                 .Sum(ticketDetail => ticketDetail.SeatPrice);
             return refundAmount/2;
         }
+
+        #endregion
+
+
+        #region Mappers
+
+        // Map Refund to RefundOutputDTO
+        private RefundOutputDTO MapRefundToRefundOutputDTO(Refund refund)
+        {
+            RefundOutputDTO refundOutputDTO = new RefundOutputDTO();
+            refundOutputDTO.RefundDate = refund.RefundDate;
+            refundOutputDTO.RefundAmount = refund.RefundAmount;
+            refundOutputDTO.Status = refund.Status;
+            refundOutputDTO.TicketId = refund.TicketId;
+            return refundOutputDTO;
+        }
+
+        // Map Payment to PaymentOutputDTO
+        private PaymentOutputDTO MapPaymentToPaymentOutputDTO(Payment payment)
+        {
+            PaymentOutputDTO paymentOutputDTO = new PaymentOutputDTO();
+            paymentOutputDTO.TransactionId = payment.TransactionId;
+            paymentOutputDTO.PaymentMethod = payment.PaymentMethod;
+            paymentOutputDTO.PaymentDate = payment.PaymentDate;
+            paymentOutputDTO.AmountPaid = payment.AmountPaid;
+            paymentOutputDTO.Status = payment.Status;
+            return paymentOutputDTO;
+        }
+
+        #endregion
+
     }
 }

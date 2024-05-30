@@ -9,7 +9,8 @@ namespace BusBookingAppln.Repositories.Classes
     public class BusWithSeatsRepository : BaseRepository<string, Bus>
     {
         public BusWithSeatsRepository(BusBookingContext context) : base(context) 
-        {}
+        {
+        }
 
         public override async Task<IList<Bus>> GetAll()
         {
@@ -40,7 +41,9 @@ namespace BusBookingAppln.Repositories.Classes
         {
             var item = _context.Buses.Include(x => x.SeatsInBus).ToList().FirstOrDefault(x => x.BusNumber == key);
             if (item == null)
+            {
                 throw new EntityNotFoundException($"Entity of type Bus with BusNumber = {key} not found.");
+            }
             return item;
         }
 
@@ -53,7 +56,9 @@ namespace BusBookingAppln.Repositories.Classes
                 int result = await _context.SaveChangesAsync();
                 return entity;
             }
-            catch (EntityNotFoundException) { throw; }
+            catch (EntityNotFoundException) { 
+                throw; 
+            }
         }
     }
 }

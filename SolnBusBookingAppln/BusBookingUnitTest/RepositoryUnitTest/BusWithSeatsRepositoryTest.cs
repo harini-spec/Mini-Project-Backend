@@ -4,18 +4,26 @@ using BusBookingAppln.Models.DBModels;
 using BusBookingAppln.Repositories;
 using BusBookingAppln.Repositories.Classes;
 using BusBookingAppln.Repositories.Interfaces;
+using Castle.Core.Logging;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace BusBookingUnitTest.RepositoryUnitTest
 {
     public class BusWithSeatsRepositoryTest
     {
         BusBookingContext context;
+        IRepository<string, Bus> busRepository;
+
         [SetUp]
         public void Setup()
         {
             DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("BusWithSeatsRepoDB");
             context = new BusBookingContext(optionsBuilder.Options);
+            busRepository = new BusWithSeatsRepository(context);
+
         }
 
         [TearDown]
@@ -28,9 +36,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         [Test]
         public async Task AddBusSuccessTest()
         {
-            // Arrange
-            IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
-
             // Action
             var result = await busRepository.Add(new Bus
             {
@@ -46,7 +51,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task AddBusInvalidOperationExceptionTest()
         {
             // Arrange
-            IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
             await busRepository.Add(new Bus
             {
                 BusNumber = "TN04A1111",
@@ -68,7 +72,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetByBusNumberSuccessTest()
         {
             // Arrange
-            IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
             await busRepository.Add(new Bus
             {
                 BusNumber = "TN04A1111",
@@ -85,9 +88,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         [Test]
         public async Task GetByBusNumberFailureTest()
         {
-            // Arrange
-            IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
-
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(() => busRepository.GetById("TN04A0000"));
 
@@ -98,8 +98,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         [Test]
         public async Task DeleteByBusNumberExceptionTest()
         {
-            // Arrange
-            IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
 
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(() => busRepository.Delete("TN04A0000"));
@@ -112,7 +110,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task UpdateByBusNumberExceptionTest()
         {
             // Arrange
-            IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
             var bus = new Bus
             {
                 BusNumber = "TN04A0000",
@@ -129,8 +126,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         [Test]
         public async Task GetAllBusFailTest()
         {
-            // Arrange
-            IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
 
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(() => busRepository.GetAll());
@@ -143,7 +138,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task GetAllBusSuccessTest()
         {
             // Arrange
-            IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
             await busRepository.Add(new Bus
             {
                 BusNumber = "TN04A1111",
@@ -161,7 +155,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task DeleteBusSuccessTest()
         {
             // Arrange
-            IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
             await busRepository.Add(new Bus
             {
                 BusNumber = "TN04A1111",
@@ -179,7 +172,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         public async Task UpdateBusSuccessTest()
         {
             // Arrange
-            IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
             await busRepository.Add(new Bus
             {
                 BusNumber = "TN04A1111",

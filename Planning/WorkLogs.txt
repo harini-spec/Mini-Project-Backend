@@ -21,6 +21,7 @@ Installed Packages:
     EF Core - JWT Bearer 
     EF Core - InMemory
     MOQ
+    log4net
 
 Repository Layer:
     For Primary Key     - IRepository - Base Repository - Main Repository

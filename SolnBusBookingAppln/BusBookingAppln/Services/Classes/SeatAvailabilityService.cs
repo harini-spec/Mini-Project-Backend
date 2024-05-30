@@ -24,6 +24,8 @@ namespace BusBookingAppln.Services.Classes
         }
 
 
+        #region CheckSeatAvailability
+
         // Check seat availability in a particular schedule - True : Available, False : Not Available
         public async Task<bool> CheckSeatAvailability(Schedule schedule, int SeatID)
         {
@@ -61,6 +63,10 @@ namespace BusBookingAppln.Services.Classes
             catch (NoItemsFoundException) { return true; }
         }
 
+        #endregion
+
+
+        #region DeleteNotBookedTickets
 
         // Delete tickets where reservation time limit has exceeded - 1 hr
         public async Task DeleteNotBookedTickets()
@@ -80,6 +86,10 @@ namespace BusBookingAppln.Services.Classes
             }
         }
 
+        #endregion
+
+
+        #region GetAllAvailableSeatsInABusSchedule
 
         // Get all available seats in a schedule
         public async Task<List<GetSeatsDTO>> GetAllAvailableSeatsInABusSchedule(int ScheduleId)
@@ -101,6 +111,10 @@ namespace BusBookingAppln.Services.Classes
             throw new NoSeatsAvailableException();
         }
 
+        #endregion
+
+
+        #region Mappers
 
         // Map Seat to GetSeatsDTO
         private GetSeatsDTO MapSeatToGetSeatsDTO(Seat seat)
@@ -112,5 +126,7 @@ namespace BusBookingAppln.Services.Classes
             getSeatsDTO.SeatPrice = seat.SeatPrice;
             return getSeatsDTO;
         }
+
+        #endregion
     }
 }

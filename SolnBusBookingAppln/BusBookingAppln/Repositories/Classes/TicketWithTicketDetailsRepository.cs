@@ -10,8 +10,7 @@ namespace BusBookingAppln.Repositories.Classes
     {
         public readonly BusBookingContext _context;
 
-        public TicketWithTicketDetailsRepository(BusBookingContext context)
-        {
+        public TicketWithTicketDetailsRepository(BusBookingContext context) {
             _context = context;
         }
 
@@ -23,7 +22,7 @@ namespace BusBookingAppln.Repositories.Classes
                 await _context.SaveChangesAsync();
                 return entity;
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ioe)
             {
                 throw new InvalidOperationCustomException();
             }
@@ -58,7 +57,9 @@ namespace BusBookingAppln.Repositories.Classes
         {
             var item = _context.Tickets.Include(x => x.TicketDetails).ToList().FirstOrDefault(x => x.Id == key);
             if (item == null)
+            {
                 throw new EntityNotFoundException($"Entity of type Ticket with ID {key} not found.");
+            }
             return item;
         }
 
@@ -71,7 +72,8 @@ namespace BusBookingAppln.Repositories.Classes
                 int result = await _context.SaveChangesAsync();
                 return entity;
             }
-            catch (EntityNotFoundException) { throw; }
+            catch (EntityNotFoundException) {
+                throw; }
         }
     }
 }

@@ -20,6 +20,7 @@ namespace BusBookingAppln.Services.Classes
             _userService = userService;
         }
 
+        #region SoftDeleteCustomerAccount
 
         // Soft delete account : Status = "Inactive"
         public async Task<string> SoftDeleteCustomerAccount(int UserId)
@@ -41,6 +42,10 @@ namespace BusBookingAppln.Services.Classes
             throw new UserNotActiveException("User account is already deleted");
         }
 
+        #endregion
+
+
+        #region ActivateDeletedCustomerAccount
 
         // Activate deleted account : Status = "Active"
         public async Task<LoginOutputDTO> ActivateDeletedCustomerAccount(LoginInputDTO loginInputDTO)
@@ -84,5 +89,7 @@ namespace BusBookingAppln.Services.Classes
                 throw;
             }
         }
+
+        #endregion
     }
 }

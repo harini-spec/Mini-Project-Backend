@@ -20,9 +20,6 @@ Repository tests:
     User
     User Details
     Driver Details 
-    Payment
-    Refund 
-    Feedback 
 
 Service tests:
     SeatAvailabilityService

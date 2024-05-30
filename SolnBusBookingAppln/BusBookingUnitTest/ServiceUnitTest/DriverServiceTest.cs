@@ -31,7 +31,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
         [SetUp]
         public void Setup()
         {
-            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("RouteRepoDB");
+            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("DriverDB");
             context = new BusBookingContext(optionsBuilder.Options);
 
             driverDetailRepo = new MainRepository<int, DriverDetail>(context);

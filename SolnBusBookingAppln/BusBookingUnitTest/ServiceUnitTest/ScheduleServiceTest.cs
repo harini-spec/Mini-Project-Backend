@@ -33,7 +33,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
         [SetUp]
         public void Setup()
         {
-            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("RouteRepoDB");
+            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("ScheduleRepoDB");
             context = new BusBookingContext(optionsBuilder.Options);
             ScheduleRepository = new MainRepository<int, Schedule>(context);
             driverRepo = new DriverWithScheduleRepository(context);
@@ -107,6 +107,13 @@ namespace BusBookingUnitTest.ServiceUnitTest
         public async Task GetScheduleByIdSuccessTest()
         {
             // Arrange
+            await RouteRepo.Add(
+                new Route
+                {
+                    Id = 1,
+                    Source = "Chennai",
+                    Destination = "Karnataka"
+                });
             await ScheduleRepository.Add(new Schedule
             {
                 Id = 2,
@@ -174,7 +181,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             {
                 DateTimeOfDeparture = DateTime.Now.AddDays(2),
                 Source = "Chennai",
-                Destination = "Vellore"
+                Destination = "Karnataka"
             };
 
             // Action
@@ -188,6 +195,13 @@ namespace BusBookingUnitTest.ServiceUnitTest
         public async Task GetAllSchedulesOnAGivenRouteAndDateExceptionTest()
         {
             // Arrange - Route Added in route service test
+            await RouteRepo.Add(
+                new Route
+                {
+                    Id = 2,
+                    Source = "Chennai",
+                    Destination = "Vellore"
+                });
             UserInputDTOForSchedule schedule = new UserInputDTOForSchedule()
             {
                 DateTimeOfDeparture = DateTime.Now.AddDays(3),

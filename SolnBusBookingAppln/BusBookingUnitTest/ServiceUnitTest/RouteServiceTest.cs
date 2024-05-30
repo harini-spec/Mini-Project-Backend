@@ -24,7 +24,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
         [SetUp]
         public void Setup()
         {
-            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("RouteRepoDB");
+            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("RouteDB");
             context = new BusBookingContext(optionsBuilder.Options);
             RouteRepository = new MainRepository<int, Route>(context);
             routeService = new RouteService(RouteRepository);

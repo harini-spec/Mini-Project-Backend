@@ -132,10 +132,20 @@ namespace BusBookingAppln.Services.Classes
         // Book ticket - Make payment
         public async Task<PaymentOutputDTO> BookTicket(int UserId, int TicketId, string PaymentMethod)
         {
+            Ticket ticket = null;
+
+            // Wrong Ticket Id checking
+            try
+            {
+                ticket = await _TicketRepository.GetById(TicketId);
+            }
+            catch (EntityNotFoundException)
+            {
+                throw;
+            }
+
             // Check if its been less than 1 hr of adding
             await _SeatAvailability.DeleteNotBookedTickets();
-
-            Ticket ticket = null;
             try
             {
                 ticket = await _TicketRepository.GetById(TicketId);

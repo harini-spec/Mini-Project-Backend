@@ -24,5 +24,5 @@ Installed Packages:
 
 Repository Layer:
     For Primary Key     - IRepository - Base Repository - Main Repository
-    For Include         - IRepository - Concrete Class
+    For Include         - IRepository - Base Repository - Concrete Class
     For Composite Key   - IRepositoryCompositeKey - Concrete Class

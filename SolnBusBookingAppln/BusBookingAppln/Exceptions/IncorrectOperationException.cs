@@ -2,8 +2,7 @@
 
 namespace BusBookingAppln.Exceptions
 {
-    [Serializable]
-    internal class IncorrectOperationException : Exception
+    public class IncorrectOperationException : Exception
     {
         public IncorrectOperationException()
         {

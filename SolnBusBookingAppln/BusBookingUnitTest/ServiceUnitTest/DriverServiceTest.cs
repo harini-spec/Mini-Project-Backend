@@ -19,9 +19,9 @@ namespace BusBookingUnitTest.ServiceUnitTest
 {
     public class DriverServiceTest
     {
-        IRepository<int, Driver> _driverWithSchedulesRepo;
-        IRepository<int, DriverDetail> _driverDetailRepo;
-        ITokenService _tokenService;
+        IRepository<int, Driver> driverWithSchedulesRepo;
+        IRepository<int, DriverDetail> driverDetailRepo;
+        ITokenService tokenService;
 
         BusBookingContext context;
 
@@ -34,8 +34,8 @@ namespace BusBookingUnitTest.ServiceUnitTest
             DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("RouteRepoDB");
             context = new BusBookingContext(optionsBuilder.Options);
 
-            _driverDetailRepo = new MainRepository<int, DriverDetail>(context);
-            _driverWithSchedulesRepo = new DriverWithScheduleRepository(context);
+            driverDetailRepo = new MainRepository<int, DriverDetail>(context);
+            driverWithSchedulesRepo = new DriverWithScheduleRepository(context);
 
             Mock<IConfigurationSection> configurationJWTSection = new Mock<IConfigurationSection>();
             configurationJWTSection.Setup(x => x.Value).Returns("This is the Secret Key to generate JWT Token for SHA256");
@@ -43,10 +43,10 @@ namespace BusBookingUnitTest.ServiceUnitTest
             configTokenSection.Setup(x => x.GetSection("JWT")).Returns(configurationJWTSection.Object);
             Mock<IConfiguration> mockConfig = new Mock<IConfiguration>();
             mockConfig.Setup(x => x.GetSection("TokenKey")).Returns(configTokenSection.Object);
-            _tokenService = new TokenService(mockConfig.Object);
+            tokenService = new TokenService(mockConfig.Object);
 
-            DriverService = new DriverService(_driverWithSchedulesRepo, _tokenService, _driverDetailRepo);
-            AdminService = new AdminService(_driverWithSchedulesRepo, _driverDetailRepo);
+            DriverService = new DriverService(driverWithSchedulesRepo, tokenService, driverDetailRepo);
+            AdminService = new AdminService(driverWithSchedulesRepo, driverDetailRepo);
         }
 
 

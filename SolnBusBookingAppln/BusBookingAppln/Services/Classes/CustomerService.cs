@@ -37,7 +37,6 @@ namespace BusBookingAppln.Services.Classes
                     return "Account successfully deleted";
                 }
                 return "Sorry, you have active tickets. Cannot delete your account now";
-
             }
             throw new UserNotActiveException("User account is already deleted");
         }

@@ -2,38 +2,29 @@ Topic: Bus Booking System
 Deadline: Tuesday 28/05/2024
 
 -----------------------------------------------------------------------------------------------------------------------------------/
+Logging 
+Unit test repos, services 
 
+Add summary in Interfaces
+Try to combine driver with user 
+Clean git unwanted folders
 Exceptions: OperationCanceledException, DbUpdateException, DbUpdateConcurrencyException, same key? - InvalidOperationException
 Catch general exception and throw it in service / seperate exceptions in controller 
 
-Add summary in Interfaces
-Logging 
-All dtos have validation?
-check authorize part 
-check all files - crct ones are present 
-
-Unit test repos, services 
-
-Have understanding of data flow
-Check all endpoints once 
-Try to combine driver with user 
-Clean git unwanted folders
+Add ticket - seat not available 
+    - Check if seat belongs to schedule 
+Get Reward points of user 
 -----------------------------------------------------------------------------------------------------------------------------------/
 
 Repository tests:
-
-**User** 
-**User Details** 
-**Driver Details** 
-**Payment** 
-**Refund** 
-**Feedback** 
+    User
+    User Details
+    Driver Details 
+    Payment
+    Refund 
+    Feedback 
 
 Service tests:
-
-User 
-Customer
-Feedback
-SeatAvailabilityService
-Ticket
-Transaction
+    SeatAvailabilityService
+    Ticket
+    Transaction

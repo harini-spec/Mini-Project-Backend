@@ -18,6 +18,12 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             context = new BusBookingContext(optionsBuilder.Options);
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
 
         [Test]
         public async Task AddBusSuccessTest()
@@ -43,14 +49,14 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
             await busRepository.Add(new Bus
             {
-                BusNumber = "TN04A5555",
+                BusNumber = "TN04A1111",
                 TotalSeats = 30
             });
 
             // Action
             var exception = Assert.ThrowsAsync<InvalidOperationCustomException>(() => busRepository.Add(new Bus
             {
-                BusNumber = "TN04A5555",
+                BusNumber = "TN04A1111",
                 TotalSeats = 30
             }));
 
@@ -65,15 +71,15 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
             await busRepository.Add(new Bus
             {
-                BusNumber = "TN04A2222",
+                BusNumber = "TN04A1111",
                 TotalSeats = 30
             });
 
             // Action
-            var result = await busRepository.GetById("TN04A2222");
+            var result = await busRepository.GetById("TN04A1111");
 
             // Assert
-            Assert.That(result.BusNumber, Is.EqualTo("TN04A2222"));
+            Assert.That(result.BusNumber, Is.EqualTo("TN04A1111"));
         }
 
         [Test]
@@ -125,9 +131,6 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             // Arrange
             IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
-            await busRepository.Delete("TN04A1111");
-            await busRepository.Delete("TN04A5555");
-
 
             // Action
             var exception = Assert.ThrowsAsync<NoItemsFoundException>(() => busRepository.GetAll());
@@ -143,7 +146,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
             await busRepository.Add(new Bus
             {
-                BusNumber = "TN04A4444",
+                BusNumber = "TN04A1111",
                 TotalSeats = 30
             });
 
@@ -161,15 +164,15 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
             await busRepository.Add(new Bus
             {
-                BusNumber = "TN04A3333",
+                BusNumber = "TN04A1111",
                 TotalSeats = 30
             });
 
             // Action
-            var entity = await busRepository.Delete("TN04A3333");
+            var entity = await busRepository.Delete("TN04A1111");
 
             // Assert
-            Assert.That(entity.BusNumber, Is.EqualTo("TN04A3333"));
+            Assert.That(entity.BusNumber, Is.EqualTo("TN04A1111"));
         }
 
         [Test]
@@ -179,14 +182,14 @@ namespace BusBookingUnitTest.RepositoryUnitTest
             IRepository<string, Bus> busRepository = new BusWithSeatsRepository(context);
             await busRepository.Add(new Bus
             {
-                BusNumber = "TN04A3333",
+                BusNumber = "TN04A1111",
                 TotalSeats = 30
             });
-            var entity = await busRepository.GetById("TN04A3333");
+            var entity = await busRepository.GetById("TN04A1111");
             entity.TotalSeats = 15;
 
             // Action
-            var result = await busRepository.Update(entity, "TN04A3333");
+            var result = await busRepository.Update(entity, "TN04A1111");
 
             // Assert
             Assert.That(result.TotalSeats, Is.EqualTo(15));

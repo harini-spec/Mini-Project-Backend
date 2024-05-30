@@ -6,14 +6,14 @@ using BusBookingAppln.Services.Interfaces;
 
 namespace BusBookingAppln.Services.Classes
 {
-    public class CustomerService : ICustomerService
+    public class CustomerAccountService : ICustomerService
     {
         private readonly ITicketService _ticketService;
         private readonly IRepository<int, UserDetail> _userDetailRepo;
         private readonly IUserService _userService;
 
 
-        public CustomerService(ITicketService ticketService, IRepository<int, UserDetail> userDetailRepo, IUserService userService)
+        public CustomerAccountService(ITicketService ticketService, IRepository<int, UserDetail> userDetailRepo, IUserService userService)
         {
             _ticketService = ticketService;
             _userDetailRepo = userDetailRepo;

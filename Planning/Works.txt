@@ -4,6 +4,8 @@ Deadline: Tuesday 28/05/2024
 -----------------------------------------------------------------------------------------------------------------------------------/
 Logging 
 Unit test repos, services 
+Regions in code too 
+Rewrite tests??
 
 Add summary in Interfaces
 Try to combine driver with user 
@@ -20,7 +22,3 @@ Seperate Admin and Customer to diff table - same email id checking pblm
 Repository tests:
     User Details
     Driver Details 
-
-Service tests:
-    Ticket
-    Transaction

@@ -10,13 +10,13 @@ using System.Text;
 
 namespace BusBookingAppln.Services.Classes
 {
-    public class AdminService : IAdminService
+    public class DriverAccountService : IAdminService
     {
         private readonly IRepository<int, Driver> _driverRepo;
         private readonly IRepository<int, DriverDetail> _driverDetailRepo;
         private readonly IDriverService _driverService;
 
-        public AdminService(IRepository<int, Driver> driverRepo, IRepository<int, DriverDetail> driverDetailRepo, IDriverService driverService)
+        public DriverAccountService(IRepository<int, Driver> driverRepo, IRepository<int, DriverDetail> driverDetailRepo, IDriverService driverService)
         {
             _driverRepo = driverRepo;
             _driverDetailRepo = driverDetailRepo;

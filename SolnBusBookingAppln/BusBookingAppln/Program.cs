@@ -91,7 +91,7 @@ namespace BusBookingAppln
             #region services 
 
             builder.Services.AddScoped<ITokenService, TokenService>();
-            builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddScoped<IAdminService, DriverAccountService>();
             builder.Services.AddScoped<IDriverService, DriverService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IBusService, BusService>();
@@ -101,7 +101,7 @@ namespace BusBookingAppln
             builder.Services.AddScoped<ITicketService, TicketService>();
             builder.Services.AddScoped<ISeatAvailability, SeatAvailabilityService>();
             builder.Services.AddScoped<IFeedbackService, FeedbackService>();
-            builder.Services.AddScoped<ICustomerService, CustomerService>();
+            builder.Services.AddScoped<ICustomerService, CustomerAccountService>();
             builder.Services.AddScoped<ITransactionService, TransactionService>();
             #endregion
 

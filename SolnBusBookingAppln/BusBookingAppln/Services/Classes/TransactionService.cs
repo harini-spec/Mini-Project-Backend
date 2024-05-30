@@ -132,7 +132,7 @@ namespace BusBookingAppln.Services.Classes
         // Book ticket - Make payment
         public async Task<PaymentOutputDTO> BookTicket(int UserId, int TicketId, string PaymentMethod)
         {
-            Ticket ticket = null;
+            Ticket ticket = new Ticket();
 
             // Wrong Ticket Id checking
             try
@@ -163,7 +163,7 @@ namespace BusBookingAppln.Services.Classes
 
             Payment payment = CreatePayment(ticket, PaymentMethod);
 
-            Reward reward = null;
+            Reward reward = new Reward();
             try
             {
                 reward = await _RewardRepository.GetById(UserId);

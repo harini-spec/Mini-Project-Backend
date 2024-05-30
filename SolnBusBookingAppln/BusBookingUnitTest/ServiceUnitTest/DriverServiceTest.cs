@@ -46,7 +46,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             tokenService = new TokenService(mockConfig.Object);
 
             DriverService = new DriverService(driverWithSchedulesRepo, tokenService, driverDetailRepo);
-            AdminService = new AdminService(driverWithSchedulesRepo, driverDetailRepo, DriverService);
+            AdminService = new DriverAccountService(driverWithSchedulesRepo, driverDetailRepo, DriverService);
         }
 
 

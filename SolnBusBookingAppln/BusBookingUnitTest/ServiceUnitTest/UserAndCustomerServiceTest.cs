@@ -49,7 +49,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
 
             userService = new UserService(UserRepo, UserDetailRepo, tokenService);
             ticketService = new TicketService(null, null, null, TicketRepository, null, null);
-            customerService = new CustomerService(ticketService, UserDetailRepo, userService);
+            customerService = new CustomerAccountService(ticketService, UserDetailRepo, userService);
         }
 
         [Test, Order(1)]

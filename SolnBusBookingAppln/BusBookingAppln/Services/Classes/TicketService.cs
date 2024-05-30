@@ -274,7 +274,7 @@ namespace BusBookingAppln.Services.Classes
             return await _TicketRepository.Delete(ticketId);
         }
 
-
+        #region Mappers
         // Map InputTicketDTO.TicketDetail List to TicketDetail List
         private async Task<List<TicketDetail>> MapInputTicketDetailsToTicketDetails(InputTicketDTO inputTicketDTO)
         {
@@ -362,5 +362,6 @@ namespace BusBookingAppln.Services.Classes
             addedTicketDetailDTO.Status = ticketDetail.Status;
             return addedTicketDetailDTO;
         }
+        #endregion
     }
 }

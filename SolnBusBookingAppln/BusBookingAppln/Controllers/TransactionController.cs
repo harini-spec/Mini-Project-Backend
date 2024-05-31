@@ -15,10 +15,12 @@ namespace BusBookingAppln.Controllers
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionService _TransactionService;
+        private readonly ILogger _logger;
 
-        public TransactionController(ITransactionService TransactionService)
+        public TransactionController(ITransactionService TransactionService, ILogger logger)
         {
             _TransactionService = TransactionService;
+            _logger = logger;
         }
 
         [HttpPost("BookTicket")]
@@ -39,22 +41,27 @@ namespace BusBookingAppln.Controllers
             }
             catch (IncorrectOperationException ioe)
             {
+                _logger.LogError(ioe.Message);
                 return BadRequest(new ErrorModel(400, ioe.Message));
             }
             catch (UnauthorizedUserException uau)
             {
+                _logger.LogCritical(uau.Message);
                 return Unauthorized(new ErrorModel(401, uau.Message));
             }
             catch (InvalidOperationException ioe)
             {
+                _logger.LogCritical(ioe.Message);
                 return Conflict(new ErrorModel(409, ioe.Message));
             }
             catch (EntityNotFoundException enf)
             {
+                _logger.LogCritical(enf.Message);
                 return NotFound(new ErrorModel(404, enf.Message));
             }
             catch (Exception ex)
             {
+                _logger.LogCritical(ex.Message);
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }
@@ -77,22 +84,27 @@ namespace BusBookingAppln.Controllers
             }
             catch (UnauthorizedUserException uau)
             {
+                _logger.LogCritical(uau.Message);
                 return Unauthorized(new ErrorModel(401, uau.Message));
             }
             catch (IncorrectOperationException ioe)
             {
+                _logger.LogError(ioe.Message);
                 return BadRequest(new ErrorModel(400, ioe.Message));
             }
             catch (InvalidOperationException ioe)
-            {
+            {       
+                _logger.LogError(ioe.Message);
                 return Conflict(new ErrorModel(409, ioe.Message));
             }
             catch (EntityNotFoundException enf)
             {
+                _logger.LogCritical(enf.Message);
                 return NotFound(new ErrorModel(404, enf.Message));
             }
             catch (Exception ex)
             {
+                _logger.LogCritical(ex.Message);
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }
@@ -115,22 +127,27 @@ namespace BusBookingAppln.Controllers
             }
             catch (UnauthorizedUserException uau)
             {
+                _logger.LogCritical(uau.Message);
                 return Unauthorized(new ErrorModel(401, uau.Message));
             }
             catch (IncorrectOperationException ioe)
             {
+                _logger.LogError(ioe.Message);
                 return BadRequest(new ErrorModel(400, ioe.Message));
             }
             catch (InvalidOperationException ioe)
             {
+                _logger.LogError(ioe.Message);
                 return Conflict(new ErrorModel(409, ioe.Message));
             }
             catch (EntityNotFoundException enf)
             {
+                _logger.LogCritical(enf.Message);
                 return NotFound(new ErrorModel(404, enf.Message));
             }
             catch (Exception ex)
             {
+                _logger.LogCritical(ex.Message);
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }

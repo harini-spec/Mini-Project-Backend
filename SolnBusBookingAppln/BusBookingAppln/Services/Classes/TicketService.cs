@@ -16,9 +16,10 @@ namespace BusBookingAppln.Services.Classes
         private readonly ISeatService _SeatService;
         private readonly ISeatAvailability _SeatAvailabilityService;
         private readonly IScheduleService _ScheduleService;
+        private readonly ILogger<TicketService> _logger;
 
 
-        public TicketService(IRepository<int, Reward> RewardRepository, IRepositoryCompositeKey<int, int, TicketDetail> TicketDetailRepository, ISeatAvailability SeatAvailabilityService, IRepository<int, Ticket> TicketRepository, ISeatService seatService, IScheduleService scheduleService)
+        public TicketService(IRepository<int, Reward> RewardRepository, IRepositoryCompositeKey<int, int, TicketDetail> TicketDetailRepository, ISeatAvailability SeatAvailabilityService, IRepository<int, Ticket> TicketRepository, ISeatService seatService, IScheduleService scheduleService, ILogger<TicketService> logger)
         {
             _RewardRepository = RewardRepository;
             _TicketRepository = TicketRepository;
@@ -26,6 +27,7 @@ namespace BusBookingAppln.Services.Classes
             _ScheduleService = scheduleService;
             _SeatService = seatService;
             _TicketDetailRepository = TicketDetailRepository;
+            _logger = logger;
         }
 
 
@@ -55,7 +57,10 @@ namespace BusBookingAppln.Services.Classes
 
             // Return exception along with unavailable seat IDs
             if (seatsAvailable.Count != inputTicketDTO.TicketDetails.Count)
+            {
+                _logger.LogError("Some seats are not available: " + string.Join(",", SeatsNotAvailable.ToArray()));
                 throw new NoSeatsAvailableException(SeatsNotAvailable);
+            }
 
 
             // Create Ticket
@@ -127,6 +132,7 @@ namespace BusBookingAppln.Services.Classes
             }
             catch (NoItemsFoundException)
             {
+                _logger.LogError("No Tickets in the database");
                 return false;
             }
             tickets = tickets.ToList().Where(x => x.UserId == userId && x.Status == "Booked").ToList();
@@ -159,9 +165,11 @@ namespace BusBookingAppln.Services.Classes
                 }
                 else
                 {
-                    throw new IncorrectOperationException($"Ticket already {ticket.Status}. Go to the cancellation page");
+                    _logger.LogError($"Ticket status = {ticket.Status}. Wrong action, can't cancel");
+                    throw new IncorrectOperationException($"Ticket status = {ticket.Status}. Wrong action, can't cancel");
                 }
             }
+            _logger.LogError("Wrong user trying to remove the ticket. UserId = " + UserId);
             throw new UnauthorizedUserException("You can't remove this ticket");
         }
 
@@ -217,13 +225,16 @@ namespace BusBookingAppln.Services.Classes
                             return addedTicketDetailDTO;
                         }
                     }
+                    _logger.LogError($"Ticket Item with Seat ID = {SeatId} not found");
                     throw new EntityNotFoundException("Ticket Item not found");
                 }
                 else
                 {
-                    throw new IncorrectOperationException($"Ticket already {ticket.Status}. Go to the cancellation page");
+                    _logger.LogError($"Ticket Status = {ticket.Status}. Wrong action, Can't cancel");
+                    throw new IncorrectOperationException($"Ticket Status = {ticket.Status}. Wrong action, Can't cancel");
                 }
             }
+            _logger.LogCritical("Wrong user trying to remove the ticket item. UserId = " + UserId);
             throw new UnauthorizedUserException("You can't remove this ticket item");
         }
 
@@ -241,12 +252,16 @@ namespace BusBookingAppln.Services.Classes
                 tickets = await GetAllTickets();
                 tickets = tickets.Where(x => x.UserId == CustomerId).ToList();
                 if (tickets.Count == 0)
+                {
+                    _logger.LogError("Customer has no tickets");
                     throw new NoItemsFoundException("Customer has no tickets");
+                }
                 return await MapTicketsToAddedTicketDTOs(tickets);
 
             }
             catch (NoItemsFoundException)
             {
+                _logger.LogError("There are no tickets in the database");
                 throw;
             }
         }
@@ -290,6 +305,7 @@ namespace BusBookingAppln.Services.Classes
             }
             catch (EntityNotFoundException)
             {
+                _logger.LogError($"No Reward record found for User with ID = {userId}");
                 return 0;
             }
         }

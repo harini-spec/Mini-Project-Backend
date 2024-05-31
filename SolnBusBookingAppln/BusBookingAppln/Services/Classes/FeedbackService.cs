@@ -10,12 +10,14 @@ namespace BusBookingAppln.Services.Classes
     {
         private readonly IRepository<int, Feedback> _FeedbackRepository;
         private readonly ITicketService _ticketService;
+        private readonly ILogger<FeedbackService> _logger;
 
 
-        public FeedbackService(IRepository<int, Feedback> FeedbackRepository, ITicketService ticketService)
+        public FeedbackService(IRepository<int, Feedback> FeedbackRepository, ITicketService ticketService, ILogger<FeedbackService> logger)
         {
             _FeedbackRepository = FeedbackRepository;
             _ticketService = ticketService;
+            _logger = logger;
         }
 
 
@@ -28,7 +30,10 @@ namespace BusBookingAppln.Services.Classes
 
             // Check if the ticket belongs to the user
             if(ticket.UserId != UserId)
+            {
+                _logger.LogCritical("You can't provide feedback for this ticket");
                 throw new UnauthorizedUserException("You can't provide feedback for this ticket");
+            }
 
             // Check if the ride is over
             if (ticket.Status == "Ride Over") 
@@ -37,6 +42,7 @@ namespace BusBookingAppln.Services.Classes
                 await _FeedbackRepository.Add(feedback);
                 return "Feedback successfully added";
             }
+            _logger.LogError("Ticket status is not Ride Over: Can't add feedback");
             throw new IncorrectOperationException("You cannot add feedback to this ticket");
         }
 
@@ -53,7 +59,10 @@ namespace BusBookingAppln.Services.Classes
             // Filter feedbacks of given Schedule
             List<Feedback> result = feedbacks.ToList().Where(x => x.FeedbackForTicket.ScheduleId == ScheduleId).ToList();
             if (result.Count == 0)
+            {
+                _logger.LogError("No feedbacks found");
                 throw new NoItemsFoundException("No feedbacks found");
+            }
 
             List<GetFeedbackDTO> getFeedbackDTOs = MapFeedbackListToGetFeedbackDTOList(result);
             return getFeedbackDTOs;

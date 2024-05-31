@@ -13,10 +13,12 @@ namespace BusBookingAppln.Controllers
     public class ScheduleController : ControllerBase
     {
         private readonly IScheduleService _scheduleService;
+        private readonly ILogger<ScheduleController> _logger;
 
-        public ScheduleController(IScheduleService scheduleService)
+        public ScheduleController(IScheduleService scheduleService, ILogger<ScheduleController> logger)
         {
             _scheduleService = scheduleService;
+            _logger = logger;
         }
 
         [HttpPost("AddSchedule")]
@@ -36,10 +38,12 @@ namespace BusBookingAppln.Controllers
                 }
                 catch (InvalidOperationException ioe)
                 {
+                    _logger.LogError(ioe.Message);
                     return Conflict(new ErrorModel(409, ioe.Message));
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogCritical(ex.Message);
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
             }
@@ -63,14 +67,17 @@ namespace BusBookingAppln.Controllers
                 }
                 catch (NoRoutesFoundForGivenSourceAndDest nrf)
                 {
+                    _logger.LogError(nrf.Message);
                     return NotFound(new ErrorModel(404, nrf.Message));
                 }
                 catch (NoSchedulesFoundForGivenRouteAndDate nsf)
                 {
+                    _logger.LogError(nsf.Message);
                     return NotFound(new ErrorModel(404, nsf.Message));
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogCritical(ex.Message);
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
             }
@@ -89,16 +96,14 @@ namespace BusBookingAppln.Controllers
                     List<ScheduleReturnDTO> result = await _scheduleService.GetAllSchedules();
                     return Ok(result);
                 }
-                catch (EntityNotFoundException enf)
-                {
-                    return NotFound(new ErrorModel(404, enf.Message));
-                }
                 catch (NoItemsFoundException nif)
                 {
+                    _logger.LogError(nif.Message);
                     return NotFound(new ErrorModel(404, nif.Message));
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogCritical(ex.Message);
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
         }

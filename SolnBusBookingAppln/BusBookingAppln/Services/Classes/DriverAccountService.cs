@@ -15,12 +15,14 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRepository<int, Driver> _driverRepo;
         private readonly IRepository<int, DriverDetail> _driverDetailRepo;
         private readonly IDriverService _driverService;
+        private readonly ILogger<DriverAccountService> _logger;
 
-        public DriverAccountService(IRepository<int, Driver> driverRepo, IRepository<int, DriverDetail> driverDetailRepo, IDriverService driverService)
+        public DriverAccountService(IRepository<int, Driver> driverRepo, IRepository<int, DriverDetail> driverDetailRepo, IDriverService driverService, ILogger<DriverAccountService> logger)
         {
             _driverRepo = driverRepo;
             _driverDetailRepo = driverDetailRepo;
             _driverService = driverService;
+            _logger = logger;
         }
 
         #region RegisterDriver
@@ -37,6 +39,7 @@ namespace BusBookingAppln.Services.Classes
             var ExistingDriver = await _driverService.GetDriverByEmail(registerInputDTO.Email);
             if(ExistingDriver != null) 
             {
+                _logger.LogError("Email ID already exists");
                 throw new UnableToRegisterException("Email ID already exists");
             }
 
@@ -54,12 +57,14 @@ namespace BusBookingAppln.Services.Classes
             catch (Exception) { }
             if (InsertedDriver == null)
             {
+                _logger.LogError("Not able to register at this moment");
                 throw new UnableToRegisterException("Not able to register at this moment");
             }
             if (InsertedDriverDetail == null)
             {
                 await RevertDriverInsert(driver);
             }
+            _logger.LogError("Not able to register at this moment");
             throw new UnableToRegisterException("Not able to register at this moment");
         }
 

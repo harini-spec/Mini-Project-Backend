@@ -8,6 +8,8 @@ using BusBookingAppln.Repositories.Interfaces;
 using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +32,9 @@ namespace BusBookingUnitTest.ServiceUnitTest
         IRepository<int, Reward> RewardRepository;
         IRepositoryCompositeKey<int, int, TicketDetail> TicketDetailRepository;
 
+        Mock<ILogger<SeatAvailabilityService>> SeatAvailabilityLogger;
+        Mock<ILogger<TransactionService>> TransactionLogger;
+
         [SetUp]
         public void Setup()
         {
@@ -45,9 +50,14 @@ namespace BusBookingUnitTest.ServiceUnitTest
             TicketDetailRepository = new TicketDetailRepository(context);
             #endregion
 
+            #region Logger Mock Object Creation
+            SeatAvailabilityLogger = new Mock<ILogger<SeatAvailabilityService>>();
+            TransactionLogger = new Mock<ILogger<TransactionService>>();
+            #endregion
+
             #region Service Injection
-            seatAvailability = new SeatAvailabilityService(null, null, TicketRepository, TicketDetailRepository);
-            transactionService = new TransactionService(seatAvailability, ScheduleRepository, PaymentRepository, RewardRepository, TicketRepository, RefundRepository);
+            seatAvailability = new SeatAvailabilityService(null, null, TicketRepository, TicketDetailRepository, SeatAvailabilityLogger.Object);
+            transactionService = new TransactionService(seatAvailability, ScheduleRepository, PaymentRepository, RewardRepository, TicketRepository, RefundRepository, TransactionLogger.Object);
             #endregion
 
             #region Add Bus and Seats
@@ -421,7 +431,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             var exception = Assert.ThrowsAsync<IncorrectOperationException>(async () => await transactionService.CancelTicket(1, 1));
 
             // Assert
-            Assert.That(exception.Message, Is.EqualTo("You can't cancel this ticket: It is not booked/Cancelled/Ride over"));
+            Assert.That(exception.Message, Is.EqualTo("You can't cancel this ticket: It's status is Not Booked"));
         }
 
         [Test, Order(10)]
@@ -536,9 +546,11 @@ namespace BusBookingUnitTest.ServiceUnitTest
             // Assert
             Assert.That(exception.Message, Is.EqualTo("You can't cancel this ticket"));
         }
+
         #endregion
 
         #region Cancel Seats Tests
+
         [Test, Order(11)]
         public async Task CancelSeatSuccessTest()
         {
@@ -750,6 +762,61 @@ namespace BusBookingUnitTest.ServiceUnitTest
             // Assert
             Assert.That(result, Is.Not.Null);
         }
+
+        [Test, Order(13)]
+        public async Task CancelSeatTicketDetailNullExceptionTest()
+        {
+            // Arrange
+            TicketDetail ticketDetail1 = new TicketDetail()
+            {
+                PassengerName = "Sam",
+                PassengerGender = "Male",
+                PassengerAge = 30,
+                PassengerPhone = "9999999999",
+                SeatId = 1,
+                SeatPrice = 50,
+                Status = "Not Booked",
+            };
+            TicketDetail ticketDetail2 = new TicketDetail()
+            {
+                PassengerName = "Sam",
+                PassengerGender = "Male",
+                PassengerAge = 30,
+                PassengerPhone = "9999999999",
+                SeatId = 2,
+                SeatPrice = 50,
+                Status = "Not Booked",
+            };
+            List<TicketDetail> ticketDetails = new List<TicketDetail> { ticketDetail1, ticketDetail2 };
+            Ticket ticket = new Ticket()
+            {
+                Id = 1,
+                UserId = 1,
+                ScheduleId = 2,
+                Status = "Not Booked",
+                Total_Cost = 1000,
+                DateAndTimeOfAdding = DateTime.Now,
+                TicketDetails = ticketDetails
+            };
+
+            await TicketRepository.Add(ticket);
+            await transactionService.BookTicket(1, 1, "GPay");
+
+            List<int> seatIds = new List<int>() { 2 };
+            CancelSeatsInputDTO cancellationDTO = new CancelSeatsInputDTO()
+            {
+                SeatIds = seatIds,
+                TicketId = 1
+            };
+            await transactionService.CancelSeats(1, cancellationDTO);
+
+            // Action
+            var exception = Assert.ThrowsAsync<IncorrectOperationException>(async () => await transactionService.CancelSeats(1, cancellationDTO));
+
+            // Assert
+            Assert.That(exception.Message, Is.EqualTo("You can only cancel Booked seats"));
+        }
+
         #endregion
     }
 }

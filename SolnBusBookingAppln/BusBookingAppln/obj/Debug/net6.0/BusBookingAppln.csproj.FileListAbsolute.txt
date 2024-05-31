@@ -71,3 +71,4 @@ C:\Users\VC\Desktop\Presidio\Mini-Project-Backend\SolnBusBookingAppln\BusBooking
 C:\Users\VC\Desktop\Presidio\Mini-Project-Backend\SolnBusBookingAppln\BusBookingAppln\bin\Debug\net6.0\Microsoft.IdentityModel.Abstractions.dll
 C:\Users\VC\Desktop\Presidio\Mini-Project-Backend\SolnBusBookingAppln\BusBookingAppln\bin\Debug\net6.0\log4net.config
 C:\Users\VC\Desktop\Presidio\Mini-Project-Backend\SolnBusBookingAppln\BusBookingAppln\bin\Debug\net6.0\log4net.dll
+C:\Users\VC\Desktop\Presidio\Mini-Project-Backend\SolnBusBookingAppln\BusBookingAppln\bin\Debug\net6.0\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll

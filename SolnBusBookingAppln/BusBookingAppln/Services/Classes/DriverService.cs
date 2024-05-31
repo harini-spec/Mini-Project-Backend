@@ -14,13 +14,15 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRepository<int, Driver> _driverWithSchedulesRepo;
         private readonly IRepository<int, DriverDetail> _driverDetailRepo;
         private readonly ITokenService _tokenService;
+        private readonly ILogger<DriverService> _logger;
 
 
-        public DriverService(IRepository<int, Driver> driverWithScheduleRepo, ITokenService tokenService, IRepository<int, DriverDetail> driverDetailRepo)
+        public DriverService(IRepository<int, Driver> driverWithScheduleRepo, ITokenService tokenService, IRepository<int, DriverDetail> driverDetailRepo, ILogger<DriverService> logger)
         {
             _tokenService = tokenService;
             _driverDetailRepo = driverDetailRepo;
             _driverWithSchedulesRepo = driverWithScheduleRepo;
+            _logger = logger;
         }
 
 
@@ -37,6 +39,7 @@ namespace BusBookingAppln.Services.Classes
             }
             catch(NoItemsFoundException)
             {
+                _logger.LogError("No Driver with given Email ID");
                 return null;
             }
         }
@@ -55,6 +58,7 @@ namespace BusBookingAppln.Services.Classes
                 Driver driver = await GetDriverByEmail(loginInputDTO.Email);
                 if (driver == null)
                 {
+                    _logger.LogError("Email doesn't exist");
                     throw new UnauthorizedUserException("Invalid username or password");
                 }
 
@@ -73,8 +77,10 @@ namespace BusBookingAppln.Services.Classes
                         LoginDriverOutputDTO loginOutputDTO = MapDriverToLoginDriverReturnDTO(driver);
                         return loginOutputDTO;
                     }
+                    _logger.LogError("Account is not activated");
                     throw new UserNotActiveException("Your account is not activated");
                 }
+                _logger.LogError("Wrong Password");
                 throw new UnauthorizedUserException("Invalid username or password");
             }
             catch (Exception)
@@ -112,6 +118,7 @@ namespace BusBookingAppln.Services.Classes
                 Driver driver = await GetDriverByEmail(email);
                 if (driver == null)
                 {
+                    _logger.LogCritical("Email ID not found");
                     throw new UnauthorizedUserException("Invalid username or password");
                 }
                 DriverDetail driverDetail = await _driverDetailRepo.GetById(driver.Id);
@@ -123,6 +130,7 @@ namespace BusBookingAppln.Services.Classes
 
                 return "Password successfully changed";
             }
+            _logger.LogError("Validation Error: Password must be atleast 8 characters");
             throw new ValidationErrorExcpetion("Password must be atleast 8 characters");
         }
 

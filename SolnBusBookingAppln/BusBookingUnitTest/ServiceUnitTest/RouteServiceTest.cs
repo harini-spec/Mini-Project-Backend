@@ -8,6 +8,8 @@ using BusBookingAppln.Repositories.Interfaces;
 using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,15 +21,24 @@ namespace BusBookingUnitTest.ServiceUnitTest
     public class RouteServiceTest
     {
         IRepository<int, Route> RouteRepository;
+
         BusBookingContext context;
+
         IRouteService routeService;
+
+        Mock<ILogger<RouteService>> RouteLogger;
+
         [SetUp]
         public void Setup()
         {
             DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("RouteDB");
             context = new BusBookingContext(optionsBuilder.Options);
+
             RouteRepository = new MainRepository<int, Route>(context);
-            routeService = new RouteService(RouteRepository);
+
+            RouteLogger = new Mock<ILogger<RouteService>>();
+
+            routeService = new RouteService(RouteRepository, RouteLogger.Object);
         }
 
 
@@ -41,7 +52,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
         }
 
         [Test, Order(2)]
-        public async Task GetRouteBySourceAndDestFailTest()
+        public async Task GetRouteBySourceAndDestDestNotFoundFailTest()
         {
             // Arrange
             Route route = new Route()
@@ -57,6 +68,22 @@ namespace BusBookingUnitTest.ServiceUnitTest
         }
 
         [Test, Order(3)]
+        public async Task GetRouteBySourceAndDestSourceNotFoundFailTest()
+        {
+            // Arrange
+            Route route = new Route()
+            {
+                Id = 100,
+                Source = "Chennai",
+                Destination = "Vellore"
+            };
+            var result = await RouteRepository.Add(route);
+
+            // Action
+            var exception = Assert.ThrowsAsync<NoRoutesFoundForGivenSourceAndDest>(async () => await routeService.GetRoute("Bangalore", "Chennai"));
+        }
+
+        [Test, Order(4)]
         public async Task GetRouteByIdSuccessTest()
         {
             // Arrange
@@ -75,7 +102,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             Assert.That(result.Id, Is.EqualTo(2));
         }
 
-        [Test, Order(4)]
+        [Test, Order(5)]
         public async Task GetRouteBySourceAndDestSuccessTest()
         {
             // Arrange

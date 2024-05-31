@@ -11,13 +11,15 @@ namespace BusBookingAppln.Services.Classes
         private readonly ITicketService _ticketService;
         private readonly IRepository<int, UserDetail> _userDetailRepo;
         private readonly IUserService _userService;
+        private readonly ILogger<CustomerAccountService> _logger;
 
 
-        public CustomerAccountService(ITicketService ticketService, IRepository<int, UserDetail> userDetailRepo, IUserService userService)
+        public CustomerAccountService(ITicketService ticketService, IRepository<int, UserDetail> userDetailRepo, IUserService userService, ILogger<CustomerAccountService> logger)
         {
             _ticketService = ticketService;
             _userDetailRepo = userDetailRepo;
             _userService = userService;
+            _logger = logger;
         }
 
         #region SoftDeleteCustomerAccount
@@ -39,6 +41,7 @@ namespace BusBookingAppln.Services.Classes
                 }
                 return "Sorry, you have active tickets. Cannot delete your account now";
             }
+            _logger.LogError("User account is already deleted");
             throw new UserNotActiveException("User account is already deleted");
         }
 
@@ -71,10 +74,16 @@ namespace BusBookingAppln.Services.Classes
                         return loginOutputDTO;
                     }
                     else
+                    {
+                        _logger.LogError("User account is already active");
                         throw new IncorrectOperationException("User account is already active");
+                    }
                 }
-                else 
+                else
+                {
+                    _logger.LogCritical("Only Customer account can be activated here");
                     throw new UnauthorizedUserException("Only Customer account can be activated here");
+                }
             }
             catch (IncorrectOperationException) { throw; }
 

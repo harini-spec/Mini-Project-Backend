@@ -7,6 +7,8 @@ using BusBookingAppln.Repositories.Interfaces;
 using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,16 +20,23 @@ namespace BusBookingUnitTest.ServiceUnitTest
     public class BusServiceTest
     {
         BusBookingContext context;
+
         IRepository<string, Bus> busRepo;
         IBusService busService;
+
+        Mock<ILogger<BusService>> BusLogger;
 
         [SetUp]
         public void Setup()
         {
             DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("BusDB");
             context = new BusBookingContext(optionsBuilder.Options);
+
             busRepo = new MainRepository<string, Bus>(context);
-            busService = new BusService(busRepo);
+
+            BusLogger = new Mock<ILogger<BusService>>();
+
+            busService = new BusService(busRepo, BusLogger.Object);
         }
 
         [Test]

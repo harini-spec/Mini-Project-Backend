@@ -34,8 +34,15 @@ namespace BusBookingUnitTest.ServiceUnitTest
         IScheduleService scheduleService;
         ISeatService seatService;
         ISeatAvailability seatAvailabilityService;
-
         ITicketService ticketService;
+
+        Mock<ILogger<BusService>> BusLogger;
+        Mock<ILogger<SeatService>> SeatLogger;
+        Mock<ILogger<RouteService>> RouteLogger;
+        Mock<ILogger<DriverService>> DriverLogger;
+        Mock<ILogger<ScheduleService>> ScheduleLogger;
+        Mock<ILogger<TicketService>> TicketLogger;
+        Mock<ILogger<SeatAvailabilityService>> SeatAvailabilityLogger;
 
         [SetUp]
         public void Setup()
@@ -55,15 +62,24 @@ namespace BusBookingUnitTest.ServiceUnitTest
             DriverDetailRepo = new MainRepository<int, DriverDetail>(context);
             #endregion
 
-            #region Service Injection
-            BusService = new BusService(busRepo);
-            RouteService = new RouteService(RouteRepo);
-            driverService = new DriverService(driverRepo, null, DriverDetailRepo);
-            scheduleService = new ScheduleService(driverRepo, ScheduleRepository, BusService, RouteService, driverService);
-            seatService = new SeatService(SeatRepository);
-            seatAvailabilityService = new SeatAvailabilityService(scheduleService, BusService, TicketRepository, TicketDetailRepository);
+            #region Logger Object creation
+            BusLogger = new Mock<ILogger<BusService>>();
+            SeatLogger = new Mock<ILogger<SeatService>>();
+            DriverLogger = new Mock<ILogger<DriverService>>();
+            RouteLogger = new Mock<ILogger<RouteService>>();
+            ScheduleLogger = new Mock<ILogger<ScheduleService>>();
+            TicketLogger = new Mock<ILogger<TicketService>>();
+            SeatAvailabilityLogger = new Mock<ILogger<SeatAvailabilityService>>();
+            #endregion
 
-            ticketService = new TicketService(RewardRepository, TicketDetailRepository, seatAvailabilityService, TicketRepository, seatService, scheduleService);
+            #region Service Injection
+            BusService = new BusService(busRepo, BusLogger.Object);
+            RouteService = new RouteService(RouteRepo, RouteLogger.Object);
+            driverService = new DriverService(driverRepo, null, DriverDetailRepo, DriverLogger.Object);
+            scheduleService = new ScheduleService(driverRepo, ScheduleRepository, BusService, RouteService, driverService, ScheduleLogger.Object);
+            seatService = new SeatService(SeatRepository, SeatLogger.Object);
+            seatAvailabilityService = new SeatAvailabilityService(scheduleService, BusService, TicketRepository, TicketDetailRepository, SeatAvailabilityLogger.Object);
+            ticketService = new TicketService(RewardRepository, TicketDetailRepository, seatAvailabilityService, TicketRepository, seatService, scheduleService, TicketLogger.Object);
             #endregion
 
             #region Add Bus and Seats
@@ -351,7 +367,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             var exception = Assert.ThrowsAsync<IncorrectOperationException>(async () => await ticketService.RemoveTicket(1, 1));
 
             // Assert
-            Assert.That(exception.Message, Is.EqualTo("Ticket already Booked. Go to the cancellation page"));
+            Assert.That(exception.Message, Is.EqualTo("Ticket status = Booked. Wrong action, can't cancel"));
         }
         #endregion
 
@@ -577,7 +593,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             var exception = Assert.ThrowsAsync<IncorrectOperationException>(async () => await ticketService.RemoveTicketItem(1, 1, 1));
 
             // Assert
-            Assert.That(exception.Message, Is.EqualTo("Ticket already Booked. Go to the cancellation page"));
+            Assert.That(exception.Message, Is.EqualTo("Ticket Status = Booked. Wrong action, Can't cancel"));
         }
 
         [Test]

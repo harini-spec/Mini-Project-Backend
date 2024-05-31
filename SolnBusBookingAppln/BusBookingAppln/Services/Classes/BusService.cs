@@ -10,11 +10,12 @@ namespace BusBookingAppln.Services.Classes
     public class BusService : IBusService
     {
         private readonly IRepository<string, Bus> _busRepo;
+        private readonly ILogger<BusService> _logger;
 
-
-        public BusService(IRepository<string, Bus> BusRepository)
+        public BusService(IRepository<string, Bus> BusRepository, ILogger<BusService> logger)
         {
             _busRepo = BusRepository;
+            _logger = logger;
         }
 
         #region CheckIfBusAlreadyBooked
@@ -53,6 +54,7 @@ namespace BusBookingAppln.Services.Classes
                 await _busRepo.Add(bus);
                 return InputBus;
             }
+            _logger.LogError("Total seats in Bus and no. of seats entered do not match");
             throw new DataDoesNotMatchException();
         }
 

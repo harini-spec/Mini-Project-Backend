@@ -8,6 +8,7 @@ using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -22,12 +23,17 @@ namespace BusBookingUnitTest.ServiceUnitTest
         IRepository<int, User> UserRepo;
         IRepository<int, UserDetail> UserDetailRepo;
         IRepository<int, Ticket> TicketRepository;
+
         ITicketService ticketService;
         ITokenService tokenService;
         IUserService userService;
         ICustomerService customerService;
 
         BusBookingContext context;
+
+        Mock<ILogger<CustomerAccountService>> CustomerAccountLogger;
+        Mock<ILogger<UserService>> UserServiceLogger;
+        Mock<ILogger<TicketService>> TicketLogger;
 
         [SetUp]
         public void Setup()
@@ -47,9 +53,13 @@ namespace BusBookingUnitTest.ServiceUnitTest
             mockConfig.Setup(x => x.GetSection("TokenKey")).Returns(configTokenSection.Object);
             tokenService = new TokenService(mockConfig.Object);
 
-            userService = new UserService(UserRepo, UserDetailRepo, tokenService);
-            ticketService = new TicketService(null, null, null, TicketRepository, null, null);
-            customerService = new CustomerAccountService(ticketService, UserDetailRepo, userService);
+            CustomerAccountLogger = new Mock<ILogger<CustomerAccountService>>();
+            UserServiceLogger = new Mock<ILogger<UserService>>();
+            TicketLogger = new Mock<ILogger<TicketService>>();
+
+            userService = new UserService(UserRepo, UserDetailRepo, tokenService, UserServiceLogger.Object);
+            ticketService = new TicketService(null, null, null, TicketRepository, null, null, TicketLogger.Object);
+            customerService = new CustomerAccountService(ticketService, UserDetailRepo, userService, CustomerAccountLogger.Object);
         }
 
         #region Login User Tests
@@ -229,11 +239,6 @@ namespace BusBookingUnitTest.ServiceUnitTest
         public async Task SoftDeleteCustomerAccountAlreadyDeletedExceptionTest()
         {
             // Arrange
-            LoginInputDTO CustomerLogin = new LoginInputDTO()
-            {
-                Email = "sam@gmail.com",
-                Password = "samaroot"
-            };
             await TicketRepository.Delete(100);
             var result = await customerService.SoftDeleteCustomerAccount(2);
 
@@ -242,6 +247,65 @@ namespace BusBookingUnitTest.ServiceUnitTest
 
             // Assert
             Assert.That(exception.Message, Is.EqualTo("User account is already deleted"));
+        }
+
+        [Test, Order(9)]
+        public async Task SoftDeleteCustomerAccountSuccessTest()
+        {
+            // Arrange
+            await TicketRepository.Add(new Ticket()
+            {
+                Id = 100,
+                Status = "Not Booked",
+                ScheduleId = 1,
+                DiscountPercentage = 0,
+                Total_Cost = 50,
+                Final_Amount = 50,
+                UserId = 2,
+                DateAndTimeOfAdding = DateTime.Now
+            });
+            LoginInputDTO CustomerLogin = new LoginInputDTO()
+            {
+                Email = "sam@gmail.com",
+                Password = "samaroot"
+            };
+            await customerService.ActivateDeletedCustomerAccount(CustomerLogin);
+
+            // Action
+            var result = await customerService.SoftDeleteCustomerAccount(2);
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+        }
+
+        [Test, Order(10)]
+        public async Task SoftDeleteCustomerAccountWithNoCustomerTicketsSuccessTest()
+        {
+            // Arrange
+            await TicketRepository.Delete(100);
+            await TicketRepository.Add(new Ticket()
+            {
+                Id = 100,
+                Status = "Not Booked",
+                ScheduleId = 1,
+                DiscountPercentage = 0,
+                Total_Cost = 50,
+                Final_Amount = 50,
+                UserId = 3,
+                DateAndTimeOfAdding = DateTime.Now
+            });
+            LoginInputDTO CustomerLogin = new LoginInputDTO()
+            {
+                Email = "sam@gmail.com",
+                Password = "samaroot"
+            };
+            await customerService.ActivateDeletedCustomerAccount(CustomerLogin);
+
+            // Action
+            var result = await customerService.SoftDeleteCustomerAccount(2);
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
         }
 
         #endregion

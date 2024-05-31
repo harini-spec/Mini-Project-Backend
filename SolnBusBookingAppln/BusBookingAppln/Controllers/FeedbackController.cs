@@ -16,10 +16,12 @@ namespace BusBookingAppln.Controllers
     public class FeedbackController : ControllerBase
     {
         private readonly IFeedbackService _feedbackService;
+        private readonly ILogger<FeedbackController> _logger;
 
-        public FeedbackController(IFeedbackService feedbackService) 
+        public FeedbackController(IFeedbackService feedbackService, ILogger<FeedbackController> logger) 
         { 
             _feedbackService = feedbackService;
+            _logger = logger;
         }
 
         [HttpGet("GetFeedbacksForARide")]
@@ -36,10 +38,12 @@ namespace BusBookingAppln.Controllers
             }
             catch (NoItemsFoundException nif)
             {
+                _logger.LogError(nif.Message);
                 return NotFound(new ErrorModel(404, nif.Message));
             }
             catch (Exception ex)
             {
+                _logger.LogCritical(ex.Message);
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }
@@ -65,22 +69,27 @@ namespace BusBookingAppln.Controllers
                 }
                 catch (UnauthorizedUserException uau)
                 {
+                    _logger.LogCritical(uau.Message);
                     return Unauthorized(new ErrorModel(401, uau.Message));
                 }
                 catch (InvalidOperationException ioe)
                 {
+                    _logger.LogError(ioe.Message);
                     return Conflict(new ErrorModel(409, ioe.Message));
                 }
                 catch (EntityNotFoundException enf)
                 {
+                    _logger.LogCritical(enf.Message);
                     return NotFound(new ErrorModel(404, enf.Message));
                 }
                 catch (IncorrectOperationException ioe)
                 {
+                    _logger.LogError(ioe.Message);
                     return BadRequest(new ErrorModel(400, ioe.Message));
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogCritical(ex.Message);  
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
             }

@@ -13,14 +13,16 @@ namespace BusBookingAppln.Services.Classes
         private readonly IBusService _busService;
         private readonly IRepositoryCompositeKey<int, int, TicketDetail> _TicketDetailRepository;
         private readonly IRepository<int, Ticket> _TicketRepository;
+        private readonly ILogger<SeatAvailabilityService> _logger;
     
 
-        public SeatAvailabilityService(IScheduleService ScheduleService, IBusService busService, IRepository<int, Ticket> TicketRepository, IRepositoryCompositeKey<int, int, TicketDetail> TicketDetailRepository) 
+        public SeatAvailabilityService(IScheduleService ScheduleService, IBusService busService, IRepository<int, Ticket> TicketRepository, IRepositoryCompositeKey<int, int, TicketDetail> TicketDetailRepository, ILogger<SeatAvailabilityService> logger) 
         {
             _scheduleService = ScheduleService;
             _busService = busService;
             _TicketDetailRepository = TicketDetailRepository;
             _TicketRepository = TicketRepository;
+            _logger = logger;
         }
 
 
@@ -60,7 +62,10 @@ namespace BusBookingAppln.Services.Classes
                 }
                 return true;
             }
-            catch (NoItemsFoundException) { return true; }
+            catch (NoItemsFoundException nif) {
+                _logger.LogError(nif.Message);
+                return true; 
+            }
         }
 
         #endregion
@@ -108,6 +113,7 @@ namespace BusBookingAppln.Services.Classes
             }
             if (result.Count > 0)
                 return result;
+            _logger.LogError("No seats available");
             throw new NoSeatsAvailableException();
         }
 

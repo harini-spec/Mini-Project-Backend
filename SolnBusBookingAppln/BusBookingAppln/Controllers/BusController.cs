@@ -14,10 +14,12 @@ namespace BusBookingAppln.Controllers
     public class BusController : ControllerBase
     {
         private readonly IBusService _busService;
+        private readonly ILogger<BusController> _logger;
 
-        public BusController(IBusService busService)
+        public BusController(IBusService busService, ILogger<BusController> logger)
         {
             _busService = busService;
+            _logger = logger;
         }
 
         [HttpPost("AddBusAndSeats")]
@@ -38,14 +40,17 @@ namespace BusBookingAppln.Controllers
                 }
                 catch(DataDoesNotMatchException ddnm)
                 {
+                    _logger.LogError(ddnm.Message);
                     return UnprocessableEntity(new ErrorModel(422, ddnm.Message));
                 }
                 catch (InvalidOperationException ioe)
                 {
+                    _logger.LogError(ioe.Message);
                     return Conflict(new ErrorModel(409, ioe.Message));
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogCritical(ex.Message);
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
             }

@@ -32,23 +32,32 @@ namespace BusBookingUnitTest.ServiceUnitTest
         IRouteService RouteService;
         IDriverService driverService;
 
+        Mock<ILogger<BusService>> BusLogger;
+        Mock<ILogger<DriverService>> DriverLogger;
+        Mock<ILogger<RouteService>> RouteLogger;
+        Mock<ILogger<ScheduleService>> ScheduleLogger;
+
         [SetUp]
         public void Setup()
         {
             DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("ScheduleRepoDB");
             context = new BusBookingContext(optionsBuilder.Options);
+
             ScheduleRepository = new MainRepository<int, Schedule>(context);
             driverRepo = new DriverWithScheduleRepository(context);
-
             busRepo = new BusWithSeatsRepository(context);
             RouteRepo = new MainRepository<int, Route>(context);
-            DriverDetailRepo = new MainRepository<int, DriverDetail>(context);  
+            DriverDetailRepo = new MainRepository<int, DriverDetail>(context);
 
-            BusService = new BusService(busRepo);
-            RouteService = new RouteService(RouteRepo);
-            driverService = new DriverService(driverRepo, null, DriverDetailRepo);
+            BusLogger = new Mock<ILogger<BusService>>();
+            DriverLogger = new Mock<ILogger<DriverService>>();
+            RouteLogger = new Mock<ILogger<RouteService>>();
+            ScheduleLogger = new Mock<ILogger<ScheduleService>>();
 
-            scheduleService = new ScheduleService(driverRepo, ScheduleRepository, BusService, RouteService, driverService);
+            BusService = new BusService(busRepo, BusLogger.Object);
+            RouteService = new RouteService(RouteRepo, RouteLogger.Object);
+            driverService = new DriverService(driverRepo, null, DriverDetailRepo, DriverLogger.Object);
+            scheduleService = new ScheduleService(driverRepo, ScheduleRepository, BusService, RouteService, driverService, ScheduleLogger.Object);
         }
 
         #region Get All Schedules Tests

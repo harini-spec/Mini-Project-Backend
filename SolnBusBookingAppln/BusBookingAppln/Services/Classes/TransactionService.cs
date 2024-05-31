@@ -15,9 +15,10 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRepository<int, Schedule> _ScheduleRepository;
         private readonly IRepository<int, Ticket> _TicketRepository;
         private readonly IRepository<int, Reward> _RewardRepository;
+        private readonly ILogger<TransactionService> _logger;
         
         
-        public TransactionService(ISeatAvailability seatAvailability, IRepository<int, Schedule> ScheduleRepository, IRepository<string, Payment> PaymentRepository, IRepository<int, Reward> RewardRepository, IRepository<int, Ticket> TicketRepository, IRepository<string, Refund> RefundRepository) 
+        public TransactionService(ISeatAvailability seatAvailability, IRepository<int, Schedule> ScheduleRepository, IRepository<string, Payment> PaymentRepository, IRepository<int, Reward> RewardRepository, IRepository<int, Ticket> TicketRepository, IRepository<string, Refund> RefundRepository, ILogger<TransactionService> logger) 
         {
             _SeatAvailability = seatAvailability;
             _PaymentRepository = PaymentRepository;
@@ -25,6 +26,7 @@ namespace BusBookingAppln.Services.Classes
             _TicketRepository = TicketRepository;
             _ScheduleRepository = ScheduleRepository;
             _RefundRepository = RefundRepository;
+            _logger = logger;
         }
 
         #region CheckCancellationValidity
@@ -40,12 +42,18 @@ namespace BusBookingAppln.Services.Classes
             {
                 // Check if it's the user's ticket
                 if (ticket.UserId != UserId)
+                {
+                    _logger.LogCritical($"Wrong user trying to cancel the ticket. UserId = {UserId}");
                     throw new UnauthorizedUserException("You can't cancel this ticket");
+                }
 
                 // Check if its within 24 hrs of Time of departure - No Refund 
                 Schedule schedule = await _ScheduleRepository.GetById(ticket.ScheduleId);
                 if ((schedule.DateTimeOfDeparture - DateTime.Now).TotalHours <= 24)
+                {
+                    _logger.LogError("Can cancel the ticket only 24 hours before the Time of departure");
                     throw new IncorrectOperationException("Can cancel the ticket only 24 hours before the Time of departure");
+                }
 
                 // Can cancel and refund only if the payment is successful 
                 try
@@ -54,16 +62,21 @@ namespace BusBookingAppln.Services.Classes
                     List<Payment> FinalPayment = payments.Where(x => x.TicketId == ticket.Id && x.Status == "Success").ToList();
                     if (FinalPayment.Count == 0)
                     {
+                        _logger.LogError("No payment has been made for this ticket. Cannot process refund");
                         throw new IncorrectOperationException("No payment has been made for this ticket. Cannot process refund");
                     }
                 }
                 catch (Exception)
                 {
+                    _logger.LogError("No payment has been made for this ticket. Cannot process refund");
                     throw new IncorrectOperationException("No payment has been made for this ticket. Cannot process refund");
                 }
             }
             else
-                throw new IncorrectOperationException("You can't cancel this ticket: It is not booked/Cancelled/Ride over");
+            {
+                _logger.LogError($"You can't cancel this ticket: It's status is {ticket.Status}");
+                throw new IncorrectOperationException($"You can't cancel this ticket: It's status is {ticket.Status}");
+            }
         }
 
         #endregion
@@ -93,7 +106,10 @@ namespace BusBookingAppln.Services.Classes
                 RefundOutputDTO refundOutputDTO = MapRefundToRefundOutputDTO(refund);
                 return refundOutputDTO;
             }
-            catch (Exception) { throw; }
+            catch (Exception ex) {
+                _logger.LogError(ex.Message);
+                throw; 
+            }
         }
 
         #endregion
@@ -147,6 +163,7 @@ namespace BusBookingAppln.Services.Classes
             }
             catch (EntityNotFoundException)
             {
+                _logger.LogError($"Ticket with ID {TicketId} not found");
                 throw;
             }
 
@@ -159,13 +176,17 @@ namespace BusBookingAppln.Services.Classes
             catch (EntityNotFoundException)
             // Ticket would've been deleted if it's been more than an hour
             {
+                _logger.LogError("It has been more than an hour from the time of adding the ticket");
                 throw new IncorrectOperationException("Time limit to book ticket exceeded");
             }
 
             // Check if ticket belongs to the user
             if (ticket.UserId != UserId)
+            {
+                _logger.LogCritical("Wrong User trying to book the ticket");
                 throw new UnauthorizedUserException("You can't book this ticket");
-                
+            }
+
 
             Payment payment = CreatePayment(ticket, PaymentMethod);
 
@@ -189,6 +210,7 @@ namespace BusBookingAppln.Services.Classes
             // If it's user's first booking - no reward would be present, so create one
             catch
             {
+                _logger.LogError($"No Reward record found for User with ID = {UserId}");
                 reward.UserId = UserId;
                 reward.RewardPoints = 10 * ticket.TicketDetails.Count();
                 await _RewardRepository.Add(reward);
@@ -241,9 +263,15 @@ namespace BusBookingAppln.Services.Classes
                     return refundOutputDTO;
                 }
                 else
+                {
+                    _logger.LogError("All Seats are not in the Ticket");
                     throw new IncorrectOperationException("All Seats are not in the Ticket");
+                }
             }
-            catch(Exception) { throw; }
+            catch(Exception ex) {
+                _logger.LogError(ex.Message);
+                throw; 
+            }
         }
 
         #endregion
@@ -289,6 +317,7 @@ namespace BusBookingAppln.Services.Classes
                 // If ticket detail not found or status is not "booked", return false
                 if (ticketDetail == null || ticketDetail.Status != "Booked")
                 {
+                    _logger.LogError("Ticket Seat is Not Booked : You can only cancel Booked seats");
                     throw new IncorrectOperationException("You can only cancel Booked seats");
                 }
             }

@@ -9,6 +9,7 @@ using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -22,9 +23,15 @@ namespace BusBookingUnitTest.ServiceUnitTest
     {
         IRepository<int, Feedback> FeedbackRepo;
         IRepository<int, Ticket> TicketRepository;
+
         BusBookingContext context;
+
         IFeedbackService feedbackService;
         ITicketService ticketService;
+
+        Mock<ILogger<FeedbackService>> FeedbackLogger;
+        Mock<ILogger<TicketService>> TicketLogger;
+
 
         [SetUp]
         public void Setup()
@@ -33,11 +40,13 @@ namespace BusBookingUnitTest.ServiceUnitTest
             context = new BusBookingContext(optionsBuilder.Options);
 
             FeedbackRepo = new FeedbackWithTicketRepository(context);
-
             TicketRepository = new TicketWithTicketDetailsRepository(context);
 
-            ticketService = new TicketService(null, null, null, TicketRepository, null, null);
-            feedbackService = new FeedbackService(FeedbackRepo, ticketService);
+            TicketLogger = new Mock<ILogger<TicketService>>();
+            FeedbackLogger = new Mock<ILogger<FeedbackService>>();
+
+            ticketService = new TicketService(null, null, null, TicketRepository, null, null, TicketLogger.Object);
+            feedbackService = new FeedbackService(FeedbackRepo, ticketService, FeedbackLogger.Object);
         }
 
         #region Add Feedback Tests

@@ -14,11 +14,13 @@ namespace BusBookingAppln.Controllers
     {
         private readonly IAdminService _adminService;
         private readonly IUserService _userService;
+        private readonly ILogger<AdminController> _logger;
 
-        public AdminController(IAdminService adminService, IUserService userService)
+        public AdminController(IAdminService adminService, IUserService userService, ILogger<AdminController> logger)
         {
             _adminService = adminService;
             _userService = userService;
+            _logger = logger;
         }
 
         [HttpPost("LoginAdmin")]
@@ -38,20 +40,29 @@ namespace BusBookingAppln.Controllers
                     var result = await _userService.LoginAdminAndCustomer(userLoginDTO);
                     return Ok(result);
                 }
+                catch(UnauthorizedUserException uae)
+                {
+                    _logger.LogCritical(uae.Message);
+                    return Unauthorized(new ErrorModel(401, uae.Message));
+                }
                 catch (UserNotActiveException uue)
                 {
+                    _logger.LogError(uue.Message);
                     return Unauthorized(new ErrorModel(401, uue.Message));
                 }
                 catch (EntityNotFoundException enf)
                 {
+                    _logger.LogError(enf.Message);
                     return NotFound(new ErrorModel(404, enf.Message));
                 }
                 catch (ArgumentNullException ane)
                 {
+                    _logger.LogCritical(ane.Message);
                     return BadRequest(new ErrorModel(400, ane.Message));
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogCritical(ex.Message);
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
             }
@@ -74,10 +85,12 @@ namespace BusBookingAppln.Controllers
                 }
                 catch(UnableToRegisterException ure)
                 {
+                    _logger.LogCritical(ure.Message);
                     return Conflict(new ErrorModel(409, ure.Message));
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogCritical(ex.Message);
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
             }
@@ -101,10 +114,12 @@ namespace BusBookingAppln.Controllers
                 }
                 catch (UnableToRegisterException ure)
                 {
+                    _logger.LogCritical(ure.Message);
                     return Conflict(new ErrorModel(409, ure.Message));
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogCritical(ex.Message);
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
             }
@@ -125,14 +140,17 @@ namespace BusBookingAppln.Controllers
             }
             catch (EntityNotFoundException enf)
             {
+                _logger.LogError(enf.Message);
                 return NotFound(new ErrorModel(404, enf.Message));
             }
             catch (ArgumentNullException ane)
             {
+                _logger.LogError(ane.Message);
                 return BadRequest(new ErrorModel(400, ane.Message));
             }
             catch (Exception ex)
             {
+                _logger.LogCritical(ex.Message);      
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }

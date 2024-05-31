@@ -19,11 +19,13 @@ namespace BusBookingAppln.Controllers
     {
         private readonly IDriverService _driverService;
         private readonly IScheduleService _scheduleService;
+        private readonly ILogger _logger;
 
-        public DriverController(IDriverService driverService, IScheduleService scheduleService)
+        public DriverController(IDriverService driverService, IScheduleService scheduleService, ILogger logger)
         {
             _driverService = driverService;
             _scheduleService = scheduleService;
+            _logger = logger;
         }
 
         [HttpPost("LoginDriver")]
@@ -45,22 +47,27 @@ namespace BusBookingAppln.Controllers
                 }
                 catch (UnauthorizedUserException uue)
                 {
+                    _logger.LogCritical(uue.Message);
                     return Unauthorized(new ErrorModel(401, uue.Message));
                 }
                 catch (UserNotActiveException uue)
                 {
+                    _logger.LogError(uue.Message);
                     return Unauthorized(new ErrorModel(401, uue.Message));
                 }
                 catch (EntityNotFoundException enf)
                 {
+                    _logger.LogError(enf.Message);
                     return NotFound(new ErrorModel(404, enf.Message));
                 }
                 catch (ArgumentNullException ane)
                 {
+                    _logger.LogCritical(ane.Message);
                     return BadRequest(new ErrorModel(400, ane.Message));
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogCritical(ex.Message);
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
             }
@@ -84,18 +91,22 @@ namespace BusBookingAppln.Controllers
             }
             catch (UnauthorizedUserException uue)
             {
+                _logger.LogCritical(uue.Message);
                 return Unauthorized(new ErrorModel(401, uue.Message));
             }
             catch (ArgumentNullException ane)
             {
+                _logger.LogError(ane.Message);
                 return BadRequest(new ErrorModel(400, ane.Message));
             }
             catch (EntityNotFoundException enf)
             {
+                _logger.LogCritical(enf.Message);
                 return NotFound(new ErrorModel(404, enf.Message));
             }
             catch (Exception ex)
             {
+                _logger.LogCritical(ex.Message);
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }
@@ -117,22 +128,27 @@ namespace BusBookingAppln.Controllers
             }
             catch (UnauthorizedUserException uue)
             {
+                _logger.LogCritical(uue.Message);
                 return Unauthorized(new ErrorModel(401, uue.Message));
             }
             catch (NoItemsFoundException nif)
             {
+                _logger.LogError(nif.Message);
                 return NotFound(new ErrorModel(404, nif.Message));
             }
             catch (ArgumentNullException ane)
             {
+                _logger.LogError(ane.Message);
                 return BadRequest(new ErrorModel(400, ane.Message));
             }
             catch (EntityNotFoundException enf)
             {
+                _logger.LogCritical(enf.Message);
                 return NotFound(new ErrorModel(404, enf.Message));
             }
             catch (Exception ex)
             {
+                _logger.LogCritical(ex.Message);
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }

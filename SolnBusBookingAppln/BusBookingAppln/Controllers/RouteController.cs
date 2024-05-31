@@ -13,10 +13,12 @@ namespace BusBookingAppln.Controllers
     public class RouteController : ControllerBase
     {
         private readonly IRouteService _routeService;
+        private readonly ILogger<RouteController> _logger;
 
-        public RouteController(IRouteService routeService)
+        public RouteController(IRouteService routeService, ILogger<RouteController> logger)
         {
             _routeService = routeService;
+            _logger = logger;
         }
 
         [HttpPost("AddRouteAndStops")]
@@ -36,10 +38,12 @@ namespace BusBookingAppln.Controllers
                 }
                 catch (InvalidOperationException ioe)
                 {
+                    _logger.LogError(ioe.Message);
                     return Conflict(new ErrorModel(409, ioe.Message));
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogCritical(ex.Message);
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
             }

@@ -9,11 +9,12 @@ namespace BusBookingAppln.Services.Classes
     public class RouteService : IRouteService
     {
         private readonly IRepository<int, Models.DBModels.Route> _RouteRepository;
+        private readonly ILogger<RouteService> _logger;
 
-
-        public RouteService(IRepository<int, Models.DBModels.Route> RouteRepository)
+        public RouteService(IRepository<int, Models.DBModels.Route> RouteRepository, ILogger<RouteService> logger)
         {
             _RouteRepository = RouteRepository;
+            _logger = logger;
         }
 
 
@@ -26,6 +27,7 @@ namespace BusBookingAppln.Services.Classes
             var Route = Routes.ToList().FirstOrDefault(x => x.Source.ToLower() == source.ToLower() && x.Destination.ToLower() == destination.ToLower());
             if(Route != null)
                 return Route.Id;
+            _logger.LogError($"No Route found for source = {source} and dest = {destination}");
             throw new NoRoutesFoundForGivenSourceAndDest(source, destination);
         }
 

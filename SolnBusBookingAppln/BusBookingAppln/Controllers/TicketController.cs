@@ -18,11 +18,13 @@ namespace BusBookingAppln.Controllers
     {
         private readonly ISeatAvailability _SeatAvailabilityService;
         private readonly ITicketService _TicketService;
+        private readonly ILogger<TicketController> _Logger;
 
-        public TicketController(ISeatAvailability SeatAvailabilityService, ITicketService ticketService)
+        public TicketController(ISeatAvailability SeatAvailabilityService, ITicketService ticketService, ILogger<TicketController> logger)
         {
             _SeatAvailabilityService = SeatAvailabilityService;
             _TicketService = ticketService;
+            _Logger = logger;
         }
 
         [HttpGet("GetAvailableSeats")]
@@ -39,18 +41,22 @@ namespace BusBookingAppln.Controllers
             }
             catch(EntityNotFoundException enf)
             {
+                _Logger.LogError(enf.Message);
                 return NotFound(new ErrorModel(404, enf.Message));
             }
             catch(NoItemsFoundException nif)
             {
+                _Logger.LogError(nif.Message);
                 return NotFound(new ErrorModel(404, nif.Message));
             }
             catch(NoSeatsAvailableException nsa)
             {
+                _Logger.LogError(nsa.Message);
                 return NotFound(new ErrorModel(404, nsa.Message));
             }
             catch (Exception ex)
             {
+                _Logger.LogCritical(ex.Message);
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }
@@ -73,18 +79,22 @@ namespace BusBookingAppln.Controllers
                 }
                 catch (EntityNotFoundException enf)
                 {
+                    _Logger.LogError(enf.Message);
                     return NotFound(new ErrorModel(404, enf.Message));
                 }
                 catch (NoItemsFoundException nif)
                 {
+                    _Logger.LogError(nif.Message);
                     return NotFound(new ErrorModel(404, nif.Message));
                 }
                 catch (NoSeatsAvailableException nsa)
                 {
+                    _Logger.LogError(nsa.Message);
                     return NotFound(new ErrorModel(404, nsa.Message));
                 }
                 catch (Exception ex)
                 {
+                    _Logger.LogCritical(ex.Message);
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
             }
@@ -108,18 +118,22 @@ namespace BusBookingAppln.Controllers
                 }
                 catch (EntityNotFoundException enf)
                 {
+                    _Logger.LogError(enf.Message);
                     return NotFound(new ErrorModel(404, enf.Message));
                 }
                 catch (IncorrectOperationException ioe)
                 {
+                    _Logger.LogError(ioe.Message);
                     return BadRequest(new ErrorModel(400, ioe.Message));
                 }
                 catch (UnauthorizedUserException uau)
                 {
+                    _Logger.LogCritical(uau.Message);
                     return Unauthorized(new ErrorModel(401, uau.Message));
                 }
                 catch (Exception ex)
-                {
+                {   
+                    _Logger.LogCritical(ex.Message);
                     return BadRequest(new ErrorModel(500, ex.Message));
                 }
         }
@@ -140,19 +154,23 @@ namespace BusBookingAppln.Controllers
                 return Ok(result);
             }
             catch (EntityNotFoundException enf)
-            {
+            {   
+                _Logger.LogError(enf.Message);
                 return NotFound(new ErrorModel(404, enf.Message));
             }
             catch (IncorrectOperationException ioe)
             {
+                _Logger.LogError(ioe.Message);
                 return BadRequest(new ErrorModel(400, ioe.Message));
             }
             catch (UnauthorizedUserException uau)
             {
+                _Logger.LogCritical(uau.Message);
                 return Unauthorized(new ErrorModel(401, uau.Message));
             }
             catch (Exception ex)
             {
+                _Logger.LogCritical(ex.Message);
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }
@@ -171,10 +189,12 @@ namespace BusBookingAppln.Controllers
             }
             catch (NoItemsFoundException nif)
             {
+                _Logger.LogError(nif.Message);
                 return NotFound(new ErrorModel(404, nif.Message));
             }
             catch (Exception ex)
             {
+                _Logger.LogCritical(ex.Message);
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }
@@ -194,10 +214,12 @@ namespace BusBookingAppln.Controllers
             }
             catch (NoItemsFoundException nif)
             {
+                _Logger.LogError(nif.Message);
                 return NotFound(new ErrorModel(404, nif.Message));
             }
             catch (Exception ex)
             {
+                _Logger.LogCritical(ex.Message);
                 return BadRequest(new ErrorModel(500, ex.Message));
             }
         }

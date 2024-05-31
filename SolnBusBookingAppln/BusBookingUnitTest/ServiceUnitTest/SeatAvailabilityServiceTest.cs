@@ -30,6 +30,11 @@ namespace BusBookingUnitTest.ServiceUnitTest
 
         BusBookingContext context;
 
+        Mock<ILogger<BusService>> BusLogger;
+        Mock<ILogger<ScheduleService>> ScheduleLogger;
+        Mock<ILogger<SeatAvailabilityService>> SeatAvailabilityLogger;
+
+
         [SetUp]
         public void Setup()
         {
@@ -41,10 +46,13 @@ namespace BusBookingUnitTest.ServiceUnitTest
             busRepo = new BusWithSeatsRepository(context);
             ScheduleRepository = new MainRepository<int, Schedule>(context);
 
-            scheduleService = new ScheduleService(null, ScheduleRepository, null, null, null);
-            busService = new BusService(busRepo);
-            
-            seatAvailability = new SeatAvailabilityService(scheduleService, busService, TicketRepository, TicketDetailRepository);
+            BusLogger = new Mock<ILogger<BusService>>();
+            ScheduleLogger = new Mock<ILogger<ScheduleService>>();
+            SeatAvailabilityLogger = new Mock<ILogger<SeatAvailabilityService>>();
+
+            busService = new BusService(busRepo, BusLogger.Object);
+            scheduleService = new ScheduleService(null, ScheduleRepository, null, null, null, ScheduleLogger.Object);
+            seatAvailability = new SeatAvailabilityService(scheduleService, busService, TicketRepository, TicketDetailRepository, SeatAvailabilityLogger.Object);
         }
 
         #region Check Seat Availability Tests

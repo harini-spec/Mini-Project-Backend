@@ -15,13 +15,15 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRepository<int, User> _userRepo;
         private readonly IRepository<int, UserDetail> _userDetailRepo;
         private readonly ITokenService _tokenService;
+        private readonly ILogger<UserService> _logger;
 
 
-        public UserService(IRepository<int, User> userRepo, IRepository<int, UserDetail> userDetailRepo, ITokenService tokenService)
+        public UserService(IRepository<int, User> userRepo, IRepository<int, UserDetail> userDetailRepo, ITokenService tokenService, ILogger<UserService> logger)
         {
             _userRepo = userRepo;
             _userDetailRepo = userDetailRepo;
             _tokenService = tokenService;
+            _logger = logger;
         }
 
 
@@ -38,6 +40,7 @@ namespace BusBookingAppln.Services.Classes
             }
             catch(NoItemsFoundException) 
             {
+                _logger.LogError($"No user found with given Email ID : {email}");
                 return null;
             }
         }
@@ -56,6 +59,7 @@ namespace BusBookingAppln.Services.Classes
                 User user = await GetUserByEmail(loginInputDTO.Email);
                 if (user == null)
                 {
+                    _logger.LogError("Email ID not found");
                     throw new UnauthorizedUserException("Invalid username or password");
                 }
 
@@ -74,8 +78,10 @@ namespace BusBookingAppln.Services.Classes
                         LoginOutputDTO loginOutputDTO = MapUserToLoginReturnDTO(user);
                         return loginOutputDTO;
                     }
+                    _logger.LogError("Account is not activated");
                     throw new UserNotActiveException("Your account is not activated");
                 }
+                _logger.LogCritical("Wrong password");
                 throw new UnauthorizedUserException("Invalid username or password");
             }
             catch (Exception)
@@ -113,11 +119,13 @@ namespace BusBookingAppln.Services.Classes
             var ExistingUser = await GetUserByEmail(registerInputDTO.Email);
             if (ExistingUser != null)
             {
+                _logger.LogError($"Email ID already present: {registerInputDTO.Email}");
                 throw new UnableToRegisterException("Email ID already exists");
             }
 
             try
-            {   user = MapRegisterInputDTOToUser(registerInputDTO);
+            {   
+                user = MapRegisterInputDTOToUser(registerInputDTO);
                 user.Role = Role;
                 InsertedUser = await _userRepo.Add(user);
                 userDetail = MapRegisterInputDTOToUserDetail(registerInputDTO);
@@ -127,16 +135,22 @@ namespace BusBookingAppln.Services.Classes
                 return registerOutputDTO;
             }
             catch (UnableToRegisterException) { throw; }
-            catch (Exception) { }
-            if (InsertedUser == null)
+            catch (Exception) 
             {
+                if (InsertedUser == null)
+                {
+                    _logger.LogError("Not able to register at this moment: User and UserDetail not inserted");
+                    throw new UnableToRegisterException("Not able to register at this moment");
+                }
+                if (InsertedUserDetail == null)
+                {
+                    _logger.LogError("Not able to register at this moment: UserDetail not inserted");
+                    await RevertUserInsert(user);
+                    throw new UnableToRegisterException("Not able to register at this moment");
+                }
+                _logger.LogError("Not able to register at this moment");
                 throw new UnableToRegisterException("Not able to register at this moment");
             }
-            if (InsertedUserDetail == null)
-            {
-                await RevertUserInsert(user);
-            }
-            throw new UnableToRegisterException("Not able to register at this moment");
         }
 
 

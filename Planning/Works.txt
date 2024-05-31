@@ -3,8 +3,6 @@ Deadline: Tuesday 28/05/2024
 
 -----------------------------------------------------------------------------------------------------------------------------------/
 Logging 
-Regions in code too 
-Add summary in Interfaces
 
 Try to combine driver with user 
 Clean git unwanted folders

@@ -8,6 +8,7 @@ using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -21,12 +22,15 @@ namespace BusBookingUnitTest.ServiceUnitTest
     {
         IRepository<int, Driver> driverWithSchedulesRepo;
         IRepository<int, DriverDetail> driverDetailRepo;
-        ITokenService tokenService;
 
         BusBookingContext context;
 
+        ITokenService tokenService;
         IDriverService DriverService;
         IAdminService AdminService;
+
+        Mock<ILogger<DriverAccountService>> DriverAccountLogger;
+        Mock<ILogger<DriverService>> DriverLogger;
 
         [SetUp]
         public void Setup()
@@ -45,8 +49,11 @@ namespace BusBookingUnitTest.ServiceUnitTest
             mockConfig.Setup(x => x.GetSection("TokenKey")).Returns(configTokenSection.Object);
             tokenService = new TokenService(mockConfig.Object);
 
-            DriverService = new DriverService(driverWithSchedulesRepo, tokenService, driverDetailRepo);
-            AdminService = new DriverAccountService(driverWithSchedulesRepo, driverDetailRepo, DriverService);
+            DriverAccountLogger = new Mock<ILogger<DriverAccountService>>();
+            DriverLogger = new Mock<ILogger<DriverService>>();
+
+            DriverService = new DriverService(driverWithSchedulesRepo, tokenService, driverDetailRepo, DriverLogger.Object);
+            AdminService = new DriverAccountService(driverWithSchedulesRepo, driverDetailRepo, DriverService, DriverAccountLogger.Object);
         }
 
 

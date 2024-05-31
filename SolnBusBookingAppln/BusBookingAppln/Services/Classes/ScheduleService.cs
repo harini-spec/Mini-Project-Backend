@@ -14,15 +14,17 @@ namespace BusBookingAppln.Services.Classes
         private readonly IBusService _busService;
         private readonly IRouteService _RouteService;
         private readonly IDriverService _DriverService;
+        private readonly ILogger<ScheduleService> _logger; 
 
 
-        public ScheduleService(IRepository<int, Driver> driverWithSchedulesRepo, IRepository<int, Schedule> ScheduleRepository, IBusService busService, IRouteService RouteService, IDriverService driverService)
+        public ScheduleService(IRepository<int, Driver> driverWithSchedulesRepo, IRepository<int, Schedule> ScheduleRepository, IBusService busService, IRouteService RouteService, IDriverService driverService, ILogger<ScheduleService> logger)
         {
             _ScheduleRepo = ScheduleRepository;
             _busService = busService;
             _RouteService = RouteService;
             _DriverService = driverService;
             _driverWithSchedulesRepo = driverWithSchedulesRepo;
+            _logger = logger;
         }
 
 
@@ -43,6 +45,7 @@ namespace BusBookingAppln.Services.Classes
             }
             catch(Exception)
             {
+                _logger.LogError("No schedules found");
                 Schedule schedule = MapAddScheduleDTOToSchedule(addSchedulesDTO);
                 await _ScheduleRepo.Add(schedule);
                 return addSchedulesDTO;
@@ -59,8 +62,10 @@ namespace BusBookingAppln.Services.Classes
                     await _ScheduleRepo.Add(schedule);
                     return addSchedulesDTO;
                 }
+                _logger.LogError("Driver booked in the duration of the given schedule");
                 throw new DriverAlreadyBookedException();
             }
+            _logger.LogError("Bus booked in the duration of the given schedule");
             throw new BusAlreadyBookedException();
         }
 
@@ -78,9 +83,12 @@ namespace BusBookingAppln.Services.Classes
             // Filter all schedules in the given route, date of departure and arrival
             var schedules = await _ScheduleRepo.GetAll();
             var result = schedules.ToList().Where(x => x.RouteId == RouteId && x.DateTimeOfDeparture.Date == userInputDTOForSchedule.DateTimeOfDeparture.Date);
-            
+
             if (result.ToList().Count == 0)
+            {
+                _logger.LogError($"No schedules found in the Route with Id = {RouteId} and Date of departure = {userInputDTOForSchedule.DateTimeOfDeparture}");
                 throw new NoSchedulesFoundForGivenRouteAndDate();
+            }
             List<ScheduleReturnDTO> scheduleReturnDTOs = MapScheduleListToScheduleReturnDTOList(result.ToList(), userInputDTOForSchedule.Source, userInputDTOForSchedule.Destination);
             return scheduleReturnDTOs;
         }
@@ -110,6 +118,7 @@ namespace BusBookingAppln.Services.Classes
             List<ScheduleReturnDTO> scheduleReturnDTOs = await MapScheduleListToScheduleReturnDTOList(schedules.ToList());
             if(scheduleReturnDTOs.Count == 0)
             {
+                _logger.LogError($"No schedules found after {DateTime.Now}");
                 throw new NoItemsFoundException("No Schedules are found");
             }
             return scheduleReturnDTOs;
@@ -131,6 +140,7 @@ namespace BusBookingAppln.Services.Classes
             List<ScheduleReturnDTO> scheduleReturnDTOs = await MapScheduleListToScheduleReturnDTOList(schedules);
             if (schedules.Count == 0)
             {
+                _logger.LogError($"No Schedules are found for Driver with Id {DriverId}.");
                 throw new NoItemsFoundException($"No Schedules are found for Driver with Id {DriverId}.");
             }
             return scheduleReturnDTOs;

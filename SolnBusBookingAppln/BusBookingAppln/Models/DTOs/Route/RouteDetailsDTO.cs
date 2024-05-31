@@ -2,7 +2,7 @@
 
 namespace BusBookingAppln.Models.DTOs.Route
 {
-    public class AddRouteDetailsDTO
+    public class RouteDetailsDTO
     {
         [Required(ErrorMessage = "Stop number can't be empty")]
         [Range(1, int.MaxValue, ErrorMessage = "Stop number must be greater than 0")]

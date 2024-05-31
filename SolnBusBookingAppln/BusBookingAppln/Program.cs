@@ -65,6 +65,8 @@ namespace BusBookingAppln
 
                 });
 
+
+
             #region contexts
             builder.Services.AddDbContext<BusBookingContext>(
                options => options.UseSqlServer(builder.Configuration.GetConnectionString("defaultConnection"))
@@ -79,7 +81,7 @@ namespace BusBookingAppln
             builder.Services.AddScoped<IRepository<string, Payment>, MainRepository<string, Payment>>();
             builder.Services.AddScoped<IRepository<string, Refund>, MainRepository<string, Refund>>();
             builder.Services.AddScoped<IRepository<int, Reward>, MainRepository<int, Reward>>();
-            builder.Services.AddScoped<IRepository<int, Models.DBModels.Route>, MainRepository<int, Models.DBModels.Route>>();
+            builder.Services.AddScoped<IRepository<int, Models.DBModels.Route>, RouteWithRouteDetailRepository>();
             builder.Services.AddScoped<IRepository<int, Schedule>, MainRepository<int, Schedule>>();
             builder.Services.AddScoped<IRepository<int, Seat>, MainRepository<int, Seat>>();
             builder.Services.AddScoped<IRepository<int, Ticket>, TicketWithTicketDetailsRepository>();
@@ -97,6 +99,7 @@ namespace BusBookingAppln
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IBusService, BusService>();
             builder.Services.AddScoped<IRouteService, RouteService>();
+            builder.Services.AddScoped<IRewardService, RewardService>();
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
             builder.Services.AddScoped<ISeatService, SeatService>(); 
             builder.Services.AddScoped<ITicketService, TicketService>();

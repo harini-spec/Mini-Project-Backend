@@ -26,11 +26,19 @@ namespace BusBookingAppln.Services.Interfaces
 
         #region Summary
         /// <summary>
+        /// Gets all routes
+        /// </summary>
+        /// <returns>Route DTO list containing all route information</returns>
+        #endregion 
+        public Task<List<RouteReturnDTO>> GetAllRoutes();
+
+        #region Summary
+        /// <summary>
         /// Add route with intermediate stops
         /// </summary>
         /// <param name="addRouteDTO">Add route DTO with stop DTO list</param>
         /// <returns>Added route DTO with stop DTO list</returns>
         #endregion 
-        public Task<AddRouteDTO> AddRoute(AddRouteDTO addRouteDTO);
+        public Task<RouteDTO> AddRoute(RouteDTO addRouteDTO);
     }
 }

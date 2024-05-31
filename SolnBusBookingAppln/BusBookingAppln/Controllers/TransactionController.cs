@@ -15,9 +15,9 @@ namespace BusBookingAppln.Controllers
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionService _TransactionService;
-        private readonly ILogger _logger;
+        private readonly ILogger<TransactionController> _logger;
 
-        public TransactionController(ITransactionService TransactionService, ILogger logger)
+        public TransactionController(ITransactionService TransactionService, ILogger<TransactionController> logger)
         {
             _TransactionService = TransactionService;
             _logger = logger;

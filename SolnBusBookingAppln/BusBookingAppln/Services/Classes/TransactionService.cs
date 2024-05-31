@@ -16,10 +16,11 @@ namespace BusBookingAppln.Services.Classes
         private readonly IRepository<int, Ticket> _TicketRepository;
         private readonly IRepository<int, Reward> _RewardRepository;
         private readonly ILogger<TransactionService> _logger;
+        private readonly IRewardService _rewardService;
         
-        
-        public TransactionService(ISeatAvailability seatAvailability, IRepository<int, Schedule> ScheduleRepository, IRepository<string, Payment> PaymentRepository, IRepository<int, Reward> RewardRepository, IRepository<int, Ticket> TicketRepository, IRepository<string, Refund> RefundRepository, ILogger<TransactionService> logger) 
+        public TransactionService(IRewardService rewardService, ISeatAvailability seatAvailability, IRepository<int, Schedule> ScheduleRepository, IRepository<string, Payment> PaymentRepository, IRepository<int, Reward> RewardRepository, IRepository<int, Ticket> TicketRepository, IRepository<string, Refund> RefundRepository, ILogger<TransactionService> logger) 
         {
+            _rewardService = rewardService;
             _SeatAvailability = seatAvailability;
             _PaymentRepository = PaymentRepository;
             _RewardRepository = RewardRepository;
@@ -187,34 +188,9 @@ namespace BusBookingAppln.Services.Classes
                 throw new UnauthorizedUserException("You can't book this ticket");
             }
 
-
             Payment payment = CreatePayment(ticket, PaymentMethod);
 
-            Reward reward = new Reward();
-            try
-            {
-                reward = await _RewardRepository.GetById(UserId);
-                if (ticket.DiscountPercentage == 10)
-                {
-                    // If discount provided, 100 pts deducted and 10 points added for every seat
-                    reward.RewardPoints -= 100 + (10 * ticket.TicketDetails.Count());
-                    await _RewardRepository.Update(reward, UserId);
-                }
-                else
-                {
-                    // If no discount is provided, +10 reward pts added for every seat booked 
-                    reward.RewardPoints = 10 * ticket.TicketDetails.Count();
-                    await _RewardRepository.Update(reward, UserId);
-                }
-            }
-            // If it's user's first booking - no reward would be present, so create one
-            catch
-            {
-                _logger.LogError($"No Reward record found for User with ID = {UserId}");
-                reward.UserId = UserId;
-                reward.RewardPoints = 10 * ticket.TicketDetails.Count();
-                await _RewardRepository.Add(reward);
-            }
+            await _rewardService.UpdateRewardPointsForTicketBooking(UserId, ticket);
 
             await changeTicketStatus(ticket, "Booked");
             await _PaymentRepository.Add(payment);
@@ -256,7 +232,7 @@ namespace BusBookingAppln.Services.Classes
                     Refund refund = CreateRefund(ticket, Refund_Amount);
                     await _RefundRepository.Add(refund);
 
-                    await UpdateRewardPointsForSeatCancellation(UserId, cancelSeatsInputDTO);
+                    await _rewardService.UpdateRewardPointsForSeatCancellation(UserId, cancelSeatsInputDTO);
                     await UpdateTicketDetailStatusToCancelled(cancelSeatsInputDTO);
 
                     RefundOutputDTO refundOutputDTO = MapRefundToRefundOutputDTO(refund);
@@ -342,19 +318,6 @@ namespace BusBookingAppln.Services.Classes
             }
             await _TicketRepository.Update(ticket, ticket.Id);
             await CheckIfAllSeatsCancelled(ticket);
-        }
-
-        #endregion
-
-
-        #region UpdateRewardPointsForSeatCancellation
-
-        // Reduce reward points provided while booking
-        private async Task UpdateRewardPointsForSeatCancellation(int UserId, CancelSeatsInputDTO cancelSeatsInputDTO)
-        {
-            Reward reward = await _RewardRepository.GetById(UserId);
-            reward.RewardPoints -= (10 * cancelSeatsInputDTO.SeatIds.Count());
-            await _RewardRepository.Update(reward, UserId);
         }
 
         #endregion

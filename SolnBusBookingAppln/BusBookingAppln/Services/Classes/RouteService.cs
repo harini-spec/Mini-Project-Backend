@@ -45,13 +45,32 @@ namespace BusBookingAppln.Services.Classes
         #endregion
 
 
+        #region Get All routes 
+
+        public async Task<List<RouteReturnDTO>> GetAllRoutes()
+        {
+            try
+            {
+                var routes = await _RouteRepository.GetAll();
+                List<RouteReturnDTO> routeDTOs = MapRouteToRouteReturnDTO(routes.ToList());
+                return routeDTOs;
+            }
+            catch (NoItemsFoundException)
+            {
+                throw;
+            }
+        } 
+
+        #endregion
+
+
         #region AddRoute
 
         // Add Route with stops
-        public async Task<AddRouteDTO> AddRoute(AddRouteDTO addRouteDTO)
+        public async Task<RouteDTO> AddRoute(RouteDTO addRouteDTO)
         {
-            Models.DBModels.Route route = MapAddRouteDTOToRoute(addRouteDTO);
-            route.RouteStops = MapAddRouteDetailToRouteDetail(route.Id, addRouteDTO);
+            Models.DBModels.Route route = MapRouteDTOToRoute(addRouteDTO);
+            route.RouteStops = MapRouteDetailToRouteDetail(route.Id, addRouteDTO);
             await _RouteRepository.Add(route);
             return addRouteDTO;
         }
@@ -61,8 +80,40 @@ namespace BusBookingAppln.Services.Classes
 
         #region Mappers
 
-        // Map AddRouteDTO to RouteDetail
-        private List<RouteDetail> MapAddRouteDetailToRouteDetail(int RouteId, AddRouteDTO addRouteDTO)
+        // Map Route to RouteDTO
+        private List<RouteReturnDTO> MapRouteToRouteReturnDTO(List<Models.DBModels.Route> routes)
+        {
+            List<RouteReturnDTO> routeDTOs = new List<RouteReturnDTO>();    
+            foreach(var route in routes)
+            {
+                RouteReturnDTO routeDTO = new RouteReturnDTO();
+                routeDTO.RouteId = route.Id;
+                routeDTO.Source = route.Source;
+                routeDTO.Destination = route.Destination;
+                routeDTO.RouteStops = new List<RouteDetailsDTO>();
+                routeDTO.RouteStops = MapRouteDetailToRouteDetailDTO(route.RouteStops.ToList());
+                routeDTOs.Add(routeDTO);
+            }
+            return routeDTOs;
+        }
+
+        // Map RouteDetail to RouteDetail DTO
+        private List<RouteDetailsDTO> MapRouteDetailToRouteDetailDTO(List<RouteDetail> routeStops)
+        {
+            List<RouteDetailsDTO> routeDetailsDTOs = new List<RouteDetailsDTO>();
+            foreach(var stop in routeStops)
+            {
+                RouteDetailsDTO routeDetailsDTO = new RouteDetailsDTO();
+                routeDetailsDTO.StopNumber = stop.StopNumber;
+                routeDetailsDTO.To_Location = stop.To_Location;
+                routeDetailsDTO.From_Location = stop.From_Location;
+                routeDetailsDTOs.Add(routeDetailsDTO);
+            }
+            return routeDetailsDTOs;
+        }
+
+        // Map RouteDTO to RouteDetail
+        private List<RouteDetail> MapRouteDetailToRouteDetail(int RouteId, RouteDTO addRouteDTO)
         {
             List<RouteDetail> routeDetails = new List<RouteDetail>();
             foreach(var RouteStop in addRouteDTO.RouteStops)
@@ -78,8 +129,8 @@ namespace BusBookingAppln.Services.Classes
         }
 
 
-        // Map AddRouteDTO to Route
-        private Models.DBModels.Route MapAddRouteDTOToRoute(AddRouteDTO addRouteDTO)
+        // Map RouteDTO to Route
+        private Models.DBModels.Route MapRouteDTOToRoute(RouteDTO addRouteDTO)
         {
             Models.DBModels.Route route = new Models.DBModels.Route();
             route.Source = addRouteDTO.Source;
@@ -88,5 +139,6 @@ namespace BusBookingAppln.Services.Classes
         }
 
         #endregion
+
     }
 }

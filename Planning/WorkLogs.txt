@@ -22,6 +22,7 @@ Installed Packages:
     EF Core - InMemory
     MOQ
     log4net
+    MS log4net 
 
 Repository Layer:
     For Primary Key     - IRepository - Base Repository - Main Repository

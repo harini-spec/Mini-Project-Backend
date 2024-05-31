@@ -63,6 +63,9 @@ In the bus ticket booking system, endpoints serve as the gateway for clients to 
     
 `Post/Add Route` 
 - Fill Route Object and it's Nav prop RouteDetails
+
+`Get/Get All Routes` 
+- Gets all routes along with route details
     
 `Post/Add Schedule` 
 - Fill Schedule Object with Bus Id, Route Id, Driver Id 
@@ -100,6 +103,9 @@ In the bus ticket booking system, endpoints serve as the gateway for clients to 
 `Put/Reactivate Account`
 - Enter email and password
 - Activate account if status = "Inactive"
+
+`Get/Get Reward points of Customer` 
+- Get accumulated reward points of Customer
 
 `Get/AllSchedules`
 - All sschedules are returned

@@ -19,9 +19,9 @@ namespace BusBookingAppln.Controllers
     {
         private readonly IDriverService _driverService;
         private readonly IScheduleService _scheduleService;
-        private readonly ILogger _logger;
+        private readonly ILogger<DriverController> _logger;
 
-        public DriverController(IDriverService driverService, IScheduleService scheduleService, ILogger logger)
+        public DriverController(IDriverService driverService, IScheduleService scheduleService, ILogger<DriverController> logger)
         {
             _driverService = driverService;
             _scheduleService = scheduleService;

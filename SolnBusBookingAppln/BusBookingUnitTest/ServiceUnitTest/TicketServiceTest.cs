@@ -35,6 +35,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
         ISeatService seatService;
         ISeatAvailability seatAvailabilityService;
         ITicketService ticketService;
+        IRewardService rewardService;
 
         Mock<ILogger<BusService>> BusLogger;
         Mock<ILogger<SeatService>> SeatLogger;
@@ -42,6 +43,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
         Mock<ILogger<DriverService>> DriverLogger;
         Mock<ILogger<ScheduleService>> ScheduleLogger;
         Mock<ILogger<TicketService>> TicketLogger;
+        Mock<ILogger<RewardService>> RewardLogger;
         Mock<ILogger<SeatAvailabilityService>> SeatAvailabilityLogger;
 
         [SetUp]
@@ -63,6 +65,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             #endregion
 
             #region Logger Object creation
+            RewardLogger = new Mock<ILogger<RewardService>>();
             BusLogger = new Mock<ILogger<BusService>>();
             SeatLogger = new Mock<ILogger<SeatService>>();
             DriverLogger = new Mock<ILogger<DriverService>>();
@@ -73,13 +76,14 @@ namespace BusBookingUnitTest.ServiceUnitTest
             #endregion
 
             #region Service Injection
+            rewardService = new RewardService(RewardRepository, RewardLogger.Object); 
             BusService = new BusService(busRepo, BusLogger.Object);
             RouteService = new RouteService(RouteRepo, RouteLogger.Object);
             driverService = new DriverService(driverRepo, null, DriverDetailRepo, DriverLogger.Object);
             scheduleService = new ScheduleService(driverRepo, ScheduleRepository, BusService, RouteService, driverService, ScheduleLogger.Object);
             seatService = new SeatService(SeatRepository, SeatLogger.Object);
             seatAvailabilityService = new SeatAvailabilityService(scheduleService, BusService, TicketRepository, TicketDetailRepository, SeatAvailabilityLogger.Object);
-            ticketService = new TicketService(RewardRepository, TicketDetailRepository, seatAvailabilityService, TicketRepository, seatService, scheduleService, TicketLogger.Object);
+            ticketService = new TicketService(rewardService, TicketDetailRepository, seatAvailabilityService, TicketRepository, seatService, scheduleService, TicketLogger.Object);
             #endregion
 
             #region Add Bus and Seats

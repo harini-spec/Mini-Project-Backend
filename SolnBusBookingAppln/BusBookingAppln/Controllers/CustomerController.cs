@@ -15,13 +15,15 @@ namespace BusBookingAppln.Controllers
     {
         private readonly IUserService _userService;
         private readonly ICustomerService _customerService;
+        private readonly IRewardService _rewardsService;
         private readonly ILogger<CustomerController> _logger;
 
-        public CustomerController(IUserService userService, ICustomerService customerService, ILogger<CustomerController> logger)
+        public CustomerController(IUserService userService, ICustomerService customerService, ILogger<CustomerController> logger, IRewardService rewardsService)
         {
             _userService = userService;
             _customerService = customerService;
             _logger = logger;
+            _rewardsService = rewardsService;
         }
 
         [HttpPost("LoginCustomer")]
@@ -182,6 +184,31 @@ namespace BusBookingAppln.Controllers
                 }
             }
             return BadRequest("All details are not provided. Please check the object");
+        }
+
+        [HttpGet("GetRewardPointsOfCustomer")]
+        [Authorize(Roles = "Customer")]
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<int>> GetRewardPointsOfCustomer()
+        {
+                try
+                {
+                    int CustomerId = Convert.ToInt32(User.FindFirstValue("ID"));
+                    int result = await _rewardsService.GetRewardPoints(CustomerId);
+                    return Ok(result);
+                }
+                catch (EntityNotFoundException enf)
+                {
+                    _logger.LogError(enf.Message);
+                    return NotFound(new ErrorModel(404, enf.Message));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical(ex.Message);
+                    return BadRequest(new ErrorModel(500, ex.Message));
+                }
         }
     }
 }

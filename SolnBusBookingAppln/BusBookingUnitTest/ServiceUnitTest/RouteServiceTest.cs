@@ -34,13 +34,19 @@ namespace BusBookingUnitTest.ServiceUnitTest
             DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("RouteDB");
             context = new BusBookingContext(optionsBuilder.Options);
 
-            RouteRepository = new MainRepository<int, Route>(context);
+            RouteRepository = new RouteWithRouteDetailRepository(context);
 
             RouteLogger = new Mock<ILogger<RouteService>>();
 
             routeService = new RouteService(RouteRepository, RouteLogger.Object);
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
 
         #region Get Route Tests
 
@@ -127,20 +133,21 @@ namespace BusBookingUnitTest.ServiceUnitTest
 
         #endregion
 
+
         #region Add Route Tests
 
         [Test, Order(4)]
         public async Task AddRouteBySourceAndDestSuccessTest()
         {
             // Arrange
-            AddRouteDetailsDTO addRouteDetailsDTO = new AddRouteDetailsDTO()
+            RouteDetailsDTO addRouteDetailsDTO = new RouteDetailsDTO()
             {
                 StopNumber = 1,
                 From_Location = "Chennai",
                 To_Location = "Bangalore"
             };
-            List<AddRouteDetailsDTO> stops = new List<AddRouteDetailsDTO>() { addRouteDetailsDTO };
-            AddRouteDTO addRouteDTO = new AddRouteDTO()
+            List<RouteDetailsDTO> stops = new List<RouteDetailsDTO>() { addRouteDetailsDTO };
+            RouteDTO addRouteDTO = new RouteDTO()
             {
                 Source = "Chennai",
                 Destination = "Bangalore",
@@ -159,5 +166,44 @@ namespace BusBookingUnitTest.ServiceUnitTest
         }
 
         #endregion
+
+
+        #region Get All Routes Test
+
+        [Test]
+        public async Task GetAllRouteSuccessTest()
+        {
+            // Arrange
+            RouteDetailsDTO addRouteDetailsDTO = new RouteDetailsDTO()
+            {
+                StopNumber = 1,
+                From_Location = "Chennai",
+                To_Location = "Bangalore"
+            };
+            List<RouteDetailsDTO> stops = new List<RouteDetailsDTO>() { addRouteDetailsDTO };
+            RouteDTO addRouteDTO = new RouteDTO()
+            {
+                Source = "Chennai",
+                Destination = "Bangalore",
+                RouteStops = stops
+            };
+            await routeService.AddRoute(addRouteDTO);
+
+            // Action
+            var routes = await routeService.GetAllRoutes();
+
+            // Assert
+            Assert.That(routes.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task GetAllRouteExceptionTestTest()
+        {
+            // Action
+            var exception = Assert.ThrowsAsync<NoItemsFoundException>(async () => await routeService.GetAllRoutes());
+        }
+
+        #endregion
+
     }
 }

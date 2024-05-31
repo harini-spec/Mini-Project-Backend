@@ -17,7 +17,7 @@ namespace BusBookingUnitTest.RepositoryUnitTest
         {
             DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder().UseInMemoryDatabase("RouteRepoDB");
             context = new BusBookingContext(optionsBuilder.Options);
-            RouteRepository = new MainRepository<int, Route>(context);
+            RouteRepository = new RouteWithRouteDetailRepository(context);
         }
 
         [TearDown]

@@ -22,6 +22,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
     {
         ISeatAvailability seatAvailability;
         ITransactionService transactionService;
+        IRewardService rewardService;
 
         BusBookingContext context;
 
@@ -32,8 +33,11 @@ namespace BusBookingUnitTest.ServiceUnitTest
         IRepository<int, Reward> RewardRepository;
         IRepositoryCompositeKey<int, int, TicketDetail> TicketDetailRepository;
 
+        Mock<ILogger<RewardService>> RewardLogger;
         Mock<ILogger<SeatAvailabilityService>> SeatAvailabilityLogger;
         Mock<ILogger<TransactionService>> TransactionLogger;
+
+
 
         [SetUp]
         public void Setup()
@@ -53,11 +57,13 @@ namespace BusBookingUnitTest.ServiceUnitTest
             #region Logger Mock Object Creation
             SeatAvailabilityLogger = new Mock<ILogger<SeatAvailabilityService>>();
             TransactionLogger = new Mock<ILogger<TransactionService>>();
+            RewardLogger = new Mock<ILogger<RewardService>>();
             #endregion
 
             #region Service Injection
+            rewardService = new RewardService(RewardRepository, RewardLogger.Object);
             seatAvailability = new SeatAvailabilityService(null, null, TicketRepository, TicketDetailRepository, SeatAvailabilityLogger.Object);
-            transactionService = new TransactionService(seatAvailability, ScheduleRepository, PaymentRepository, RewardRepository, TicketRepository, RefundRepository, TransactionLogger.Object);
+            transactionService = new TransactionService(rewardService, seatAvailability, ScheduleRepository, PaymentRepository, RewardRepository, TicketRepository, RefundRepository, TransactionLogger.Object);
             #endregion
 
             #region Add Bus and Seats

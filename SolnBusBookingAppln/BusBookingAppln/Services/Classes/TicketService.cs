@@ -11,7 +11,7 @@ namespace BusBookingAppln.Services.Classes
     public class TicketService : ITicketService
     {
         private readonly IRepository<int, Ticket> _TicketRepository;
-        private readonly IRepository<int, Reward> _RewardRepository;
+        private readonly IRewardService _RewardService;
         private readonly IRepositoryCompositeKey<int, int, TicketDetail> _TicketDetailRepository;
         private readonly ISeatService _SeatService;
         private readonly ISeatAvailability _SeatAvailabilityService;
@@ -19,9 +19,9 @@ namespace BusBookingAppln.Services.Classes
         private readonly ILogger<TicketService> _logger;
 
 
-        public TicketService(IRepository<int, Reward> RewardRepository, IRepositoryCompositeKey<int, int, TicketDetail> TicketDetailRepository, ISeatAvailability SeatAvailabilityService, IRepository<int, Ticket> TicketRepository, ISeatService seatService, IScheduleService scheduleService, ILogger<TicketService> logger)
+        public TicketService(IRewardService RewardService, IRepositoryCompositeKey<int, int, TicketDetail> TicketDetailRepository, ISeatAvailability SeatAvailabilityService, IRepository<int, Ticket> TicketRepository, ISeatService seatService, IScheduleService scheduleService, ILogger<TicketService> logger)
         {
-            _RewardRepository = RewardRepository;
+            _RewardService = RewardService;
             _TicketRepository = TicketRepository;
             _SeatAvailabilityService = SeatAvailabilityService;
             _ScheduleService = scheduleService;
@@ -70,7 +70,7 @@ namespace BusBookingAppln.Services.Classes
             ticket.Status = "Not Booked";
             ticket.DateAndTimeOfAdding = DateTime.Now;
             ticket.Total_Cost = await CalculateTicketTotalCost(seatsAvailable);
-            ticket.DiscountPercentage = await CalculateDiscountPercentage(UserId);
+            ticket.DiscountPercentage = await _RewardService.CalculateDiscountPercentage(UserId);
             ticket.Final_Amount = CalculateTicketFinalCost(ticket.Total_Cost, ticket.DiscountPercentage, ticket.GSTPercentage);
             ticket.TicketDetails = await MapInputTicketDetailsToTicketDetails(inputTicketDTO);
             await _TicketRepository.Add(ticket);
@@ -282,32 +282,6 @@ namespace BusBookingAppln.Services.Classes
                 DiscountAmount = total_Cost * discountPercentage / 100;
             float finalAmount = total_Cost + GSTAmount - DiscountAmount;
             return finalAmount;
-        }
-
-        #endregion
-
-
-        #region CalculateDiscountPercentage
-
-        // Calculate discount percentage based on reward points
-        public async Task<float> CalculateDiscountPercentage(int userId)
-        {
-            Reward reward = null;
-            try
-            {
-                reward = await _RewardRepository.GetById(userId);
-                if (reward.RewardPoints >= 100)
-                {
-                    return 10;
-                }
-                else
-                    return 0;
-            }
-            catch (EntityNotFoundException)
-            {
-                _logger.LogError($"No Reward record found for User with ID = {userId}");
-                return 0;
-            }
         }
 
         #endregion

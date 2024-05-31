@@ -23,17 +23,17 @@ namespace BusBookingAppln.Controllers
 
         [HttpPost("AddRouteAndStops")]
         [Authorize(Roles = "Admin")]
-        [ProducesResponseType(typeof(AddRouteDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(RouteDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<AddRouteDTO>> AddRoute(AddRouteDTO route)
+        public async Task<ActionResult<RouteDTO>> AddRoute(RouteDTO route)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    AddRouteDTO result = await _routeService.AddRoute(route);
+                    RouteDTO result = await _routeService.AddRoute(route);
                     return Ok(result);
                 }
                 catch (InvalidOperationException ioe)
@@ -48,6 +48,30 @@ namespace BusBookingAppln.Controllers
                 }
             }
             return BadRequest("All details are not provided. Please check the object");
+        }
+
+        [HttpGet("GetAllRoutes")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(List<RouteReturnDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<RouteReturnDTO>>> GetAllRoutes()
+        {
+                try
+                {
+                    var result = await _routeService.GetAllRoutes();
+                    return Ok(result);
+                }
+                catch (NoItemsFoundException nif)
+                {
+                    _logger.LogError(nif.Message);
+                    return NotFound(new ErrorModel(404, nif.Message));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical(ex.Message);
+                    return BadRequest(new ErrorModel(500, ex.Message));
+                }
         }
     }
 }

@@ -60,7 +60,7 @@ namespace BusBookingAppln.Services.Interfaces
         /// <param name="SeatId">Item Id = Seat Id</param>
         /// <returns>Removed Ticket detail DTO</returns>
         #endregion
-        public Task<TicketDetailReturnDTO> RemoveTicketItem(int UserId, int TicketId, int SeatId);
+        public Task<TicketReturnDTO> RemoveTicketItem(int UserId, int TicketId, int SeatId);
 
         #region Summary 
         /// <summary>

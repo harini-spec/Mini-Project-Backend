@@ -76,7 +76,7 @@ namespace BusBookingAppln.Services.Classes
             await _TicketRepository.Add(ticket);
 
             // Map ticket to Output DTO
-            TicketReturnDTO addedTicketDTO = await MapTicketToAddedTicketDTO(ticket);
+            TicketReturnDTO addedTicketDTO = await MapTicketToTicketReturnDTO(ticket);
             return addedTicketDTO;
         }
 
@@ -194,7 +194,7 @@ namespace BusBookingAppln.Services.Classes
         #region RemoveTicketItem
 
         // Remove Ticket Item from Added Ticket
-        public async Task<TicketDetailReturnDTO> RemoveTicketItem(int UserId, int TicketId, int SeatId)
+        public async Task<TicketReturnDTO> RemoveTicketItem(int UserId, int TicketId, int SeatId)
         {
             var ticket = await GetTicketById(TicketId);
 
@@ -215,14 +215,18 @@ namespace BusBookingAppln.Services.Classes
                             {
                                 ticketDetail = await _TicketDetailRepository.Delete(TicketId, SeatId);
                                 await DeleteTicketById(ticket.Id);
+                                throw new TicketRemovedException("Ticket is removed");
                             }
                             // Else delete only the ticket item
                             else
                             {
                                 ticketDetail = await _TicketDetailRepository.Delete(TicketId, SeatId);
+                                ticket.Total_Cost -= ticketDetail.SeatPrice;
+                                ticket.Final_Amount = CalculateTicketFinalCost(ticket.Total_Cost, ticket.DiscountPercentage, ticket.GSTPercentage);
+                                await _TicketRepository.Update(ticket, ticket.Id);
                             }
-                            TicketDetailReturnDTO addedTicketDetailDTO = await MapTicketDetailToAddedTicketDetailDTO(ticketDetail);
-                            return addedTicketDetailDTO;
+                            TicketReturnDTO ticketReturnDTO = await MapTicketToTicketReturnDTO(ticket);
+                            return ticketReturnDTO;
                         }
                     }
                     _logger.LogError($"Ticket Item with Seat ID = {SeatId} not found");
@@ -347,21 +351,21 @@ namespace BusBookingAppln.Services.Classes
         }
 
 
-        // Map Ticket List to AddedTicketDTO List 
+        // Map Ticket List to TicketReturnDTO List 
         private async Task<List<TicketReturnDTO>> MapTicketsToAddedTicketDTOs(List<Ticket> tickets)
         {
             List<TicketReturnDTO> result = new List<TicketReturnDTO>();
             foreach (var ticket in tickets)
             {
-                TicketReturnDTO addedTicketDTO = await MapTicketToAddedTicketDTO(ticket);
+                TicketReturnDTO addedTicketDTO = await MapTicketToTicketReturnDTO(ticket);
                 result.Add(addedTicketDTO);
             }
             return result;
         }
 
 
-        // Model Ticket to AddedTicketDTO
-        private async Task<TicketReturnDTO> MapTicketToAddedTicketDTO(Ticket ticket)
+        // Model Ticket to TicketReturnDTO
+        private async Task<TicketReturnDTO> MapTicketToTicketReturnDTO(Ticket ticket)
         {
             TicketReturnDTO addedTicketDTO = new TicketReturnDTO();
             addedTicketDTO.TicketId = ticket.Id;
@@ -372,25 +376,25 @@ namespace BusBookingAppln.Services.Classes
             addedTicketDTO.GSTPercentage = ticket.GSTPercentage;
             addedTicketDTO.DiscountPercentage = ticket.DiscountPercentage;
             addedTicketDTO.Final_Amount = ticket.Final_Amount;
-            addedTicketDTO.addedTicketDetailDTOs = await MapTicketDetailListToAddedTicketDetailDTOList(ticket.TicketDetails.ToList());
+            addedTicketDTO.addedTicketDetailDTOs = await MapTicketDetailListToTicketDetailReturnDTOList(ticket.TicketDetails.ToList());
             return addedTicketDTO;
         }
 
 
-        // Map TicketDetail List to AddedTicketDetailDTO List 
-        private async Task<List<TicketDetailReturnDTO>> MapTicketDetailListToAddedTicketDetailDTOList(List<TicketDetail> ticketDetails)
+        // Map TicketDetail List to TicketDetailReturnDTO List 
+        private async Task<List<TicketDetailReturnDTO>> MapTicketDetailListToTicketDetailReturnDTOList(List<TicketDetail> ticketDetails)
         {
             List<TicketDetailReturnDTO> addedTicketDetailDTOs = new List<TicketDetailReturnDTO>();
             foreach(var ticketDetail in ticketDetails)
             {
-                addedTicketDetailDTOs.Add(await MapTicketDetailToAddedTicketDetailDTO(ticketDetail));
+                addedTicketDetailDTOs.Add(await MapTicketDetailToTicketDetailReturnDTO(ticketDetail));
             }
             return addedTicketDetailDTOs;
         }
 
 
-        // Map TicketDetail to AddedTicketDetailDTO
-        private async Task<TicketDetailReturnDTO> MapTicketDetailToAddedTicketDetailDTO(TicketDetail ticketDetail)
+        // Map TicketDetail to TicketDetailReturnDTO
+        private async Task<TicketDetailReturnDTO> MapTicketDetailToTicketDetailReturnDTO(TicketDetail ticketDetail)
         {
             Seat seat = await _SeatService.GetSeatById(ticketDetail.SeatId);
             TicketDetailReturnDTO addedTicketDetailDTO = new TicketDetailReturnDTO();

@@ -92,7 +92,6 @@ namespace BusBookingAppln
             #endregion
 
             #region services 
-
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAdminService, DriverAccountService>();
             builder.Services.AddScoped<IDriverService, DriverService>();

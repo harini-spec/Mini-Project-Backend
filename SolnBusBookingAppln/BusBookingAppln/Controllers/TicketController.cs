@@ -108,12 +108,12 @@ namespace BusBookingAppln.Controllers
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<TicketDetailReturnDTO>> RemoveTicketItem(int TicketId, int SeatId)
+        public async Task<ActionResult<TicketReturnDTO>> RemoveTicketItem(int TicketId, int SeatId)
         {
                 try
                 {
                     int CustomerId = Convert.ToInt32(User.FindFirstValue("ID"));
-                    TicketDetailReturnDTO result = await _TicketService.RemoveTicketItem(CustomerId, TicketId, SeatId);
+                    TicketReturnDTO result = await _TicketService.RemoveTicketItem(CustomerId, TicketId, SeatId);
                     return Ok(result);
                 }
                 catch (EntityNotFoundException enf)

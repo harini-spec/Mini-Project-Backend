@@ -93,15 +93,18 @@ namespace BusBookingAppln.Services.Classes
                 Ticket ticket = await _TicketRepository.GetById(TicketId);
                 await CheckCancellationValidity(UserId, ticket);
 
+                // Create refund object -> Refund amount = Total cost of the ticket items / 2
+                float amount = CalculateRefundAmount(ticket);
+
                 await changeTicketStatus(ticket, "Cancelled");
 
                 // Reduce provided reward points while booking
                 Reward reward = await _RewardRepository.GetById(UserId);
-                reward.RewardPoints -= (10 * ticket.TicketDetails.Count());
+                int ActiveTicketsCount = GetActiveTicketsCount(ticket);
+                reward.RewardPoints -= (10 * ActiveTicketsCount);
                 await _RewardRepository.Update(reward, UserId);
 
-                // Create refund object -> Refund amount = Total cost of the ticket / 2
-                Refund refund = CreateRefund(ticket, ticket.Total_Cost/2);
+                Refund refund = CreateRefund(ticket, amount);
                 await _RefundRepository.Add(refund);
 
                 RefundOutputDTO refundOutputDTO = MapRefundToRefundOutputDTO(refund);
@@ -111,6 +114,28 @@ namespace BusBookingAppln.Services.Classes
                 _logger.LogError(ex.Message);
                 throw; 
             }
+        }
+
+        private float CalculateRefundAmount(Ticket ticket)
+        {
+            float amount = 0;
+            foreach(var ticketDetail in ticket.TicketDetails)
+            {
+                if (ticketDetail.Status == "Booked")
+                    amount += ticketDetail.SeatPrice;
+            }
+            return amount / 2;
+        }
+
+        private int GetActiveTicketsCount(Ticket ticket)
+        {
+            int count = 0;
+            foreach(var ticketDetail in ticket.TicketDetails)
+            {
+                if(ticketDetail.Status == "Booked")
+                    count++;
+            }
+            return count;
         }
 
         #endregion
@@ -187,6 +212,9 @@ namespace BusBookingAppln.Services.Classes
                 _logger.LogCritical("Wrong User trying to book the ticket");
                 throw new UnauthorizedUserException("You can't book this ticket");
             }
+
+            if (ticket.Status != "Not Booked")
+                throw new IncorrectOperationException("Can't book this ticket");
 
             Payment payment = CreatePayment(ticket, PaymentMethod);
 

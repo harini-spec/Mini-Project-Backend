@@ -531,11 +531,11 @@ namespace BusBookingUnitTest.ServiceUnitTest
             await ticketService.AddTicket(1, inputTicketDTO);
 
 
-            // Action 
-            var result = await ticketService.RemoveTicketItem(1, 1, 1);
+            // Action Ticket is removed
+            var exception = Assert.ThrowsAsync<TicketRemovedException>(async () => await ticketService.RemoveTicketItem(1, 1, 1));
 
             // Assert
-            Assert.That(result, Is.Not.Null);
+            Assert.That(exception.Message, Is.EqualTo("Ticket is removed"));
         }
 
         [Test]

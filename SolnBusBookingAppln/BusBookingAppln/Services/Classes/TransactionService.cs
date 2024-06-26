@@ -214,7 +214,7 @@ namespace BusBookingAppln.Services.Classes
             }
 
             if (ticket.Status != "Not Booked")
-                throw new IncorrectOperationException("Can't book this ticket");
+                throw new IncorrectOperationException("Can't book this ticket. It is already booked");
 
             Payment payment = CreatePayment(ticket, PaymentMethod);
 

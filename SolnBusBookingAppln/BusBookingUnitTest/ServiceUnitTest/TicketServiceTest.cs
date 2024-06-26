@@ -25,6 +25,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
         IRepository<int, Driver> driverRepo;
         IRepository<int, BusBookingAppln.Models.DBModels.Route> RouteRepo;
         IRepository<int, DriverDetail> DriverDetailRepo;
+        IRepository<string, Bus> _busRepositoryWithSeats;
 
         BusBookingContext context;
 
@@ -81,7 +82,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             RouteService = new RouteService(RouteRepo, RouteLogger.Object);
             driverService = new DriverService(driverRepo, null, DriverDetailRepo, DriverLogger.Object);
             scheduleService = new ScheduleService(driverRepo, ScheduleRepository, BusService, RouteService, driverService, ScheduleLogger.Object);
-            seatService = new SeatService(SeatRepository, SeatLogger.Object);
+            seatService = new SeatService(SeatRepository, SeatLogger.Object, _busRepositoryWithSeats);
             seatAvailabilityService = new SeatAvailabilityService(scheduleService, BusService, TicketRepository, TicketDetailRepository, SeatAvailabilityLogger.Object);
             ticketService = new TicketService(rewardService, TicketDetailRepository, seatAvailabilityService, TicketRepository, seatService, scheduleService, TicketLogger.Object);
             #endregion

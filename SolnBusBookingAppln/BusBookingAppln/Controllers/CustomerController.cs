@@ -3,6 +3,7 @@ using BusBookingAppln.Models.DTOs;
 using BusBookingAppln.Models.DTOs.RegisterAndLogin;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -11,6 +12,7 @@ namespace BusBookingAppln.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors]
     public class CustomerController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -100,7 +102,7 @@ namespace BusBookingAppln.Controllers
             return BadRequest("All details are not provided. Please check the object");
         }
 
-        [HttpPut("DeleteCustomerAccount")]
+        [HttpDelete("DeleteCustomerAccount")]
         [Authorize(Roles = "Customer")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status401Unauthorized)]

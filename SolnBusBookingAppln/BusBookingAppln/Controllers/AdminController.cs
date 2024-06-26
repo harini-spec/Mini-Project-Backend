@@ -4,12 +4,14 @@ using BusBookingAppln.Models.DTOs.Driver;
 using BusBookingAppln.Models.DTOs.RegisterAndLogin;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BusBookingAppln.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors]
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _adminService;

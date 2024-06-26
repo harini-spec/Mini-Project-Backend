@@ -95,7 +95,7 @@ namespace BusBookingAppln.Services.Classes
                 else
                 {
                     // If no discount is provided, +10 reward pts added for every seat booked 
-                    reward.RewardPoints = 10 * ticket.TicketDetails.Count();
+                    reward.RewardPoints += 10 * ticket.TicketDetails.Count();
                     await _RewardRepository.Update(reward, UserId);
                 }
             }

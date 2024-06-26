@@ -91,7 +91,7 @@ namespace BusBookingAppln.Services.Classes
             float Total_Cost = 0;
             foreach (int seatId in seatsAvailable)
             {
-                Seat seat = await _SeatService.GetSeatById(seatId);
+                var seat = await _SeatService.GetSeatById(seatId);
                 Total_Cost += seat.SeatPrice;
             }
             return Total_Cost;
@@ -295,6 +295,7 @@ namespace BusBookingAppln.Services.Classes
 
         public async Task<List<Ticket>> GetAllTickets()
         {
+            _SeatAvailabilityService.DeleteNotBookedTickets();
             return (List<Ticket>)await _TicketRepository.GetAll();
         }
 
@@ -338,7 +339,7 @@ namespace BusBookingAppln.Services.Classes
         // Input InputTicketDetailDTO to TicketDetail
         private async Task<TicketDetail> MapInputTicketDetailToTicketDetail(InputTicketDetailDTO inputTicketDetail)
         {
-            Seat seat = await _SeatService.GetSeatById(inputTicketDetail.SeatId);
+            var seat = await _SeatService.GetSeatById(inputTicketDetail.SeatId);
             TicketDetail ticketDetail = new TicketDetail();
             ticketDetail.Status = "Not Booked";
             ticketDetail.SeatPrice = seat.SeatPrice;
@@ -396,7 +397,7 @@ namespace BusBookingAppln.Services.Classes
         // Map TicketDetail to TicketDetailReturnDTO
         private async Task<TicketDetailReturnDTO> MapTicketDetailToTicketDetailReturnDTO(TicketDetail ticketDetail)
         {
-            Seat seat = await _SeatService.GetSeatById(ticketDetail.SeatId);
+            var seat = await _SeatService.GetSeatById(ticketDetail.SeatId);
             TicketDetailReturnDTO addedTicketDetailDTO = new TicketDetailReturnDTO();
             addedTicketDetailDTO.SeatId = ticketDetail.SeatId;
             addedTicketDetailDTO.SeatNumber = seat.SeatNumber;

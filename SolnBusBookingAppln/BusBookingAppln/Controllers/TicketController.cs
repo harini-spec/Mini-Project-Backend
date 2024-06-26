@@ -6,6 +6,7 @@ using BusBookingAppln.Models.DTOs.TicketDTOs;
 using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -14,6 +15,7 @@ namespace BusBookingAppln.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors]
     public class TicketController : ControllerBase
     {
         private readonly ISeatAvailability _SeatAvailabilityService;
@@ -125,6 +127,10 @@ namespace BusBookingAppln.Controllers
                 {
                     _Logger.LogError(ioe.Message);
                     return BadRequest(new ErrorModel(400, ioe.Message));
+                }
+                catch(TicketRemovedException tre)
+                {
+                    return Ok(new ErrorModel(200, tre.Message));
                 }
                 catch (UnauthorizedUserException uau)
                 {

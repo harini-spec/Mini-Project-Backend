@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using BusBookingAppln.Services.Interfaces;
 using BusBookingAppln.Models.DTOs.Transaction;
+using Microsoft.AspNetCore.Cors;
 
 namespace BusBookingAppln.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors]
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionService _TransactionService;

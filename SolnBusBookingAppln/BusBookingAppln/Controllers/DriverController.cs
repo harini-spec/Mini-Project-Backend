@@ -7,6 +7,7 @@ using BusBookingAppln.Repositories;
 using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -15,6 +16,7 @@ namespace BusBookingAppln.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors]
     public class DriverController : ControllerBase
     {
         private readonly IDriverService _driverService;

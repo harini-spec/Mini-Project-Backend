@@ -17,6 +17,9 @@ select * from Schedules
 select * from tickets 
 select * from ticketdetails 
 
+delete from ticketdetails where TicketId = 77
+delete from tickets where Id = 77
+
 select * from Payments
 select * from Refunds 
 

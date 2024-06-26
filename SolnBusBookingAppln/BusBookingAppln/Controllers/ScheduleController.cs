@@ -3,6 +3,7 @@ using BusBookingAppln.Models.DTOs;
 using BusBookingAppln.Models.DTOs.Schedule;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +11,7 @@ namespace BusBookingAppln.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors]
     public class ScheduleController : ControllerBase
     {
         private readonly IScheduleService _scheduleService;
@@ -36,10 +38,15 @@ namespace BusBookingAppln.Controllers
                     AddScheduleDTO result = await _scheduleService.AddSchedule(schedule);
                     return Ok(result);
                 }
-                catch (InvalidOperationException ioe)
+                catch (DriverAlreadyBookedException dabe)
                 {
-                    _logger.LogError(ioe.Message);
-                    return Conflict(new ErrorModel(409, ioe.Message));
+                    _logger.LogError(dabe.Message);
+                    return Conflict(new ErrorModel(409, dabe.Message));
+                }
+                catch (BusAlreadyBookedException babe)
+                {
+                    _logger.LogError(babe.Message);
+                    return Conflict(new ErrorModel(409, babe.Message));
                 }
                 catch (Exception ex)
                 {

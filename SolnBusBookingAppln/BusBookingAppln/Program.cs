@@ -65,7 +65,15 @@ namespace BusBookingAppln
 
                 });
 
-
+            #region CORS
+            builder.Services.AddCors(opts =>
+            {
+                opts.AddPolicy("MyCors", options =>
+                {
+                    options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                });
+            });
+            #endregion
 
             #region contexts
             builder.Services.AddDbContext<BusBookingContext>(
@@ -119,6 +127,7 @@ namespace BusBookingAppln
                 app.UseSwaggerUI();
             }
 
+            app.UseCors("MyCors");
             app.UseAuthentication();
             app.UseAuthorization();
 

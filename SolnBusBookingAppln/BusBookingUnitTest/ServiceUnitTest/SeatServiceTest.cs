@@ -22,6 +22,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
         BusBookingContext context;
 
         IRepository<int, Seat> seatRepo;
+        IRepository<string, Bus> busRepositoryWithSeats;
 
         ISeatService seatService;
 
@@ -42,10 +43,18 @@ namespace BusBookingUnitTest.ServiceUnitTest
                 SeatType = "Upper",
                 SeatPrice = 50
             });
+            busRepositoryWithSeats = new MainRepository<string, Bus>(context);
 
             SeatLogger = new Mock<ILogger<SeatService>>();
 
-            seatService = new SeatService(seatRepo, SeatLogger.Object);
+            seatService = new SeatService(seatRepo, SeatLogger.Object, busRepositoryWithSeats);
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
         }
 
         [Test]
@@ -63,6 +72,50 @@ namespace BusBookingUnitTest.ServiceUnitTest
         {
             // Action
             var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await seatService.GetSeatById(100));
+        }
+
+        [Test]
+        public async Task GetSeatsOfBusSuccessTest()
+        {
+            // Action 
+            var seat = new Seat
+            {
+                Id = 2,
+                SeatNumber = "U1",
+                SeatType = "Upper",
+                SeatPrice = 50
+            };
+            await busRepositoryWithSeats.Add(new Bus
+            {
+                BusNumber = "TN11BB1111",
+                TotalSeats = 1,
+                SeatsInBus = { seat }
+            }) ;
+            var result = await seatService.GetSeatsOfBus("TN11BB1111");
+
+            // Assert 
+            Assert.That(result.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task GetSeatsOfBusExceptionTest()
+        {
+            // Action
+            var exception = Assert.ThrowsAsync<EntityNotFoundException>(async () => await seatService.GetSeatsOfBus("100"));
+        }
+
+        [Test]
+        public async Task GetSeatsOfBusNoSeatsFailTest()
+        {
+            // Action 
+            await busRepositoryWithSeats.Add(new Bus
+            {
+                BusNumber = "TN11CC1111",
+                TotalSeats = 0,
+            });
+
+            // Assert 
+            var exception = Assert.ThrowsAsync<NoItemsFoundException>(async () => await seatService.GetSeatsOfBus("TN11CC1111"));
         }
 
     }

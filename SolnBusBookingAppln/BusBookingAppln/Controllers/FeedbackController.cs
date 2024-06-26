@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BusBookingAppln.Models.DTOs.Feedback;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Cors;
 
 namespace BusBookingAppln.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors]
     public class FeedbackController : ControllerBase
     {
         private readonly IFeedbackService _feedbackService;

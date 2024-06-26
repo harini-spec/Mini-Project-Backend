@@ -17,8 +17,10 @@ namespace BusBookingAppln.Models.DTOs.TicketDTOs
         public string PassengerGender { get; set; }
 
 
-        [StringLength(10, MinimumLength = 10, ErrorMessage = "Enter a valid phone number")]
-        public string? PassengerPhone { get; set; }
+        [StringLength(10, ErrorMessage = "Enter a valid phone number")]
+        [Required(AllowEmptyStrings = true)]
+        [RegularExpression(@"^.{10}$", ErrorMessage = "Invalid Phone number")]
+        public string PassengerPhone { get; set; }
 
 
         [Required]

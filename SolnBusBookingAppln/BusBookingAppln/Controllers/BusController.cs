@@ -4,6 +4,7 @@ using BusBookingAppln.Models.DTOs;
 using BusBookingAppln.Models.DTOs.Bus;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,7 @@ namespace BusBookingAppln.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors]
     public class BusController : ControllerBase
     {
         private readonly IBusService _busService;

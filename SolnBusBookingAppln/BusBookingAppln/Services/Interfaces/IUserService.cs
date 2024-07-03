@@ -31,6 +31,6 @@ namespace BusBookingAppln.Services.Interfaces
         /// <param name="loginDTO">Login details DTO</param>
         /// <returns>Login result DTO with JWT Token</returns>
         #endregion
-        public Task<LoginOutputDTO> LoginAdminAndCustomer(LoginInputDTO loginDTO);
+        public Task<LoginOutputDTO> LoginAdminAndCustomer(LoginInputDTO loginDTO, string Role);
     }
 }

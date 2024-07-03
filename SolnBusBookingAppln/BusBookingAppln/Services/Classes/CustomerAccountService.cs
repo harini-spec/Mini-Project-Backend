@@ -70,7 +70,7 @@ namespace BusBookingAppln.Services.Classes
                     {
                         userDetail.Status = "Active";
                         await _userDetailRepo.Update(userDetail, userDetail.UserId);
-                        LoginOutputDTO loginOutputDTO = await _userService.LoginAdminAndCustomer(loginInputDTO);
+                        LoginOutputDTO loginOutputDTO = await _userService.LoginAdminAndCustomer(loginInputDTO, "Customer");
                         return loginOutputDTO;
                     }
                     else

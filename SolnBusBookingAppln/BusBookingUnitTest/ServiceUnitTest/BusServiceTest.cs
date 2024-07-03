@@ -39,6 +39,13 @@ namespace BusBookingUnitTest.ServiceUnitTest
             busService = new BusService(busRepo, BusLogger.Object);
         }
 
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
+        }
+
         [Test]
         public async Task GetBusByBusNumberSuccessTest()
         {
@@ -101,6 +108,31 @@ namespace BusBookingUnitTest.ServiceUnitTest
 
             // Action
             var exception = Assert.ThrowsAsync<DataDoesNotMatchException>(async () => await busService.AddBus(addBusDTO));
+        }
+
+        [Test]
+        public async Task GetBusesSuccessTest()
+        {
+            // Arrange
+            await busRepo.Add(new Bus
+            {
+                BusNumber = "TN04A1111",
+                TotalSeats = 30
+            });
+
+            // Action
+            var result = await busService.GetAllBuses();
+
+            // Assert
+            Assert.That(result.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task GetBusesFailTest()
+        {
+
+            // Action
+            var exception = Assert.ThrowsAsync<NoItemsFoundException>(async () => await busService.GetAllBuses());
         }
     }
 }

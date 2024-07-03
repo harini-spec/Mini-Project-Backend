@@ -2,6 +2,8 @@
 using BusBookingAppln.Models.DBModels;
 using BusBookingAppln.Models.DTOs;
 using BusBookingAppln.Models.DTOs.Bus;
+using BusBookingAppln.Models.DTOs.Route;
+using BusBookingAppln.Services.Classes;
 using BusBookingAppln.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -57,6 +59,30 @@ namespace BusBookingAppln.Controllers
                 }
             }
             return BadRequest("All details are not provided. Please check the object");
+        }
+
+        [HttpGet("GetAllBuses")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(List<RouteReturnDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<RouteReturnDTO>>> GetAllRoutes()
+        {
+            try
+            {
+                var result = await _busService.GetAllBuses();
+                return Ok(result);
+            }
+            catch (NoItemsFoundException nif)
+            {
+                _logger.LogError(nif.Message);
+                return NotFound(new ErrorModel(404, nif.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex.Message);
+                return BadRequest(new ErrorModel(500, ex.Message));
+            }
         }
     }
 }

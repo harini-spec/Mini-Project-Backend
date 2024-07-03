@@ -26,6 +26,14 @@ namespace BusBookingAppln.Services.Interfaces
 
         #region Summary
         /// <summary>
+        /// Get all Bus data
+        /// </summary>
+        /// <returns>List of bus data</returns>
+        #endregion
+        public Task<List<AddBusDTO>> GetAllBuses();
+
+        #region Summary
+        /// <summary>
         /// Checks if a bus is booked in a given time period
         /// </summary>
         /// <param name="schedules">List of Schedule objects as input</param>

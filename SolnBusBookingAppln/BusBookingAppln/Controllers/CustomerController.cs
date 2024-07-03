@@ -42,7 +42,7 @@ namespace BusBookingAppln.Controllers
             {
                 try
                 {
-                    var result = await _userService.LoginAdminAndCustomer(userLoginDTO);
+                    var result = await _userService.LoginAdminAndCustomer(userLoginDTO, "Customer");
                     return Ok(result);
                 }
                 catch (UnauthorizedUserException uae)

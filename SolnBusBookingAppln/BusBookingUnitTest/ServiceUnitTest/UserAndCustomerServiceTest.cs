@@ -28,12 +28,14 @@ namespace BusBookingUnitTest.ServiceUnitTest
         ITokenService tokenService;
         IUserService userService;
         ICustomerService customerService;
+        ISeatAvailability seatAvailabilityService;
 
         BusBookingContext context;
 
         Mock<ILogger<CustomerAccountService>> CustomerAccountLogger;
         Mock<ILogger<UserService>> UserServiceLogger;
         Mock<ILogger<TicketService>> TicketLogger;
+        Mock<ILogger<SeatAvailabilityService>> SeatAvailabilityServiceLogger;
 
         [SetUp]
         public void Setup()
@@ -55,34 +57,51 @@ namespace BusBookingUnitTest.ServiceUnitTest
 
             CustomerAccountLogger = new Mock<ILogger<CustomerAccountService>>();
             UserServiceLogger = new Mock<ILogger<UserService>>();
+            SeatAvailabilityServiceLogger = new Mock<ILogger<SeatAvailabilityService>>();
             TicketLogger = new Mock<ILogger<TicketService>>();
 
             userService = new UserService(UserRepo, UserDetailRepo, tokenService, UserServiceLogger.Object);
-            ticketService = new TicketService(null, null, null, TicketRepository, null, null, TicketLogger.Object);
+            seatAvailabilityService = new SeatAvailabilityService(null, null, TicketRepository, null, SeatAvailabilityServiceLogger.Object);
+            ticketService = new TicketService(null, null, seatAvailabilityService, TicketRepository, null, null, TicketLogger.Object);
             customerService = new CustomerAccountService(ticketService, UserDetailRepo, userService, CustomerAccountLogger.Object);
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            context.Database.EnsureDeleted();
+            context.Dispose();
         }
 
         #region Login User Tests
 
-        [Test, Order(2)]
+        [Test]
         public async Task LoginUserSuccessTest()
         {
             // Arrange
-
+            RegisterInputDTO Admin = new RegisterInputDTO()
+            {
+                Name = "Sam",
+                Age = 30,
+                Email = "sam@gmail.com",
+                Phone = "8877887788",
+                Password = "samaroot"
+            };
+            await userService.RegisterAdminAndCustomer(Admin, "Admin");
             LoginInputDTO adminLogin = new LoginInputDTO()
             {
-                Email = "sarah@gmail.com",
-                Password = "sarahroot"
+                Email = "sam@gmail.com",
+                Password = "samaroot"
             };
 
             // Action
-            var result = await userService.LoginAdminAndCustomer(adminLogin);
+            var result = await userService.LoginAdminAndCustomer(adminLogin, "Admin");
 
             // Assert
             Assert.That(result.Role, Is.EqualTo("Admin"));
         }
 
-        [Test, Order(3)]
+        [Test]
         public async Task LoginUserIncorrectEmailExceptionTest()
         {
             // Arrange
@@ -94,13 +113,13 @@ namespace BusBookingUnitTest.ServiceUnitTest
             };
 
             // Action
-            var exception = Assert.ThrowsAsync<UnauthorizedUserException>(async () => await userService.LoginAdminAndCustomer(adminLogin));
+            var exception = Assert.ThrowsAsync<UnauthorizedUserException>(async () => await userService.LoginAdminAndCustomer(adminLogin, "Customer"));
 
             // Assert
             Assert.That(exception.Message, Is.EqualTo("Invalid username or password"));
         }
 
-        [Test, Order(3)]
+        [Test]
         public async Task LoginUserIncorrectPasswordExceptionTest()
         {
             // Arrange
@@ -112,26 +131,34 @@ namespace BusBookingUnitTest.ServiceUnitTest
             };
 
             // Action
-            var exception = Assert.ThrowsAsync<UnauthorizedUserException>(async () => await userService.LoginAdminAndCustomer(adminLogin));
+            var exception = Assert.ThrowsAsync<UnauthorizedUserException>(async () => await userService.LoginAdminAndCustomer(adminLogin, "Customer"));
 
             // Assert
             Assert.That(exception.Message, Is.EqualTo("Invalid username or password"));
         }
 
-        [Test, Order(4)]
+        [Test]
         public async Task LoginUserNotActiveExceptionTest()
         {
             // Arrange
-
-            LoginInputDTO adminLogin = new LoginInputDTO()
+            RegisterInputDTO Customer = new RegisterInputDTO()
             {
-                Email = "sarah@gmail.com",
-                Password = "sarahroot"
+                Name = "Sam",
+                Age = 30,
+                Email = "sam@gmail.com",
+                Phone = "8877887788",
+                Password = "samaroot"
+            };
+            await userService.RegisterAdminAndCustomer(Customer, "Customer");
+            LoginInputDTO customerLogin = new LoginInputDTO()
+            {
+                Email = "sam@gmail.com",
+                Password = "samaroot"
             };
             await customerService.SoftDeleteCustomerAccount(1);
 
             // Action
-            var exception = Assert.ThrowsAsync<UserNotActiveException>(async () => await userService.LoginAdminAndCustomer(adminLogin));
+            var exception = Assert.ThrowsAsync<UserNotActiveException>(async () => await userService.LoginAdminAndCustomer(customerLogin, "Customer"));
 
             // Assert
             Assert.That(exception.Message, Is.EqualTo("Your account is not activated"));
@@ -141,15 +168,24 @@ namespace BusBookingUnitTest.ServiceUnitTest
 
         #region Activate Customer Account Tests
 
-        [Test, Order(5)]
+        [Test]
         public async Task ActivateUserOnlyCustomerCanActiveExceptionTest()
         {
             // Arrange
 
+            RegisterInputDTO Admin = new RegisterInputDTO()
+            {
+                Name = "Sam",
+                Age = 30,
+                Email = "sam@gmail.com",
+                Phone = "8877887788",
+                Password = "samaroot"
+            };
+            await userService.RegisterAdminAndCustomer(Admin, "Admin");
             LoginInputDTO adminLogin = new LoginInputDTO()
             {
-                Email = "sarah@gmail.com",
-                Password = "sarahroot"
+                Email = "sam@gmail.com",
+                Password = "samaroot"
             };
 
             // Action
@@ -159,7 +195,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             Assert.That(exception.Message, Is.EqualTo("Only Customer account can be activated here"));
         }
 
-        [Test, Order(5)]
+        [Test]
         public async Task ActivateUserAlreadyActiveExceptionTest()
         {
             // Arrange
@@ -185,15 +221,24 @@ namespace BusBookingUnitTest.ServiceUnitTest
             Assert.That(exception.Message, Is.EqualTo("User account is already active"));
         }
 
-        [Test, Order(6)]
+        [Test]
         public async Task ActivateUserSuccessTest()
         {
             // Arrange
-            await customerService.SoftDeleteCustomerAccount(2);
+            RegisterInputDTO Customer = new RegisterInputDTO()
+            {
+                Name = "Sam",
+                Age = 30,
+                Email = "samu@gmail.com",
+                Phone = "8877887788",
+                Password = "samuroot"
+            };
+            await userService.RegisterAdminAndCustomer(Customer, "Customer");
+            await customerService.SoftDeleteCustomerAccount(1);
             LoginInputDTO CustomerLogin = new LoginInputDTO()
             {
-                Email = "sam@gmail.com",
-                Password = "samaroot"
+                Email = "samu@gmail.com",
+                Password = "samuroot"
             };
 
             // Action
@@ -207,15 +252,19 @@ namespace BusBookingUnitTest.ServiceUnitTest
 
         #region Soft Delete Customer Account Tests
 
-        [Test, Order(7)]
+        [Test]
         public async Task SoftDeleteCustomerAccountActiveTicketsFailTest()
         {
             // Arrange
-            LoginInputDTO CustomerLogin = new LoginInputDTO()
+            RegisterInputDTO Customer = new RegisterInputDTO()
             {
+                Name = "Sam",
+                Age = 30,
                 Email = "sam@gmail.com",
+                Phone = "8877887788",
                 Password = "samaroot"
             };
+            await userService.RegisterAdminAndCustomer(Customer, "Customer");
             await TicketRepository.Add(new Ticket()
             {
                 Id = 100,
@@ -224,35 +273,51 @@ namespace BusBookingUnitTest.ServiceUnitTest
                 DiscountPercentage = 0,
                 Total_Cost = 50,
                 Final_Amount = 50,
-                UserId = 2,
+                UserId = 1,
                 DateAndTimeOfAdding = DateTime.Now
             });
 
             // Action
-            var result = await customerService.SoftDeleteCustomerAccount(2);
+            var result = await customerService.SoftDeleteCustomerAccount(1);
 
             // Assert
             Assert.That(result, Is.EqualTo("Sorry, you have active tickets. Cannot delete your account now"));
         }
 
-        [Test, Order(8)]
+        [Test]
         public async Task SoftDeleteCustomerAccountAlreadyDeletedExceptionTest()
         {
             // Arrange
-            await TicketRepository.Delete(100);
-            var result = await customerService.SoftDeleteCustomerAccount(2);
+            RegisterInputDTO Customer = new RegisterInputDTO()
+            {
+                Name = "Sam",
+                Age = 30,
+                Email = "sam@gmail.com",
+                Phone = "8877887788",
+                Password = "samaroot"
+            };
+            await userService.RegisterAdminAndCustomer(Customer, "Customer");
+            var result = await customerService.SoftDeleteCustomerAccount(1);
 
             // Action
-            var exception = Assert.ThrowsAsync<UserNotActiveException>(async () => await customerService.SoftDeleteCustomerAccount(2));
+            var exception = Assert.ThrowsAsync<UserNotActiveException>(async () => await customerService.SoftDeleteCustomerAccount(1));
 
             // Assert
             Assert.That(exception.Message, Is.EqualTo("User account is already deleted"));
         }
 
-        [Test, Order(9)]
+        [Test]
         public async Task SoftDeleteCustomerAccountSuccessTest()
         {
             // Arrange
+            RegisterInputDTO Customer = new RegisterInputDTO()
+            {
+                Name = "Sam",
+                Age = 30,
+                Email = "sam@gmail.com",
+                Phone = "8877887788",
+                Password = "samaroot"
+            };
             await TicketRepository.Add(new Ticket()
             {
                 Id = 100,
@@ -261,28 +326,36 @@ namespace BusBookingUnitTest.ServiceUnitTest
                 DiscountPercentage = 0,
                 Total_Cost = 50,
                 Final_Amount = 50,
-                UserId = 2,
+                UserId = 1,
                 DateAndTimeOfAdding = DateTime.Now
             });
+            await userService.RegisterAdminAndCustomer(Customer, "Customer");
             LoginInputDTO CustomerLogin = new LoginInputDTO()
             {
                 Email = "sam@gmail.com",
                 Password = "samaroot"
             };
-            await customerService.ActivateDeletedCustomerAccount(CustomerLogin);
 
             // Action
-            var result = await customerService.SoftDeleteCustomerAccount(2);
+            var result = await customerService.SoftDeleteCustomerAccount(1);
 
             // Assert
             Assert.That(result, Is.Not.Null);
         }
 
-        [Test, Order(10)]
+        [Test]
         public async Task SoftDeleteCustomerAccountWithNoCustomerTicketsSuccessTest()
         {
             // Arrange
-            await TicketRepository.Delete(100);
+            RegisterInputDTO Customer = new RegisterInputDTO()
+            {
+                Name = "Sam",
+                Age = 30,
+                Email = "sam@gmail.com",
+                Phone = "8877887788",
+                Password = "samaroot"
+            };
+            await userService.RegisterAdminAndCustomer(Customer, "Customer");
             await TicketRepository.Add(new Ticket()
             {
                 Id = 100,
@@ -291,7 +364,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
                 DiscountPercentage = 0,
                 Total_Cost = 50,
                 Final_Amount = 50,
-                UserId = 3,
+                UserId = 1,
                 DateAndTimeOfAdding = DateTime.Now
             });
             LoginInputDTO CustomerLogin = new LoginInputDTO()
@@ -299,10 +372,9 @@ namespace BusBookingUnitTest.ServiceUnitTest
                 Email = "sam@gmail.com",
                 Password = "samaroot"
             };
-            await customerService.ActivateDeletedCustomerAccount(CustomerLogin);
 
             // Action
-            var result = await customerService.SoftDeleteCustomerAccount(2);
+            var result = await customerService.SoftDeleteCustomerAccount(1);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -312,7 +384,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
 
         #region Register User Tests
 
-        [Test, Order(1)]
+        [Test]
         public async Task RegisterUserSuccessTest()
         {
             // Arrange
@@ -333,7 +405,7 @@ namespace BusBookingUnitTest.ServiceUnitTest
             Assert.That(result.Email, Is.EqualTo("sarah@gmail.com"));
         }
 
-        [Test, Order(9)]
+        [Test]
         public async Task RegisterUserFailTest()
         {
             // Arrange
@@ -352,10 +424,19 @@ namespace BusBookingUnitTest.ServiceUnitTest
             Assert.That(exception.Message, Is.EqualTo("Not able to register at this moment"));
         }
 
-        [Test, Order(10)]
+        [Test]
         public async Task RegisterUserEmailAlreadyExistsExceptionTest()
         {
             // Arrange
+            RegisterInputDTO Admin = new RegisterInputDTO()
+            {
+                Name = "Sam",
+                Age = 30,
+                Email = "sam@gmail.com",
+                Phone = "8877887788",
+                Password = "samaroot"
+            };
+            await userService.RegisterAdminAndCustomer(Admin, "Admin");
             RegisterInputDTO admin = new RegisterInputDTO()
             {
                 Name = "Sarah",

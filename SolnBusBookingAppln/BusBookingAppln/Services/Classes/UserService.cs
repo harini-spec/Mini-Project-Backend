@@ -51,7 +51,7 @@ namespace BusBookingAppln.Services.Classes
         #region LoginAdminAndCustomer
 
         // Login Admin/Customer if their account is active
-        public async Task<LoginOutputDTO> LoginAdminAndCustomer(LoginInputDTO loginInputDTO)
+        public async Task<LoginOutputDTO> LoginAdminAndCustomer(LoginInputDTO loginInputDTO, string Role)
         {
             try
             {
@@ -60,6 +60,12 @@ namespace BusBookingAppln.Services.Classes
                 if (user == null)
                 {
                     _logger.LogError("Email ID not found");
+                    throw new UnauthorizedUserException("Invalid username or password");
+                }
+
+                if(user.Role != Role)
+                {
+                    _logger.LogCritical("Unauthorized");
                     throw new UnauthorizedUserException("Invalid username or password");
                 }
 
@@ -81,7 +87,7 @@ namespace BusBookingAppln.Services.Classes
                     _logger.LogError("Account is not activated");
                     throw new UserNotActiveException("Your account is not activated");
                 }
-                _logger.LogCritical("Wrong password");
+                _logger.LogError("Wrong password");
                 throw new UnauthorizedUserException("Invalid username or password");
             }
             catch (Exception)

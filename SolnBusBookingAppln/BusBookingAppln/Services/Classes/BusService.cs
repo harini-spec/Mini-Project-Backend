@@ -18,6 +18,24 @@ namespace BusBookingAppln.Services.Classes
             _logger = logger;
         }
 
+
+        public async Task<List<AddBusDTO>> GetAllBuses()
+        {
+            try
+            {
+                var buses = await _busRepo.GetAll();
+                var result = MapBusesToAddBusDTOs(buses.ToList());
+                return result;
+            }
+            catch(NoItemsFoundException nit) 
+            {
+                _logger.LogError(nit.Message);
+                throw;
+            }
+
+        }
+
+
         #region CheckIfBusAlreadyBooked
 
         // Checks if bus already booked during a specific time period. True if booked, false if not
@@ -72,6 +90,29 @@ namespace BusBookingAppln.Services.Classes
 
 
         #region Mappers
+
+        // Map Buses to AddBusDTOs
+        private List<AddBusDTO> MapBusesToAddBusDTOs(List<Bus> buses)
+        {
+            List<AddBusDTO> addBusDTOs = new List<AddBusDTO>();
+            foreach(var bus in buses)
+            {
+                addBusDTOs.Add(MapBusToAddBusDTO(bus));
+            }
+            return addBusDTOs;
+        }
+
+
+        // Map Bus to AddBusDTO
+        private AddBusDTO MapBusToAddBusDTO(Bus bus)
+        {
+            AddBusDTO addBusDTO = new AddBusDTO();
+            addBusDTO.BusNumber = bus.BusNumber;
+            addBusDTO.TotalSeats = bus.TotalSeats;
+            return addBusDTO;
+        }
+
+
         // Map AddBusDTO to Bus
         private Bus MapAddBusDTOToBus(AddBusDTO inputBus)
         {
